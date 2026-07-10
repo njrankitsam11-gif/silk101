@@ -2016,4 +2016,61 @@ window.addEventListener('DOMContentLoaded', () => {
   setupHorizontalPulse();
   setupMetamorphosis();
   setupVaultTunnel();
+  setupCustomCursor();
 });
+
+function setupCustomCursor() {
+  const dot = document.getElementById('cursor-dot');
+  const ring = document.getElementById('cursor-ring');
+  if (!dot || !ring) return;
+
+  let mouseX = window.innerWidth / 2;
+  let mouseY = window.innerHeight / 2;
+  let ringX = mouseX;
+  let ringY = mouseY;
+
+  window.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    dot.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%)`;
+  });
+
+  // Smooth trail spring interpolation
+  function updateRing() {
+    const dx = mouseX - ringX;
+    const dy = mouseY - ringY;
+    ringX += dx * 0.16; // lag/damping factor
+    ringY += dy * 0.16;
+    ring.style.transform = `translate3d(${ringX}px, ${ringY}px, 0) translate(-50%, -50%)`;
+    requestAnimationFrame(updateRing);
+  }
+  updateRing();
+
+  // Hover states on interactive elements
+  const hoverSelectors = 'a, button, select, input, .avatar-thumb, .card-interactive, .view-btn, .close-modal, .modal-close-btn';
+  
+  function addHoverListeners() {
+    document.querySelectorAll(hoverSelectors).forEach(el => {
+      el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+      el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+    });
+  }
+  addHoverListeners();
+
+  // Re-run listener attachment since content is dynamic
+  const observer = new MutationObserver(() => addHoverListeners());
+  observer.observe(document.body, { childList: true, subtree: true });
+
+  // Drag states specifically for canvases
+  const dragCanvases = document.querySelectorAll('canvas');
+  dragCanvases.forEach(canvas => {
+    canvas.addEventListener('mouseenter', () => {
+      if (canvas.id === 'canvas-drape') {
+        document.body.classList.add('cursor-drag');
+      }
+    });
+    canvas.addEventListener('mouseleave', () => {
+      document.body.classList.remove('cursor-drag');
+    });
+  });
+}

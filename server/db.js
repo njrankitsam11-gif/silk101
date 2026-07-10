@@ -37,6 +37,8 @@ db.exec(`
     material TEXT NOT NULL,
     weaving_time_days INTEGER NOT NULL,
     description TEXT,
+    color_hue INTEGER DEFAULT 0,
+    color_saturation REAL DEFAULT 1.0,
     FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL,
     FOREIGN KEY (artisan_id) REFERENCES artisans(id) ON DELETE SET NULL
   );

@@ -26,50 +26,56 @@ const artKailash = insertArtisan.run('Shri Kailash Meher', 'Puri, Odisha', 40, '
 
 // Insert Initial Inventory Items
 const insertItem = db.prepare(`
-  INSERT INTO inventory (name, category_id, artisan_id, price_fiat, stock_status, material, weaving_time_days, description)
-  VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+  INSERT INTO inventory (name, category_id, artisan_id, price_fiat, stock_status, material, weaving_time_days, description, color_hue, color_saturation)
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 `);
 
 const item1 = insertItem.run(
   'Nuapatana Khandua Ikat Saree',
   catIkat, artSebati, 150000, 'available',
   '100% Pure Mulberry Silk', 28,
-  'A masterpiece of Nuapatna, tie-dyed with organic crimson and gold. Highlights a stylized geometric gold elephant Zari motif on the Pallu.'
+  'A masterpiece of Nuapatna, tie-dyed with organic crimson and gold. Highlights a stylized geometric gold elephant Zari motif on the Pallu.',
+  0, 1.0
 ).lastInsertRowid;
 
 insertItem.run(
   'Sambalpuri Lotus Saree',
   catIkat, artRanjan, 135000, 'available',
   'Mulberry Silk', 24,
-  'Traditional Sambalpuri Lotus. Bold raspberry red background with gold-plated silver thread Zari portraying organic lotus petals.'
+  'Traditional Sambalpuri Lotus. Bold raspberry red background with gold-plated silver thread Zari portraying organic lotus petals.',
+  320, 1.2
 );
 
 insertItem.run(
   'Kotpad Temple Border Saree',
   catIkat, artSebati, 125000, 'available',
   'Organic Cotton', 35,
-  'Kotpad tribal style, featuring deep forest green with ocher oad-tree roots temple borders. Colored using local organic tree barks.'
+  'Kotpad tribal style, featuring deep forest green with ocher oad-tree roots temple borders. Colored using local organic tree barks.',
+  165, 1.2
 );
 
 insertItem.run(
   'Konark Sundial Relic Saree',
   catIkat, artRanjan, 175000, 'available',
   'Tussar Silk', 30,
-  'Dedicated to the Sun God of Konark. The Pallu features a highly detailed, procedurally woven stone relief wheel representing time divisions.'
+  'Dedicated to the Sun God of Konark. The Pallu features a highly detailed, procedurally woven stone relief wheel representing time divisions.',
+  260, 1.3
 );
 
 insertItem.run(
   'Lord Jagannath Provenance Saree',
   catIkat, artKailash, 205000, 'available',
   'Khandua Silk', 42,
-  'Sacred Khandua style. Features Balabhadra, Subhadra, and Lord Jagannath in holy shrine, with vertical lotus borders. Woven with ocher and vermilion silk.'
+  'Sacred Khandua style. Features Balabhadra, Subhadra, and Lord Jagannath in holy shrine, with vertical lotus borders. Woven with ocher and vermilion silk.',
+  45, 0.8
 );
 
 insertItem.run(
   'Maniabandha Grid Saree',
   catIkat, artKailash, 185000, 'available',
   'Fine Silk Blend', 28,
-  'Classic Maniabandha grid layout. Geometric diamonds and checkerboard squares representing mathematical symmetry in handloom.'
+  'Classic Maniabandha grid layout. Geometric diamonds and checkerboard squares representing mathematical symmetry in handloom.',
+  30, 1.1
 );
 
 // Insert a sample Enquiry

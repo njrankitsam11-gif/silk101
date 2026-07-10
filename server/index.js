@@ -38,16 +38,16 @@ app.get('/api/inventory', (req, res) => {
 
 // POST new inventory item
 app.post('/api/inventory', (req, res) => {
-  const { name, category_id, artisan_id, price_fiat, stock_status, material, weaving_time_days, description } = req.body;
+  const { name, category_id, artisan_id, price_fiat, stock_status, material, weaving_time_days, description, color_hue, color_saturation } = req.body;
   if (!name || !price_fiat || !material || !weaving_time_days) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
   try {
     const stmt = db.prepare(`
-      INSERT INTO inventory (name, category_id, artisan_id, price_fiat, stock_status, material, weaving_time_days, description)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO inventory (name, category_id, artisan_id, price_fiat, stock_status, material, weaving_time_days, description, color_hue, color_saturation)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
-    const result = stmt.run(name, category_id || null, artisan_id || null, price_fiat, stock_status || 'available', material, weaving_time_days, description || '');
+    const result = stmt.run(name, category_id || null, artisan_id || null, price_fiat, stock_status || 'available', material, weaving_time_days, description || '', color_hue || 0, color_saturation || 1.0);
     res.status(201).json({ id: result.lastInsertRowid, message: 'Item created successfully' });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -57,7 +57,7 @@ app.post('/api/inventory', (req, res) => {
 // PUT update inventory item status or details
 app.put('/api/inventory/:id', (req, res) => {
   const { id } = req.params;
-  const { name, category_id, artisan_id, price_fiat, stock_status, material, weaving_time_days, description } = req.body;
+  const { name, category_id, artisan_id, price_fiat, stock_status, material, weaving_time_days, description, color_hue, color_saturation } = req.body;
   try {
     const stmt = db.prepare(`
       UPDATE inventory
@@ -68,10 +68,12 @@ app.put('/api/inventory/:id', (req, res) => {
           stock_status = COALESCE(?, stock_status),
           material = COALESCE(?, material),
           weaving_time_days = COALESCE(?, weaving_time_days),
-          description = COALESCE(?, description)
+          description = COALESCE(?, description),
+          color_hue = COALESCE(?, color_hue),
+          color_saturation = COALESCE(?, color_saturation)
       WHERE id = ?
     `);
-    const result = stmt.run(name, category_id, artisan_id, price_fiat, stock_status, material, weaving_time_days, description, id);
+    const result = stmt.run(name, category_id, artisan_id, price_fiat, stock_status, material, weaving_time_days, description, color_hue, color_saturation, id);
     if (result.changes === 0) {
       return res.status(404).json({ error: 'Item not found' });
     }

@@ -63,6 +63,12 @@ function renderDashboard() {
       <td>${item.weaving_time_days} days</td>
       <td style="color:#86868b; font-size:0.8rem;">${item.material}</td>
       <td>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="display:inline-block; width:12px; height:12px; border-radius:50%; background:hsl(${item.color_hue || 0}, ${Math.floor((item.color_saturation || 1.0) * 100)}%, 35%); border:1px solid rgba(255,255,255,0.25);"></span>
+          <span style="font-family:monospace; font-size:0.75rem; color:#86868b;">${item.color_hue || 0}° / ${(item.color_saturation || 1.0).toFixed(1)}</span>
+        </div>
+      </td>
+      <td>
         <select class="status-select ${item.stock_status}" onchange="updateItemStatus(${item.id}, this.value)">
           <option value="available" ${item.stock_status === 'available' ? 'selected' : ''}>Available</option>
           <option value="reserved" ${item.stock_status === 'reserved' ? 'selected' : ''}>Reserved</option>
@@ -232,6 +238,8 @@ document.getElementById('add-saree-form').onsubmit = async (e) => {
     artisan_id: parseInt(document.getElementById('inp-artisan').value),
     price_fiat: parseInt(document.getElementById('inp-price').value),
     weaving_time_days: parseInt(document.getElementById('inp-weaving-time').value),
+    color_hue: parseInt(document.getElementById('inp-hue').value),
+    color_saturation: parseFloat(document.getElementById('inp-sat').value),
     material: document.getElementById('inp-material').value,
     description: document.getElementById('inp-description').value
   };
@@ -245,12 +253,33 @@ document.getElementById('add-saree-form').onsubmit = async (e) => {
     if (res.ok) {
       addModal.classList.remove('open');
       document.getElementById('add-saree-form').reset();
+      updateModalColorPreview();
       fetchData();
     }
   } catch (err) {
     console.error('Error adding new saree:', err);
   }
 };
+
+// Live color preview updates
+const inpHue = document.getElementById('inp-hue');
+const inpSat = document.getElementById('inp-sat');
+const valHue = document.getElementById('val-hue');
+const valSat = document.getElementById('val-sat');
+const colorPreview = document.getElementById('color-preview');
+
+function updateModalColorPreview() {
+  if (!inpHue || !inpSat) return;
+  const h = inpHue.value;
+  const s = parseFloat(inpSat.value);
+  valHue.textContent = `${h}°`;
+  valSat.textContent = `${s.toFixed(1)}×`;
+  colorPreview.style.background = `hsl(${h}, ${Math.floor(s * 100)}%, 25%)`;
+}
+if (inpHue && inpSat) {
+  inpHue.addEventListener('input', updateModalColorPreview);
+  inpSat.addEventListener('input', updateModalColorPreview);
+}
 
 // Submit automated article generator
 const genForm = document.getElementById('generate-article-form');

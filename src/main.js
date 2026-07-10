@@ -818,146 +818,141 @@ function setupMetamorphosis() {
 /* ==========================================================
    SECTION 4: THE VAULT (Z-Axis Parallax & Gold Shader)
 ========================================================== */
-const sareeCollection = [
-  {
-    id: 6,
-    name: "Nuapatana Khandua Ikat Saree",
-    num: "1-OF-1 COLLECTION / #3302",
-    artisan: "Smt. Sebati Mohanty",
-    coords: "20° 26' 18\" N, 85° 17' 55\" E",
-    timestamp: "BLOCK #8297401 (10-July-2026 13:05:12)",
-    hash: "0xf7c00e199e52ff5dcd702c2f8832a839da49e0c1f191b7d517c5b61fa23e8a92"
-  },
-  {
-    id: 1,
-    name: "Sambalpuri Lotus Saree",
-    num: "1-OF-1 COLLECTION / #8291",
-    artisan: "Shri Ranjan Meher",
-    coords: "20° 27' 35\" N, 85° 18' 42\" E",
-    timestamp: "BLOCK #8291884 (10-July-2026 12:47:37)",
-    hash: "0x8a92f7c00e199e52ff5dcd702c2f8832a839da49e0c1f191b7d517c5b61fa23e"
-  },
-  {
-    id: 2,
-    name: "Kotpad Temple Border",
-    num: "1-OF-1 COLLECTION / #4019",
-    artisan: "Smt. Sebati Mohanty",
-    coords: "19° 08' 22\" N, 82° 19' 11\" E",
-    timestamp: "BLOCK #8292410 (10-July-2026 12:48:02)",
-    hash: "0x3e1b7f0f670da288cd72ca1bc0a928ba948b8ca702cfef99aaefd688cf812903"
-  },
-  {
-    id: 4,
-    name: "Konark Sundial Relic Saree",
-    num: "1-OF-1 COLLECTION / #1088",
-    artisan: "Shri Ranjan Meher",
-    coords: "19° 53' 15\" N, 86° 05' 41\" E",
-    timestamp: "BLOCK #8295012 (10-July-2026 12:59:12)",
-    hash: "0x7a39e80c1bf9c88ee940da28ff5dcd702c2f8832a839da49e0c1f191b7d517c5"
-  },
-  {
-    id: 5,
-    name: "Lord Jagannath Provenance Saree",
-    num: "1-OF-1 COLLECTION / #7007",
-    artisan: "Shri Kailash Meher",
-    coords: "19° 48' 17\" N, 85° 49' 06\" E",
-    timestamp: "BLOCK #8296184 (10-July-2026 13:02:40)",
-    hash: "0x6f19e8c00e199e52ff5dcd702c2f8832a839da49e0c1f191b7d517c5b61fa23e"
-  },
-  {
-    id: 3,
-    name: "Maniabandha Grid Saree",
-    num: "1-OF-1 COLLECTION / #9204",
-    artisan: "Shri Kailash Meher",
-    coords: "20° 29' 44\" N, 85° 21' 03\" E",
-    timestamp: "BLOCK #8293991 (10-July-2026 12:48:15)",
-    hash: "0x9d72c1c9e81f181c00fa6c88ee94cfdbac8f8dca712bfd98fa6c5188da91209e"
-  }
-];
+let sareeCollection = [];
 
-function setupVaultTunnel() {
+// Dynamic Currency Conversion Utility
+function getLocaleDetails() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const lang = urlParams.get('lang') || 'en-IN';
+  
+  const currencies = {
+    'en-US': { rate: 0.012, symbol: '$', code: 'USD' },
+    'en-GB': { rate: 0.0094, symbol: '£', code: 'GBP' },
+    'en-CA': { rate: 0.016, symbol: '$', code: 'CAD' },
+    'en-AU': { rate: 0.018, symbol: '$', code: 'AUD' },
+    'en-AE': { rate: 0.044, symbol: 'AED ', code: 'AED' },
+    'en-SG': { rate: 0.016, symbol: '$', code: 'SGD' },
+    'en-IN': { rate: 1.0, symbol: '₹', code: 'INR' },
+    'hi-IN': { rate: 1.0, symbol: '₹', code: 'INR' }
+  };
+  
+  return currencies[lang] || currencies['en-IN'];
+}
+
+function formatSareePrice(inrPrice) {
+  const details = getLocaleDetails();
+  const converted = inrPrice * details.rate;
+  return `${details.symbol}${Math.round(converted).toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+}
+
+async function setupVaultTunnel() {
   const stage = document.getElementById('tunnel-stage');
-  
-  sareeCollection.forEach((item, index) => {
-    const card = document.createElement('div');
-    card.className = 'saree-card';
-    card.dataset.id = item.id;
+  if (!stage) return;
+  stage.innerHTML = '<div style="color:var(--color-zari); font-family:\'Outfit\'; font-size:1.1rem; text-align:center; padding:100px 0;">Weaving loom connection...</div>';
+
+  try {
+    const response = await fetch('/api/inventory');
+    if (!response.ok) throw new Error('API failed');
+    sareeCollection = await response.json();
     
-    const shadow = document.createElement('div');
-    shadow.className = 'saree-layer layer-shadow';
+    stage.innerHTML = ''; // Clear loading indicator
     
-    const silk = document.createElement('div');
-    silk.className = 'saree-layer layer-silk';
-    
-    const zari = document.createElement('div');
-    zari.className = 'saree-layer layer-zari';
-    
-    // Textures & Shader layers
-    const silkCanvas = document.createElement('canvas');
-    silkCanvas.width = 420;
-    silkCanvas.height = 580;
-    drawSilkTexture(silkCanvas.getContext('2d'), item.id);
-    silk.style.backgroundImage = `url(${silkCanvas.toDataURL()})`;
-    
-    const zariCanvas = document.createElement('canvas');
-    zariCanvas.width = 420;
-    zariCanvas.height = 580;
-    drawZariPattern(zariCanvas.getContext('2d'), item.id);
-    zari.style.backgroundImage = `url(${zariCanvas.toDataURL()})`;
-    
-    const info = document.createElement('div');
-    info.className = 'saree-info';
-    info.innerHTML = `
-      <span class="saree-num">${item.num}</span>
-      <h4 class="saree-name">${item.name}</h4>
-      <span class="saree-action">Enter 3D Showcase</span>
-    `;
-    
-    card.appendChild(shadow);
-    card.appendChild(silk);
-    card.appendChild(zari);
-    card.appendChild(info);
-    
-    stage.appendChild(card);
-    
-    // Luminous Gold reflection shader on mouse move
-    card.addEventListener('mousemove', (e) => {
-      const cardRect = card.getBoundingClientRect();
-      const mx = e.clientX - cardRect.left;
-      const my = e.clientY - cardRect.top;
+    sareeCollection.forEach((item, index) => {
+      const card = document.createElement('div');
+      card.className = 'saree-card';
+      card.dataset.id = item.id;
       
-      const zariCtx = zariCanvas.getContext('2d');
-      zariCtx.clearRect(0, 0, 420, 580);
+      const shadow = document.createElement('div');
+      shadow.className = 'saree-layer layer-shadow';
       
-      // Draw base pattern
-      drawZariPattern(zariCtx, item.id);
+      const silk = document.createElement('div');
+      silk.className = 'saree-layer layer-silk';
       
-      // Dynamic gold spotlight highlight (luminous shader effect)
-      zariCtx.save();
-      zariCtx.globalCompositeOperation = 'source-atop';
+      const zari = document.createElement('div');
+      zari.className = 'saree-layer layer-zari';
       
-      const radGrad = zariCtx.createRadialGradient(mx, my, 5, mx, my, 180);
-      radGrad.addColorStop(0, 'rgba(255, 235, 170, 0.95)');
-      radGrad.addColorStop(0.3, 'rgba(212, 175, 55, 0.7)');
-      radGrad.addColorStop(1, 'rgba(212, 175, 55, 0.1)');
+      // Dynamic Canvas Shading using database HSL colors
+      const silkCanvas = document.createElement('canvas');
+      silkCanvas.width = 420;
+      silkCanvas.height = 580;
+      drawSilkTexture(silkCanvas.getContext('2d'), item.color_hue || 0, item.color_saturation || 1.0);
+      silk.style.backgroundImage = `url(${silkCanvas.toDataURL()})`;
       
-      zariCtx.fillStyle = radGrad;
-      zariCtx.fillRect(0, 0, 420, 580);
-      zariCtx.restore();
-      
+      const zariCanvas = document.createElement('canvas');
+      zariCanvas.width = 420;
+      zariCanvas.height = 580;
+      drawZariPattern(zariCanvas.getContext('2d'), item.id, item.category_name);
       zari.style.backgroundImage = `url(${zariCanvas.toDataURL()})`;
+      
+      const isSold = item.stock_status === 'sold';
+      const isReserved = item.stock_status === 'reserved';
+      const statusLabel = isSold ? 'SOLD' : isReserved ? 'RESERVED' : '1-OF-1 COLLECTION';
+      
+      const info = document.createElement('div');
+      info.className = 'saree-info';
+      info.innerHTML = `
+        <span class="saree-num">${statusLabel} / #${String(item.id).padStart(4, '0')}</span>
+        <h4 class="saree-name">${item.name}</h4>
+        <span class="saree-action">${isSold ? 'Archived Masterpiece' : 'Enter 3D Showcase'}</span>
+      `;
+      
+      card.appendChild(shadow);
+      card.appendChild(silk);
+      card.appendChild(zari);
+      card.appendChild(info);
+      
+      stage.appendChild(card);
+      
+      // Dynamic gold light shader reflection on mouse move
+      card.addEventListener('mousemove', (e) => {
+        const cardRect = card.getBoundingClientRect();
+        const mx = e.clientX - cardRect.left;
+        const my = e.clientY - cardRect.top;
+        
+        const zariCtx = zariCanvas.getContext('2d');
+        zariCtx.clearRect(0, 0, 420, 580);
+        
+        drawZariPattern(zariCtx, item.id, item.category_name);
+        
+        zariCtx.save();
+        zariCtx.globalCompositeOperation = 'source-atop';
+        
+        const radGrad = zariCtx.createRadialGradient(mx, my, 5, mx, my, 180);
+        radGrad.addColorStop(0, 'rgba(255, 235, 170, 0.95)');
+        radGrad.addColorStop(0.3, 'rgba(212, 175, 55, 0.7)');
+        radGrad.addColorStop(1, 'rgba(212, 175, 55, 0.1)');
+        
+        zariCtx.fillStyle = radGrad;
+        zariCtx.fillRect(0, 0, 420, 580);
+        zariCtx.restore();
+        
+        zari.style.backgroundImage = `url(${zariCanvas.toDataURL()})`;
+      });
+      
+      card.addEventListener('mouseleave', () => {
+        const zariCtx = zariCanvas.getContext('2d');
+        zariCtx.clearRect(0, 0, 420, 580);
+        drawZariPattern(zariCtx, item.id, item.category_name);
+        zari.style.backgroundImage = `url(${zariCanvas.toDataURL()})`;
+      });
+      
+      card.addEventListener('click', () => {
+        openUnweaveModal(item, sareeCollection);
+      });
     });
     
-    // Reset shader reflection on leave
-    card.addEventListener('mouseleave', () => {
-      const zariCtx = zariCanvas.getContext('2d');
-      zariCtx.clearRect(0, 0, 420, 580);
-      drawZariPattern(zariCtx, item.id);
-      zari.style.backgroundImage = `url(${zariCanvas.toDataURL()})`;
-    });
-  });
-  
+    // Bind scroll parallax timeline trigger
+    setupVaultScrollParallax();
+  } catch (error) {
+    console.error('Vault API load failed:', error);
+    stage.innerHTML = '<div style="color:#ff6b6b; font-family:\'Outfit\'; text-align:center; padding:100px 0;">Error loading collection from database.</div>';
+  }
+}
+
+// Separate ScrollTrigger binding for dynamic cards length
+function setupVaultScrollParallax() {
   const cards = document.querySelectorAll('.saree-card');
+  if (cards.length === 0) return;
   
   ScrollTrigger.create({
     trigger: '#vault',
@@ -997,58 +992,41 @@ function setupVaultTunnel() {
       });
     }
   });
-
-  cards.forEach(card => {
-    card.addEventListener('click', () => {
-      const id = parseInt(card.dataset.id);
-      openUnweaveModal(id);
-    });
-  });
 }
 
-function drawSilkTexture(ctx, id) {
-  if (id === 6) {
-    // Nuapatana tie-dye Crimson & Gold grad
-    const grad = ctx.createLinearGradient(0, 0, 420, 580);
-    grad.addColorStop(0, '#7a0016');
-    grad.addColorStop(0.5, '#ba1a08');
-    grad.addColorStop(1, '#4a000b');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, 420, 580);
-    
-    // Draw fuzzy vertical tie-dye ikat spots on borders
-    ctx.fillStyle = 'rgba(212, 175, 55, 0.22)';
-    for (let y = 10; y < 580; y += 15) {
-      const fuzz1 = Math.random() * 8;
-      const fuzz2 = Math.random() * 8;
-      ctx.fillRect(20 + fuzz1, y, 15 + fuzz2, 8);
-      ctx.fillRect(380 - fuzz1, y, 15 + fuzz2, 8);
-    }
-  } else {
-    ctx.fillStyle = id === 1 ? '#a80c34' : id === 2 ? '#14402a' : id === 3 ? '#40124c' : id === 4 ? '#122b52' : id === 5 ? '#800810' : '#151518';
-    ctx.fillRect(0, 0, 420, 580);
+function drawSilkTexture(ctx, hue, sat) {
+  const grad = ctx.createLinearGradient(0, 0, 420, 580);
+  grad.addColorStop(0, `hsl(${hue}, ${Math.floor(sat * 90)}%, 22%)`);
+  grad.addColorStop(0.5, `hsl(${hue}, ${Math.floor(sat * 100)}%, 32%)`);
+  grad.addColorStop(1, `hsl(${hue}, ${Math.floor(sat * 90)}%, 14%)`);
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 420, 580);
+  
+  // Draw fuzzy vertical tie-dye ikat spots on borders
+  ctx.fillStyle = 'rgba(212, 175, 55, 0.18)';
+  for (let y = 10; y < 580; y += 15) {
+    const fuzz1 = Math.random() * 8;
+    const fuzz2 = Math.random() * 8;
+    ctx.fillRect(20 + fuzz1, y, 15 + fuzz2, 8);
+    ctx.fillRect(380 - fuzz1, y, 15 + fuzz2, 8);
   }
   
   ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)';
   ctx.lineWidth = 0.5;
   for (let x = 0; x < 420; x += 3) {
-    ctx.beginPath();
-    ctx.moveTo(x, 0);
-    ctx.lineTo(x, 580);
-    ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 580); ctx.stroke();
   }
   for (let y = 0; y < 580; y += 3) {
-    ctx.beginPath();
-    ctx.moveTo(0, y);
-    ctx.lineTo(420, y);
-    ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(420, y); ctx.stroke();
   }
 }
 
-function drawZariPattern(ctx, id) {
-  if (id === 1) {
-    ctx.strokeStyle = 'rgba(255, 0, 127, 0.95)';
-    ctx.fillStyle = 'rgba(255, 215, 0, 0.55)';
+function drawZariPattern(ctx, id, category_name) {
+  const cat = (category_name || '').toLowerCase();
+  
+  if (cat.includes('ikat')) {
+    ctx.strokeStyle = 'rgba(255, 215, 0, 0.95)';
+    ctx.fillStyle = 'rgba(212, 175, 55, 0.25)';
     ctx.lineWidth = 2.5;
     for (let y = 100; y < 580; y += 160) {
       ctx.save();
@@ -1058,38 +1036,28 @@ function drawZariPattern(ctx, id) {
       else drawLotusPath(ctx);
       ctx.restore();
     }
-  } else if (id === 2) {
-    ctx.strokeStyle = 'rgba(244, 208, 63, 0.95)';
-    ctx.fillStyle = 'rgba(186, 26, 8, 0.5)';
+  } else if (cat.includes('chanderi')) {
+    ctx.strokeStyle = 'rgba(255, 215, 0, 0.95)';
+    ctx.fillStyle = 'rgba(186, 26, 8, 0.15)';
     ctx.lineWidth = 3;
     ctx.beginPath();
     for (let x = 30; x <= 390; x += 60) {
-      ctx.moveTo(x, 50);
-      ctx.lineTo(x + 30, 200);
-      ctx.lineTo(x + 60, 50);
-      
-      ctx.moveTo(x, 530);
-      ctx.lineTo(x + 30, 380);
-      ctx.lineTo(x + 60, 530);
+      ctx.moveTo(x, 50); ctx.lineTo(x + 30, 180); ctx.lineTo(x + 60, 50);
+      ctx.moveTo(x, 530); ctx.lineTo(x + 30, 400); ctx.lineTo(x + 60, 530);
     }
     ctx.stroke();
-  } else if (id === 3) {
-    ctx.strokeStyle = 'rgba(0, 191, 255, 0.95)';
-    ctx.fillStyle = 'rgba(255, 0, 127, 0.45)';
+  } else if (cat.includes('kanjivaram')) {
+    ctx.strokeStyle = 'rgba(255, 215, 0, 0.95)';
+    ctx.fillStyle = 'rgba(255, 0, 127, 0.1)';
     ctx.lineWidth = 2.5;
     ctx.beginPath();
     for (let x = 70; x < 420; x += 140) {
       for (let y = 100; y < 580; y += 180) {
-        ctx.moveTo(x, y - 40);
-        ctx.lineTo(x + 40, y);
-        ctx.lineTo(x, y + 40);
-        ctx.lineTo(x - 40, y);
-        ctx.closePath();
+        ctx.moveTo(x, y - 40); ctx.lineTo(x + 40, y); ctx.lineTo(x, y + 40); ctx.lineTo(x - 40, y); ctx.closePath();
       }
     }
     ctx.stroke();
-  } else if (id === 4) {
-    // Konark Sundial Relic Pattern
+  } else if (cat.includes('tissue')) {
     ctx.strokeStyle = 'rgba(255, 215, 0, 0.95)';
     ctx.lineWidth = 2;
     ctx.save();
@@ -1098,226 +1066,35 @@ function drawZariPattern(ctx, id) {
     ctx.arc(0, 0, 100, 0, Math.PI * 2);
     ctx.arc(0, 0, 85, 0, Math.PI * 2);
     ctx.stroke();
-    // 8 spokes
     for (let i = 0; i < 8; i++) {
       const angle = (i * Math.PI) / 4;
-      ctx.beginPath();
-      ctx.moveTo(0, 0);
-      ctx.lineTo(Math.cos(angle) * 100, Math.sin(angle) * 100);
-      ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(Math.cos(angle) * 100, Math.sin(angle) * 100); ctx.stroke();
     }
-    // Rim teeth
     for (let t = 0; t < 24; t++) {
       const angle = (t * Math.PI * 2) / 24;
-      ctx.beginPath();
-      ctx.moveTo(Math.cos(angle) * 85, Math.sin(angle) * 85);
-      ctx.lineTo(Math.cos(angle) * 100, Math.sin(angle) * 100);
-      ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(Math.cos(angle) * 85, Math.sin(angle) * 85); ctx.lineTo(Math.cos(angle) * 100, Math.sin(angle) * 100); ctx.stroke();
     }
-    ctx.beginPath();
-    ctx.arc(0, 0, 25, 0, Math.PI * 2);
-    ctx.stroke();
+    ctx.beginPath(); ctx.arc(0, 0, 25, 0, Math.PI * 2); ctx.stroke();
     ctx.restore();
-  } else if (id === 5) {
-    // Lord Jagannath Provenance Pattern (The Holy Trinity: Jagannath, Balabhadra, Subhadra)
-    ctx.save();
-    
-    // Draw vertical lotus borders on the card edges
-    ctx.strokeStyle = 'rgba(212, 175, 55, 0.7)';
-    ctx.lineWidth = 1.5;
-    ctx.fillStyle = 'rgba(212, 175, 55, 0.15)';
-    // Left border
-    ctx.beginPath();
-    ctx.strokeRect(10, 20, 30, 540);
-    // Right border
-    ctx.strokeRect(380, 20, 30, 540);
-    // Tiny border lotus details
-    for (let y = 40; y < 560; y += 40) {
-      ctx.beginPath();
-      ctx.arc(25, y, 6, 0, Math.PI * 2);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.arc(395, y, 6, 0, Math.PI * 2);
-      ctx.stroke();
-    }
-    
-    // Move to the center of the card to draw the deities & shrine
-    ctx.translate(210, 290);
-    
-    // 1. Temple Shrine / Archway above them
-    ctx.strokeStyle = 'rgba(212, 175, 55, 0.85)';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(-150, 120);
-    ctx.lineTo(-150, 0);
-    ctx.quadraticCurveTo(-150, -110, 0, -110);
-    ctx.quadraticCurveTo(150, -110, 150, 0);
-    ctx.lineTo(150, 120);
-    ctx.stroke();
-    
-    // Decorative pillars
-    ctx.lineWidth = 1;
-    ctx.strokeRect(-160, 0, 10, 120);
-    ctx.strokeRect(150, 0, 10, 120);
-    
-    // 2. Balabhadra (Left - White Face Deity)
-    ctx.save();
-    ctx.translate(-75, 40);
-    ctx.strokeStyle = 'rgba(212, 175, 55, 0.9)';
-    ctx.lineWidth = 2;
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
-    ctx.beginPath();
-    ctx.arc(0, 0, 32, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.stroke();
-    
-    ctx.strokeStyle = '#fff';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.arc(-13, -2, 10, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.arc(13, -2, 10, 0, Math.PI * 2);
-    ctx.stroke();
-    
-    ctx.fillStyle = 'rgba(212, 175, 55, 0.9)';
-    ctx.beginPath();
-    ctx.arc(-13, -2, 4, 0, Math.PI * 2);
-    ctx.arc(13, -2, 4, 0, Math.PI * 2);
-    ctx.fill();
-    
-    ctx.strokeStyle = 'rgba(212, 175, 55, 0.9)';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(-22, -22);
-    ctx.lineTo(0, -50);
-    ctx.lineTo(22, -22);
-    ctx.closePath();
-    ctx.stroke();
-    
-    ctx.beginPath();
-    ctx.moveTo(-32, 10);
-    ctx.lineTo(-45, 10);
-    ctx.lineTo(-45, -5);
-    ctx.moveTo(32, 10);
-    ctx.lineTo(45, 10);
-    ctx.lineTo(45, -5);
-    ctx.stroke();
-    ctx.restore();
-    
-    // 3. Subhadra (Center - Yellow Face Deity)
-    ctx.save();
-    ctx.translate(0, 50);
-    ctx.strokeStyle = 'rgba(212, 175, 55, 0.9)';
-    ctx.lineWidth = 2;
-    ctx.fillStyle = 'rgba(241, 196, 15, 0.15)';
-    ctx.beginPath();
-    ctx.ellipse(0, 0, 24, 28, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.stroke();
-    
-    ctx.strokeStyle = 'rgba(212, 175, 55, 0.95)';
-    ctx.lineWidth = 1.2;
-    ctx.beginPath();
-    ctx.arc(-9, -2, 8, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.arc(9, -2, 8, 0, Math.PI * 2);
-    ctx.stroke();
-    
-    ctx.fillStyle = 'rgba(212, 175, 55, 0.9)';
-    ctx.beginPath();
-    ctx.arc(-9, -2, 3, 0, Math.PI * 2);
-    ctx.arc(9, -2, 3, 0, Math.PI * 2);
-    ctx.fill();
-    
-    ctx.beginPath();
-    ctx.moveTo(-16, -24);
-    ctx.lineTo(0, -48);
-    ctx.lineTo(16, -24);
-    ctx.closePath();
-    ctx.stroke();
-    ctx.restore();
-    
-    // 4. Lord Jagannath (Right - Black Face Deity)
-    ctx.save();
-    ctx.translate(75, 40);
-    ctx.strokeStyle = 'rgba(212, 175, 55, 0.95)';
-    ctx.lineWidth = 2;
-    ctx.fillStyle = 'rgba(10, 10, 10, 0.7)';
-    ctx.beginPath();
-    ctx.arc(0, 0, 32, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.stroke();
-    
-    ctx.strokeStyle = 'rgba(212, 175, 55, 0.9)';
-    ctx.stroke();
-    
-    ctx.strokeStyle = 'rgba(212, 175, 55, 0.95)';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.arc(-13, -2, 10, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.arc(13, -2, 10, 0, Math.PI * 2);
-    ctx.stroke();
-    
-    ctx.fillStyle = 'rgba(212, 175, 55, 0.95)';
-    ctx.beginPath();
-    ctx.arc(-13, -2, 4, 0, Math.PI * 2);
-    ctx.arc(13, -2, 4, 0, Math.PI * 2);
-    ctx.fill();
-    
-    ctx.beginPath();
-    ctx.moveTo(-22, -22);
-    ctx.lineTo(0, -50);
-    ctx.lineTo(22, -22);
-    ctx.closePath();
-    ctx.stroke();
-    
-    ctx.beginPath();
-    ctx.moveTo(-32, 10);
-    ctx.lineTo(-45, 10);
-    ctx.lineTo(-45, -5);
-    ctx.moveTo(32, 10);
-    ctx.lineTo(45, 10);
-    ctx.lineTo(45, -5);
-    ctx.stroke();
-    ctx.restore();
-    
-    ctx.restore();
-  } else if (id === 6) {
-    // Nuapatana Khandua Saree - Elephant Motif
+  } else {
     ctx.strokeStyle = 'rgba(212, 175, 55, 0.9)';
     ctx.fillStyle = 'rgba(212, 175, 55, 0.35)';
     ctx.lineWidth = 2;
     ctx.save();
     ctx.translate(210, 290);
-    
-    // Abstract geometric elephant outline
     ctx.beginPath();
     ctx.arc(0, 0, 50, Math.PI, 0);
-    ctx.lineTo(50, 40);
-    ctx.lineTo(35, 40);
-    ctx.lineTo(35, 10);
-    ctx.lineTo(-35, 10);
-    ctx.lineTo(-35, 40);
-    ctx.lineTo(-50, 40);
+    ctx.lineTo(50, 40); ctx.lineTo(35, 40); ctx.lineTo(35, 10); ctx.lineTo(-35, 10); ctx.lineTo(-35, 40); ctx.lineTo(-50, 40);
     ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
+    ctx.fill(); ctx.stroke();
     
-    // Head & trunk
     ctx.beginPath();
     ctx.arc(-55, -20, 20, Math.PI * 1.5, Math.PI * 0.5);
     ctx.bezierCurveTo(-75, 0, -80, 20, -75, 30);
     ctx.bezierCurveTo(-72, 30, -70, 20, -65, 0);
     ctx.stroke();
     
-    // Saddle
-    ctx.strokeStyle = '#fff';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(-20, -25, 40, 25);
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 1; ctx.strokeRect(-20, -25, 40, 25);
     ctx.restore();
   }
 }
@@ -1359,13 +1136,14 @@ function drawGridPath(ctx) {
 let unweaveAnimationId = null;
 let drapeAnimationId = null;
 
-function setupShowroomDrape(item) {
+function setupShowroomDrape(initialItem, itemsList) {
   const canvas = document.getElementById('canvas-drape');
   const ctx = canvas.getContext('2d');
   
   canvas.width = canvas.parentElement.clientWidth || 450;
   canvas.height = canvas.parentElement.clientHeight || 420;
   
+  let activeItem = initialItem;
   let mx = canvas.width / 2;
   let my = canvas.height / 2;
   let isHovered = false;
@@ -1374,62 +1152,41 @@ function setupShowroomDrape(item) {
   let lightTheme = 'sunset'; 
   let viewAngle = 'front';
 
-  // ── Avatar Image Collections ──────────────────────────────────────────────
-  // Each collection: [front, side] photos. Others use hue-rotate on base set.
   function loadImg(src) { const i = new Image(); i.src = src; return i; }
 
   const avatarCollections = {
-    // Style 1: Crimson Pata (4 full frames)
-    1: { frames: [loadImg('/avatars/frame_front.png'), loadImg('/avatars/frame_quarter.png'), loadImg('/avatars/frame_side.png'), loadImg('/avatars/frame_back.png')], hue: 0, sat: 1 },
-    // Style 2: Navy Sambalpuri (2 frames, mirrored for back)
-    2: { frames: [loadImg('/avatars/navy_front.png'), loadImg('/avatars/navy_front.png'), loadImg('/avatars/navy_side.png'), loadImg('/avatars/navy_side.png')], hue: 0, sat: 1 },
-    // Style 3: Green Chanderi (2 frames)
-    3: { frames: [loadImg('/avatars/green_front.png'), loadImg('/avatars/green_front.png'), loadImg('/avatars/green_side.png'), loadImg('/avatars/green_side.png')], hue: 0, sat: 1 },
-    // Style 4: Royal Purple Kanjivaram (2 frames)
-    4: { frames: [loadImg('/avatars/purple_front.png'), loadImg('/avatars/purple_front.png'), loadImg('/avatars/purple_side.png'), loadImg('/avatars/purple_side.png')], hue: 0, sat: 1 },
-    // Style 5: Golden Tissue (2 frames)
-    5: { frames: [loadImg('/avatars/golden_front.png'), loadImg('/avatars/golden_front.png'), loadImg('/avatars/golden_side.png'), loadImg('/avatars/golden_side.png')], hue: 0, sat: 1 },
-    // Styles 6-12: Crimson base with hue-rotate color tinting
-    6:  { frames: null, hue: 30,  sat: 1.1 },  // orange/saffron
-    7:  { frames: null, hue: 165, sat: 1.2 },  // teal
-    8:  { frames: null, hue: 45,  sat: 0.8 },  // golden warm
-    9:  { frames: null, hue: 200, sat: 0.7 },  // slate blue
-    10: { frames: null, hue: 260, sat: 1.3 },  // electric indigo
-    11: { frames: null, hue: 320, sat: 1.1 },  // magenta rose
-    12: { frames: null, hue: 0,   sat: 0.1 },  // silver-grey
+    // Style mappings based on indices
+    1: { frames: [loadImg('/avatars/frame_front.png'), loadImg('/avatars/frame_quarter.png'), loadImg('/avatars/frame_side.png'), loadImg('/avatars/frame_back.png')] },
+    2: { frames: [loadImg('/avatars/navy_front.png'), loadImg('/avatars/navy_front.png'), loadImg('/avatars/navy_side.png'), loadImg('/avatars/navy_side.png')] },
+    3: { frames: [loadImg('/avatars/green_front.png'), loadImg('/avatars/green_front.png'), loadImg('/avatars/green_side.png'), loadImg('/avatars/green_side.png')] },
+    4: { frames: [loadImg('/avatars/purple_front.png'), loadImg('/avatars/purple_front.png'), loadImg('/avatars/purple_side.png'), loadImg('/avatars/purple_side.png')] },
+    5: { frames: [loadImg('/avatars/golden_front.png'), loadImg('/avatars/golden_front.png'), loadImg('/avatars/golden_side.png'), loadImg('/avatars/golden_side.png')] }
   };
 
-  // Base crimson frames used for hue-rotated variants
   const baseFrames = [
     loadImg('/avatars/frame_front.png'), loadImg('/avatars/frame_quarter.png'),
     loadImg('/avatars/frame_side.png'),  loadImg('/avatars/frame_back.png')
   ];
 
-  // Get the current avatar's frames & filter string
   function getAvatarFrames() {
-    const col = avatarCollections[currentAvatarId] || avatarCollections[1];
-    return { frames: col.frames || baseFrames, hue: col.hue, sat: col.sat };
+    const hue = activeItem.color_hue || 0;
+    const sat = activeItem.color_saturation || 1.0;
+    
+    // Choose base texture images based on hue ranges
+    let frames = baseFrames;
+    if (hue >= 180 && hue < 240) {
+      frames = avatarCollections[2].frames; // Navy base
+    } else if (hue >= 100 && hue < 180) {
+      frames = avatarCollections[3].frames; // Green base
+    } else if (hue >= 240 && hue < 300) {
+      frames = avatarCollections[4].frames; // Purple base
+    } else if (hue >= 40 && hue < 60) {
+      frames = avatarCollections[5].frames; // Golden base
+    }
+    
+    return { frames, hue, sat };
   }
 
-  // Update portrait thumbnails from the sprite sheet
-  const gridImg = new Image();
-  gridImg.src = '/avatars/portraits_grid.png';
-  gridImg.onload = () => {
-    const thumbs = document.querySelectorAll('.avatar-thumb');
-    thumbs.forEach((thumb, i) => {
-      const col = i % 4;
-      const row = Math.floor(i / 4);
-      // Since columns = 4 and rows = 3, CSS background percentage offsets are col/(4-1)*100 and row/(3-1)*100
-      const pctX = (col / 3) * 100;
-      const pctY = (row / 2) * 100;
-      thumb.style.backgroundImage = `url('/avatars/portraits_grid.png')`;
-      thumb.style.backgroundSize = '400% 300%';
-      thumb.style.backgroundPosition = `${pctX}% ${pctY}%`;
-      thumb.textContent = '';
-    });
-  };
-  let currentAvatarId = 1;
-  
   function playShowroomSound(freq = 440, vol = 0.04, duration = 0.08) {
     if (!audioCtx || audioCtx.state !== 'running') return;
     try {
@@ -1486,7 +1243,6 @@ function setupShowroomDrape(item) {
     };
   });
 
-  // View Angle controls
   const btnViewFront = document.getElementById('btn-view-front');
   const btnViewProfile = document.getElementById('btn-view-profile');
 
@@ -1504,85 +1260,61 @@ function setupShowroomDrape(item) {
     playShowroomSound(440, 0.04, 0.05);
   };
 
-  // Avatar selector dropdown
-  const selectAvatar = document.getElementById('select-avatar-asset');
-  const avatarThumbs = document.querySelectorAll('.avatar-thumb');
+  // Build and bind dynamic sidebar collection thumbnails
+  const thumbsContainer = document.querySelector('.avatar-thumbs');
   
-  function updateActiveAvatar(id) {
-    currentAvatarId = id;
-    selectAvatar.value = id;
+  function updateActiveItem(selectedItem) {
+    activeItem = selectedItem;
     
-    avatarThumbs.forEach(t => {
-      if (parseInt(t.dataset.id) === id) {
-        t.classList.add('active');
-      } else {
-        t.classList.remove('active');
-      }
-    });
+    // Update active thumbnail borders
+    if (thumbsContainer) {
+      thumbsContainer.querySelectorAll('.avatar-thumb').forEach(t => {
+        if (parseInt(t.dataset.id) === selectedItem.id) {
+          t.classList.add('active');
+        } else {
+          t.classList.remove('active');
+        }
+      });
+    }
 
-
-
-    const names = {
-      1: "Nuapatana Khandua Ikat Saree",
-      2: "Sambalpuri Lotus Saree",
-      3: "Kotpad Temple Border Saree",
-      4: "Konark Sundial Relic Saree",
-      5: "Lord Jagannath Provenance Saree",
-      6: "Maniabandha Grid Saree",
-      7: "Kataki Silk Wave Saree",
-      8: "Mayurbhanj Tribal Stripe Saree",
-      9: "Gopalpur Tussar Heritage Saree",
-      10: "Bomkai Raj Mandala Saree",
-      11: "Khandua Crimson Relic Saree",
-      12: "Nilagiri Forest Border Saree"
-    };
-    const artisans = {
-      1: "Smt. Sebati Mohanty",
-      2: "Shri Ranjan Meher",
-      3: "Smt. Sebati Mohanty",
-      4: "Shri Ranjan Meher",
-      5: "Shri Kailash Meher",
-      6: "Shri Kailash Meher",
-      7: "Smt. Sebati Mohanty",
-      8: "Shri Ranjan Meher",
-      9: "Shri Kailash Meher",
-      10: "Shri Ranjan Meher",
-      11: "Smt. Sebati Mohanty",
-      12: "Shri Kailash Meher"
-    };
-    const locations = {
-      1: "Nuapatna, Odisha",
-      2: "Maniabandha, Odisha",
-      3: "Nuapatna, Odisha",
-      4: "Maniabandha, Odisha",
-      5: "Puri, Odisha",
-      6: "Puri, Odisha",
-      7: "Nuapatna, Odisha",
-      8: "Maniabandha, Odisha",
-      9: "Puri, Odisha",
-      10: "Maniabandha, Odisha",
-      11: "Nuapatna, Odisha",
-      12: "Puri, Odisha"
-    };
-
-    document.getElementById('showroom-title').textContent = names[currentAvatarId] || item.name;
-    const artisanName = artisans[currentAvatarId] || item.artisan;
-    const artisanLoc = locations[currentAvatarId] || (item.coords.includes('20° 26\'') ? 'Nuapatna, Odisha' : item.coords.includes('19° 48\'') ? 'Puri, Odisha' : 'Maniabandha, Odisha');
-    document.getElementById('showroom-artisan-name').innerHTML = `${artisanName} &nbsp;·&nbsp; ${artisanLoc}`;
+    document.getElementById('showroom-title').textContent = selectedItem.name;
+    
+    // Set artisan and location details dynamically
+    const artisanName = selectedItem.artisan_name || 'Master Weaver';
+    const loc = selectedItem.artisan_location || 'Odisha, India';
+    document.getElementById('showroom-artisan-name').innerHTML = `${artisanName} &nbsp;·&nbsp; ${loc}`;
+    
+    // Update price dynamically with global currency converter
+    document.getElementById('showroom-price-fiat').textContent = formatSareePrice(selectedItem.price_fiat);
+    
+    // Reset purchase success messages
+    document.getElementById('btn-acquire-now').classList.remove('hidden');
+    document.getElementById('reserve-success-message').classList.add('hidden');
+    
+    playShowroomSound(500, 0.04, 0.06);
   }
 
-  selectAvatar.onchange = (e) => {
-    updateActiveAvatar(parseInt(e.target.value));
-    playShowroomSound(500, 0.04, 0.06);
-  };
+  // Populate thumbnails
+  if (thumbsContainer && itemsList) {
+    thumbsContainer.innerHTML = itemsList.map((itm, idx) => {
+      const activeClass = itm.id === activeItem.id ? 'active' : '';
+      return `<div class="avatar-thumb ${activeClass}" data-id="${itm.id}" style="background-color: hsl(${itm.color_hue || 0}, 80%, 25%);">${String(idx + 1).padStart(2, '0')}</div>`;
+    }).join('');
+    
+    thumbsContainer.querySelectorAll('.avatar-thumb').forEach(thumb => {
+      thumb.onclick = () => {
+        const id = parseInt(thumb.dataset.id);
+        const matched = itemsList.find(itm => itm.id === id);
+        if (matched) updateActiveItem(matched);
+      };
+    });
+  }
 
-  avatarThumbs.forEach(thumb => {
-    thumb.onclick = (e) => {
-      const id = parseInt(e.target.dataset.id);
-      updateActiveAvatar(id);
-      playShowroomSound(520, 0.04, 0.06);
-    };
-  });
+  // Remove the static SELECT input binding if it exists
+  const selectAvatar = document.getElementById('select-avatar-asset');
+  if (selectAvatar) {
+    selectAvatar.style.display = 'none'; // hide select drop-down, replace with sidebar thumbs
+  }
   
   const acquireBtn = document.getElementById('btn-acquire-now');
   const successMsg = document.getElementById('reserve-success-message');
@@ -1593,10 +1325,10 @@ function setupShowroomDrape(item) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          item_id: currentAvatarId,
-          customer_name: 'Walk-in Guest',
-          customer_email: 'guest@antigravity.com',
-          message: `Enquired interest in the "${document.getElementById('showroom-title').textContent}"`
+          item_id: activeItem.id,
+          customer_name: 'Global Loom Guest',
+          customer_email: 'buyer@silk101.global',
+          message: `Enquired interest in buying the "${activeItem.name}" (#${activeItem.id})`
         })
       });
       if (res.ok) {
@@ -1609,7 +1341,6 @@ function setupShowroomDrape(item) {
     }
   };
   
-  // Keyboard Accessibility spins
   const handleKeys = (e) => {
     if (document.getElementById('unweave-modal').classList.contains('hidden')) return;
     if (e.key === 'ArrowRight') {
@@ -1629,25 +1360,22 @@ function setupShowroomDrape(item) {
   };
   window.addEventListener('keydown', handleKeys);
   
-  // ── Refined Physics ────────────────────────────────────────────────────────
   let rotation = 0;
   let isDragging = false;
   let startX = 0;
-  let velocity = 0.012;         // initial gentle auto-spin
-  let lastDx = 0;               // for momentum flick
-  const FRICTION       = 0.92;  // smooth deceleration
-  const MAX_VELOCITY   = 0.35;  // cap speed on fast flick
-  const MIN_AUTO_SPIN  = 0.0015;// idle micro-spin
+  let velocity = 0.012;
+  let lastDx = 0;
+  const FRICTION       = 0.92;
+  const MAX_VELOCITY   = 0.35;
+  const MIN_AUTO_SPIN  = 0.0015;
   let particles = [];
 
-  // ── Zoom System ───────────────────────────────────────────────────────────
-  let zoomLevel  = 1.0;         // current zoom scale
-  let zoomTarget = 1.0;         // target zoom (spring interpolated)
+  let zoomLevel  = 1.0;
+  let zoomTarget = 1.0;
   const ZOOM_MIN = 0.6;
   const ZOOM_MAX = 3.2;
-  const ZOOM_SPRING = 0.12;     // spring stiffness
+  const ZOOM_SPRING = 0.12;
 
-  // Pinch-to-zoom state
   let lastPinchDist = null;
 
   function applyZoom(delta) {
@@ -1655,14 +1383,12 @@ function setupShowroomDrape(item) {
     playShowroomSound(zoomTarget > zoomLevel ? 880 : 440, 0.02, 0.06);
   }
 
-  // Mouse wheel zoom
   canvas.addEventListener('wheel', (e) => {
     e.preventDefault();
     const factor = e.deltaY < 0 ? 0.15 : -0.15;
     applyZoom(factor);
   }, { passive: false });
 
-  // Zoom buttons (injected below)
   function attachZoomButtons() {
     const btnZoomIn  = document.getElementById('btn-zoom-in');
     const btnZoomOut = document.getElementById('btn-zoom-out');
@@ -1673,7 +1399,6 @@ function setupShowroomDrape(item) {
   }
   attachZoomButtons();
 
-  // Mouse drag rotation
   canvas.onmousedown = (e) => {
     isDragging = true;
     startX = e.clientX;
@@ -1683,7 +1408,6 @@ function setupShowroomDrape(item) {
 
   window.onmouseup = () => {
     if (isDragging) {
-      // Flick momentum: carry last delta as velocity
       velocity = Math.max(-MAX_VELOCITY, Math.min(MAX_VELOCITY, lastDx * 0.015));
     }
     isDragging = false;
@@ -1699,7 +1423,7 @@ function setupShowroomDrape(item) {
     if (isDragging) {
       const dx = e.clientX - startX;
       lastDx = dx;
-      const dv = dx * 0.008;  // sensitivity
+      const dv = dx * 0.008;
       rotation += dv;
       startX = e.clientX;
 
@@ -1721,7 +1445,6 @@ function setupShowroomDrape(item) {
 
   canvas.onmouseleave = () => { isHovered = false; isDragging = false; };
 
-  // Touch drag + pinch-to-zoom
   canvas.addEventListener('touchstart', (e) => {
     if (e.touches.length === 1) {
       isDragging = true;
@@ -1767,23 +1490,19 @@ function setupShowroomDrape(item) {
   function drawDrape() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // ── Spring-interpolated zoom ──
     zoomLevel += (zoomTarget - zoomLevel) * ZOOM_SPRING;
 
-    // ── Refined inertial physics ──
     if (!isDragging) {
       rotation += velocity;
       velocity *= FRICTION;
       if (Math.abs(velocity) < MIN_AUTO_SPIN) {
-        velocity = MIN_AUTO_SPIN; // gentle perpetual micro-spin
+        velocity = MIN_AUTO_SPIN;
       }
     }
 
-    // Normalize rotation to [0, 2PI]
     const TAU = Math.PI * 2;
     const normRot = ((rotation % TAU) + TAU) % TAU;
 
-    // ── Frame blending ──
     const FRAME_COUNT = 4;
     const segmentAngle = TAU / FRAME_COUNT;
     const frameIndex = Math.floor(normRot / segmentAngle) % FRAME_COUNT;
@@ -1797,25 +1516,21 @@ function setupShowroomDrape(item) {
     const cw = canvas.width;
     const ch = canvas.height;
 
-    // Apply canvas hue-rotate + saturate filter for tinted variants
     if (hue !== 0 || sat !== 1) {
       ctx.filter = `hue-rotate(${hue}deg) saturate(${sat})`;
     } else {
       ctx.filter = 'none';
     }
 
-    // Draw dark background
     ctx.fillStyle = '#030303';
     ctx.fillRect(0, 0, cw, ch);
 
-    // Subtle vignette
     const vignette = ctx.createRadialGradient(cw/2, ch/2, ch*0.2, cw/2, ch/2, ch*0.82);
     vignette.addColorStop(0, 'rgba(0,0,0,0)');
     vignette.addColorStop(1, 'rgba(0,0,0,0.7)');
     ctx.fillStyle = vignette;
     ctx.fillRect(0, 0, cw, ch);
 
-    // Draw avatar image frames with cross-fade + zoom transform
     if (currentFrame && currentFrame.complete) {
       const imgW = currentFrame.naturalWidth || cw;
       const imgH = currentFrame.naturalHeight || ch;
@@ -1826,19 +1541,16 @@ function setupShowroomDrape(item) {
       const dx = (cw - dw) / 2;
       const dy = (ch - dh) / 2 + ch * 0.01;
 
-      // Draw current frame at 1-blendT opacity
       ctx.globalAlpha = 1 - blendT;
       ctx.drawImage(currentFrame, dx, dy, dw, dh);
 
-      // Draw next frame at blendT opacity for smooth crossfade
       if (nextFrame && nextFrame.complete) {
         ctx.globalAlpha = blendT;
         ctx.drawImage(nextFrame, dx, dy, dw, dh);
       }
       ctx.globalAlpha = 1;
-      ctx.filter = 'none'; // reset filter so HUD is uncoloured
+      ctx.filter = 'none';
 
-      // Studio lighting color grade overlay based on light theme
       if (lightTheme === 'neon') {
         const neonGrad = ctx.createLinearGradient(0, 0, cw, 0);
         neonGrad.addColorStop(0, 'rgba(0, 200, 255, 0.08)');
@@ -1851,7 +1563,6 @@ function setupShowroomDrape(item) {
         ctx.fillRect(0, 0, cw, ch);
       }
 
-      // Floor reflection
       const reflectHeight = dh * 0.18;
       ctx.save();
       ctx.globalAlpha = 0.22 * (1 - blendT);
@@ -1864,7 +1575,6 @@ function setupShowroomDrape(item) {
       }
       ctx.restore();
 
-      // Fade reflection with gradient
       ctx.globalAlpha = 1;
       const reflFade = ctx.createLinearGradient(0, dy + dh, 0, dy + dh + reflectHeight);
       reflFade.addColorStop(0, 'rgba(3,3,3,0.5)');
@@ -1881,7 +1591,6 @@ function setupShowroomDrape(item) {
       ctx.fillText('LOADING AVATAR MODEL...', cw / 2, ch / 2);
     }
 
-    // Futuristic cyber grid overlay
     ctx.strokeStyle = 'rgba(255, 215, 0, 0.012)';
     ctx.lineWidth = 1;
     for (let x = 0; x < cw; x += 50) {
@@ -1891,11 +1600,9 @@ function setupShowroomDrape(item) {
       ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(cw, y); ctx.stroke();
     }
 
-    // Live zoom display element update
     const zoomDisp = document.getElementById('zoom-display');
     if (zoomDisp) zoomDisp.textContent = `${zoomLevel.toFixed(2)}×`;
 
-    // HAPE HUD metrics
     ctx.fillStyle = 'rgba(255, 215, 0, 0.45)';
     ctx.font = 'bold 9px monospace';
     ctx.textAlign = 'left';
@@ -1907,16 +1614,14 @@ function setupShowroomDrape(item) {
 
     ctx.textAlign = 'right';
     ctx.fillText(`LENS: ${inspectMode.toUpperCase()}`, cw - 20, 35);
-    ctx.fillText(`MODEL: NXS-${String(currentAvatarId).padStart(3,'0')}-PATA`, cw - 20, 50);
+    ctx.fillText(`MODEL: NXS-${String(activeItem.id).padStart(3,'0')}-PATA`, cw - 20, 50);
     ctx.fillText(`LIGHT: ${lightTheme.toUpperCase()}`, cw - 20, 65);
-    ctx.fillText(`STYLE: ${['PATA','IKAT','CHANDERI','KANJIVARAM','TISSUE','SAFFRON','TEAL','AMBER','SLATE','INDIGO','MAGENTA','SILVER'][currentAvatarId-1] || '---'}`, cw - 20, 80);
+    ctx.fillText(`STYLE: ${activeItem.category_name || 'SAREE'}`, cw - 20, 80);
 
-    // Center drag instruction
     ctx.textAlign = 'center';
     ctx.fillStyle = 'rgba(255, 215, 0, 0.25)';
     ctx.fillText('↔ CLICK & DRAG TO ROTATE · TOUCH SUPPORTED', cw / 2, ch - 18);
 
-    // Update and draw swirl particles in 3D helix path
     particles.forEach((p, index) => {
       p.angle += p.speedR;
       p.y += p.speedY;
@@ -1937,7 +1642,6 @@ function setupShowroomDrape(item) {
       }
     });
 
-    // Spotlight / Loupe inspect modes
     if (isHovered) {
       if (inspectMode === 'spotlight') {
         ctx.save();
@@ -1954,7 +1658,6 @@ function setupShowroomDrape(item) {
       } else if (inspectMode === 'loupe') {
         ctx.save();
         ctx.beginPath(); ctx.arc(mx, my, 80, 0, Math.PI * 2); ctx.clip();
-        // Magnified region
         const srcX = mx - 33;
         const srcY = my - 33;
         ctx.drawImage(canvas, srcX, srcY, 66, 66, mx - 80, my - 80, 160, 160);
@@ -1972,27 +1675,24 @@ function setupShowroomDrape(item) {
   drawDrape();
 }
 
-function openUnweaveModal(id) {
-  const item = sareeCollection.find(s => s.id === id);
+function openUnweaveModal(item, itemsList) {
   if (!item) return;
   
   const modal = document.getElementById('unweave-modal');
   modal.classList.remove('hidden');
   
-  // Fill showroom data
   document.getElementById('showroom-title').textContent = item.name;
   
-  const loc = item.coords.includes('20° 26\'') ? 'Nuapatna, Odisha' : item.coords.includes('19° 48\'') ? 'Puri, Odisha' : 'Maniabandha, Odisha';
-  document.getElementById('showroom-artisan-name').innerHTML = `${item.artisan} &nbsp;·&nbsp; ${loc}`;
+  const artisanName = item.artisan_name || 'Master Weaver';
+  const loc = item.artisan_location || 'Odisha, India';
+  document.getElementById('showroom-artisan-name').innerHTML = `${artisanName} &nbsp;·&nbsp; ${loc}`;
   
-  const fiatPrices = { 1: "₹1,50,000", 2: "₹1,35,000", 3: "₹1,25,000", 4: "₹1,75,000", 5: "₹2,05,000", 6: "₹1,85,000" };
-  document.getElementById('showroom-price-fiat').textContent = fiatPrices[item.id] || "₹1,50,000";
+  document.getElementById('showroom-price-fiat').textContent = formatSareePrice(item.price_fiat);
   
   document.getElementById('btn-acquire-now').classList.remove('hidden');
   document.getElementById('reserve-success-message').classList.add('hidden');
   
-  // Start Drape Renderer
-  setupShowroomDrape(item);
+  setupShowroomDrape(item, itemsList);
 }
 
 function closeUnweaveModal() {

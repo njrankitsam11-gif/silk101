@@ -1575,7 +1575,6 @@ body.cursor-drag .custom-cursor-ring::after {
   }
 }
 
-/* Saree Layer Model Overlay */
 .saree-layer.layer-model {
   transform: translateZ(12px);
   background-size: contain;
@@ -1583,5 +1582,43 @@ body.cursor-drag .custom-cursor-ring::after {
   background-repeat: no-repeat;
   opacity: 0.85;
 }
+
+/* ── Interactive Map & Designer Configurator styling ────────────────────── */
+.avatar-sidebar {
+  width: 140px;
+  align-items: stretch;
+}
+.avatar-thumbs {
+  flex-direction: row !important;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 0.25rem;
+}
+.avatar-thumb {
+  width: 32px !important;
+  height: 40px !important;
+}
+.custom-control-group input[type="range"] {
+  height: 4px;
+  border-radius: 2px;
+  outline: none;
+}
+.map-marker {
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.map-marker:hover {
+  transform: scale(1.15);
+}
+.map-marker text {
+  font-weight: 600;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+  pointer-events: none;
+}
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.8); opacity: 0; }
+  100% { transform: scale(1); opacity: 0; }
+}
+
 
 

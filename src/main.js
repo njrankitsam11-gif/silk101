@@ -1735,10 +1735,133 @@ function setupShowroomDrape(initialItem, itemsList) {
     });
   }
 
+  // Designer Configurator Mode variables
+  let isCustomMode = false;
+  let customHue = 0;
+  let customSat = 1.0;
+  let customPattern = 'lotus';
+
+  // Overwrite getAvatarFrames to support custom configuration
+  const originalGetAvatarFrames = getAvatarFrames;
+  getAvatarFrames = function() {
+    const hue = isCustomMode ? customHue : (activeItem.color_hue || 0);
+    const sat = isCustomMode ? customSat : (activeItem.color_saturation || 1.0);
+    
+    let frames = baseFrames;
+    if (hue >= 180 && hue < 240) {
+      frames = avatarCollections[2].frames; // Navy base
+    } else if (hue >= 100 && hue < 180) {
+      frames = avatarCollections[3].frames; // Green base
+    } else if (hue >= 240 && hue < 300) {
+      frames = avatarCollections[4].frames; // Purple base
+    } else if (hue >= 40 && hue < 60) {
+      frames = avatarCollections[5].frames; // Golden base
+    }
+    
+    return { frames, hue, sat };
+  };
+
+  // Bind sidebar tab switching
+  const tabCollection = document.getElementById('tab-collection');
+  const tabCustomizer = document.getElementById('tab-customizer');
+  const paneCollection = document.getElementById('pane-collection');
+  const paneCustomizer = document.getElementById('pane-customizer');
+
+  if (tabCollection && tabCustomizer && paneCollection && paneCustomizer) {
+    tabCollection.onclick = () => {
+      tabCollection.classList.add('active');
+      tabCollection.style.borderBottom = '2px solid var(--color-zari)';
+      tabCollection.style.color = '#fff';
+      tabCustomizer.classList.remove('active');
+      tabCustomizer.style.borderBottom = 'none';
+      tabCustomizer.style.color = 'rgba(255,255,255,0.5)';
+      paneCollection.style.display = 'block';
+      paneCustomizer.style.display = 'none';
+      isCustomMode = false;
+      updateActiveItem(activeItem);
+    };
+
+    tabCustomizer.onclick = () => {
+      tabCustomizer.classList.add('active');
+      tabCustomizer.style.borderBottom = '2px solid var(--color-zari)';
+      tabCustomizer.style.color = '#fff';
+      tabCollection.classList.remove('active');
+      tabCollection.style.borderBottom = 'none';
+      tabCollection.style.color = 'rgba(255,255,255,0.5)';
+      paneCollection.style.display = 'none';
+      paneCustomizer.style.display = 'flex';
+      isCustomMode = true;
+      
+      document.getElementById('showroom-title').textContent = `Custom ${customPattern.charAt(0).toUpperCase() + customPattern.slice(1)} Weave`;
+      document.getElementById('showroom-artisan-name').innerHTML = `Designed by You &nbsp;·&nbsp; Tailored in Nuapatna`;
+      document.getElementById('showroom-price-fiat').textContent = formatSareePrice(250000);
+      playShowroomSound(540, 0.04, 0.05);
+    };
+  }
+
+  // Bind designer customizer inputs
+  const hueSlider = document.getElementById('custom-saree-hue');
+  const satSlider = document.getElementById('custom-saree-sat');
+  const patternSelect = document.getElementById('custom-saree-pattern');
+
+  if (hueSlider) {
+    hueSlider.oninput = (e) => {
+      customHue = parseInt(e.target.value);
+      document.getElementById('val-custom-hue').textContent = `${customHue}°`;
+      playShowroomSound(150 + customHue, 0.01, 0.02);
+    };
+  }
+  if (satSlider) {
+    satSlider.oninput = (e) => {
+      customSat = parseFloat(e.target.value);
+      document.getElementById('val-custom-sat').textContent = `${customSat.toFixed(1)}x`;
+      playShowroomSound(200 + customSat * 100, 0.01, 0.02);
+    };
+  }
+  if (patternSelect) {
+    patternSelect.onchange = (e) => {
+      customPattern = e.target.value;
+      if (isCustomMode) {
+        document.getElementById('showroom-title').textContent = `Custom ${customPattern.charAt(0).toUpperCase() + customPattern.slice(1)} Weave`;
+      }
+      playShowroomSound(500, 0.04, 0.05);
+    };
+  }
+
+  // Certificate generation binding
+  const btnGenerateCertificate = document.getElementById('btn-generate-certificate');
+  const certOverlay = document.getElementById('cert-overlay');
+  const btnCloseCert = document.getElementById('btn-close-cert');
+
+  if (btnGenerateCertificate && certOverlay) {
+    btnGenerateCertificate.onclick = () => {
+      const hueVal = isCustomMode ? customHue : (activeItem.color_hue || 0);
+      const satVal = isCustomMode ? customSat : (activeItem.color_saturation || 1.0);
+      const patternVal = isCustomMode ? customPattern : (activeItem.category_name || 'Ikat');
+
+      document.getElementById('cert-display-hue').textContent = `${hueVal}° HSL`;
+      document.getElementById('cert-display-sat').textContent = `${parseFloat(satVal).toFixed(2)}x`;
+      document.getElementById('cert-display-pattern').textContent = patternVal.charAt(0).toUpperCase() + patternVal.slice(1);
+      
+      const uniqueId = `LOM-2026-${Math.floor(1000 + Math.random() * 9000)}`;
+      document.getElementById('cert-display-id').textContent = `CERTIFICATE #${uniqueId}`;
+
+      certOverlay.classList.remove('hidden');
+      playShowroomSound(980, 0.08, 0.2);
+    };
+  }
+
+  if (btnCloseCert && certOverlay) {
+    btnCloseCert.onclick = () => {
+      certOverlay.classList.add('hidden');
+      playShowroomSound(440, 0.04, 0.05);
+    };
+  }
+
   // Remove the static SELECT input binding if it exists
   const selectAvatar = document.getElementById('select-avatar-asset');
   if (selectAvatar) {
-    selectAvatar.style.display = 'none'; // hide select drop-down, replace with sidebar thumbs
+    selectAvatar.style.display = 'none';
   }
   
   const acquireBtn = document.getElementById('btn-acquire-now');
@@ -2185,7 +2308,193 @@ window.addEventListener('DOMContentLoaded', () => {
   setupMetamorphosis();
   setupVaultTunnel();
   setupCustomCursor();
+  setupInteractiveExtensions();
 });
+
+function setupInteractiveExtensions() {
+  // 1. SHUTTLE LOOM MINIGAME
+  const btnToggleManual = document.getElementById('btn-toggle-manual-loom');
+  const manualLoomPanel = document.getElementById('manual-loom-panel');
+  const shuttleSlider = document.getElementById('shuttle-slider');
+  const progressVal = document.getElementById('game-progress-val');
+  const progressBar = document.getElementById('game-progress-bar');
+  const successMsg = document.getElementById('game-success-message');
+  
+  let isManualActive = false;
+  let weftProgress = 0;
+  let lastSide = 'left';
+  
+  if (btnToggleManual && manualLoomPanel) {
+    btnToggleManual.onclick = () => {
+      isManualActive = !isManualActive;
+      if (isManualActive) {
+        btnToggleManual.textContent = "Deactivate Manual Shuttle Loom";
+        manualLoomPanel.classList.remove('hidden');
+        weftProgress = 0;
+        lastSide = 'left';
+        if (progressVal) progressVal.textContent = '0%';
+        if (progressBar) progressBar.style.width = '0%';
+        if (shuttleSlider) shuttleSlider.style.left = '0';
+        if (successMsg) successMsg.classList.add('hidden');
+      } else {
+        btnToggleManual.textContent = "Activate Manual Shuttle Loom";
+        manualLoomPanel.classList.add('hidden');
+      }
+    };
+  }
+
+  window.addEventListener('keydown', (e) => {
+    if (!isManualActive || weftProgress >= 100) return;
+    
+    const key = e.key.toLowerCase();
+    if (key === 'a' && lastSide === 'right') {
+      weftProgress += 5;
+      lastSide = 'left';
+      if (shuttleSlider) shuttleSlider.style.left = '0';
+      triggerShuttleSound(true);
+      updateWeftProgress();
+    } else if (key === 'd' && lastSide === 'left') {
+      weftProgress += 5;
+      lastSide = 'right';
+      if (shuttleSlider) shuttleSlider.style.left = 'calc(100% - 20px)';
+      triggerShuttleSound(false);
+      updateWeftProgress();
+    }
+  });
+
+  function triggerShuttleSound(isLeft) {
+    if (!audioCtx || audioCtx.state !== 'running') return;
+    try {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = isLeft ? 'triangle' : 'sawtooth';
+      osc.frequency.setValueAtTime(isLeft ? 220 : 330, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.12);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.12);
+    } catch (err) {}
+  }
+
+  function updateWeftProgress() {
+    if (weftProgress > 100) weftProgress = 100;
+    if (progressVal) progressVal.textContent = `${weftProgress}%`;
+    if (progressBar) progressBar.style.width = `${weftProgress}%`;
+    
+    if (weftProgress === 100) {
+      if (successMsg) successMsg.classList.remove('hidden');
+      playSuccessFanfare();
+      
+      // Seed a secret master design in localStorage!
+      try {
+        const localInv = JSON.parse(localStorage.getItem('saree_inventory') || '[]');
+        const secretId = 99;
+        if (!localInv.find(i => i.id === secretId)) {
+          localInv.unshift({
+            id: secretId,
+            name: 'Artisan Golden Shuttle Saree',
+            category_id: 4,
+            category_name: 'Tissue Silk',
+            artisan_id: 2,
+            artisan_name: 'Shri Ranjan Meher',
+            artisan_location: 'Maniabandha, Odisha',
+            price_fiat: 280000,
+            stock_status: 'available',
+            material: 'Woven Golden Shuttle Thread',
+            weaving_time_days: 50,
+            description: 'Unlocks by completing the rhythm. Pure gold threads spun in traditional grid designs representing the sun deity.',
+            color_hue: 50,
+            color_saturation: 1.5
+          });
+          localStorage.setItem('saree_inventory', JSON.stringify(localInv));
+          setTimeout(() => {
+            setupVaultTunnel();
+          }, 1500);
+        }
+      } catch (err) {}
+    }
+  }
+
+  function playSuccessFanfare() {
+    if (!audioCtx) return;
+    const notes = [261.63, 329.63, 392.00, 523.25];
+    notes.forEach((freq, idx) => {
+      setTimeout(() => {
+        try {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+          gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.25);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.25);
+        } catch (e) {}
+      }, idx * 120);
+    });
+  }
+
+  // 2. GEOGRAPHICAL WEAVING MAP
+  const markers = document.querySelectorAll('.map-marker');
+  const infoName = document.querySelector('.info-cluster-name');
+  const infoDesc = document.querySelector('.info-cluster-desc');
+
+  const CLUSTER_DATA = {
+    nuapatna: {
+      name: "Nuapatna Weavers Cluster",
+      desc: "Famous for Khandua Ikat (Loom of Devotion) woven for Jagannath deities. Historically utilizes turmeric, madder root, and wild tassar silk threads."
+    },
+    maniabandha: {
+      name: "Maniabandha Double-Ikat Cluster",
+      desc: "Renowned for geometric mathematical grids and Lotus motif double-Ikat. Zero-electricity Pit Looms operated by Buddhist weavers."
+    },
+    puri: {
+      name: "Puri Temple Architecture Weavers",
+      desc: "Specializes in weaving temple borders and mythological patterns, featuring intricate details inspired by the stone carvings of Jagannath Temple."
+    },
+    kotpad: {
+      name: "Kotpad Tribal Dye Cooperative",
+      desc: "Woven using thick organic cotton yarn colored with organic root bark extracts from the Indian Madder tree (Aal tree). Deep crimson and ocher tones."
+    }
+  };
+
+  markers.forEach(marker => {
+    const clusterKey = marker.dataset.cluster;
+    marker.onmouseenter = () => {
+      const data = CLUSTER_DATA[clusterKey];
+      if (data && infoName && infoDesc) {
+        infoName.textContent = data.name;
+        infoDesc.textContent = data.desc;
+        marker.querySelector('circle').setAttribute('fill', '#ffd700');
+        marker.querySelector('circle').setAttribute('r', '7');
+      }
+    };
+
+    marker.onmouseleave = () => {
+      marker.querySelector('circle').setAttribute('fill', '#d4af37');
+      marker.querySelector('circle').setAttribute('r', '5');
+    };
+
+    marker.onclick = () => {
+      if (audioCtx) {
+        try {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+          gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.1);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+        } catch (e) {}
+      }
+    };
+  });
+}
 
 function setupCustomCursor() {
   const dot = document.getElementById('cursor-dot');

@@ -4,14 +4,20 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev:frontend": "vite",
+    "dev:backend": "node server/index.js",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "db:seed": "node server/seed.js"
   },
   "devDependencies": {
+    "concurrently": "^10.0.3",
     "vite": "^8.1.1"
   },
   "dependencies": {
+    "better-sqlite3": "^12.11.1",
+    "express": "^5.2.1",
     "gsap": "^3.15.0"
   }
 }

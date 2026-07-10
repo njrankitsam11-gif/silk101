@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Loom Console | Antigraviti Inventory</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;600&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/src/style.css">
+    <style>
+      body {
+        background: #06060b;
+        color: #fff;
+        font-family: 'Outfit', sans-serif;
+      }
+      .admin-layout {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+      }
+      .admin-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        padding-bottom: 1.5rem;
+        margin-bottom: 2rem;
+      }
+      .admin-logo {
+        font-family: 'Playfair Display', serif;
+        font-weight: 300;
+        font-size: 1.8rem;
+        letter-spacing: 2px;
+      }
+      .admin-logo span {
+        color: var(--color-accent, #ffd700);
+      }
+      .admin-nav {
+        display: flex;
+        gap: 1.5rem;
+      }
+      .admin-nav-btn {
+        background: transparent;
+        border: none;
+        color: #86868b;
+        font-size: 0.95rem;
+        font-weight: 500;
+        cursor: pointer;
+        padding: 0.5rem 0;
+        border-bottom: 2px solid transparent;
+        transition: all 0.3s;
+      }
+      .admin-nav-btn.active, .admin-nav-btn:hover {
+        color: #fff;
+        border-bottom-color: var(--color-accent, #ffd700);
+      }
+      
+      /* Dashboard Metrics Grid */
+      .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
+        margin-bottom: 2.5rem;
+      }
+      .metric-card {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        border-radius: 8px;
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      }
+      .metric-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: #86868b;
+      }
+      .metric-value {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.2rem;
+        font-weight: 400;
+        color: var(--color-accent, #ffd700);
+      }
+
+      /* Sections styling */
+      .admin-section {
+        display: none;
+      }
+      .admin-section.active {
+        display: block;
+      }
+
+      /* Action controls */
+      .action-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+      }
+      .btn-add {
+        background: var(--color-accent, #ffd700);
+        color: #000;
+        border: none;
+        padding: 0.6rem 1.4rem;
+        border-radius: 4px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .btn-add:hover {
+        background: #fff;
+        box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+      }
+
+      /* Data Tables */
+      .table-container {
+        background: rgba(255, 255, 255, 0.01);
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+        font-size: 0.9rem;
+      }
+      th, td {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      }
+      th {
+        background: rgba(255, 255, 255, 0.02);
+        color: #86868b;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 1px;
+      }
+      tr:last-child td {
+        border-bottom: none;
+      }
+      tr:hover td {
+        background: rgba(255, 255, 255, 0.01);
+      }
+
+      /* Dropdown select inside table */
+      .status-select {
+        background: #111116;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #fff;
+        padding: 0.35rem 0.65rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        outline: none;
+        cursor: pointer;
+        font-family: inherit;
+      }
+      .status-select.available { border-color: #2ecc71; color: #2ecc71; }
+      .status-select.reserved { border-color: #f1c40f; color: #f1c40f; }
+      .status-select.sold { border-color: #e74c3c; color: #e74c3c; }
+
+      .btn-delete {
+        background: transparent;
+        border: 1px solid rgba(231, 76, 60, 0.4);
+        color: #e74c3c;
+        padding: 0.35rem 0.65rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .btn-delete:hover {
+        background: #e74c3c;
+        color: #fff;
+      }
+
+      /* Modal styling */
+      .admin-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 10000;
+        background: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(8px);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s;
+      }
+      .admin-modal.open {
+        opacity: 1;
+        pointer-events: all;
+      }
+      .modal-card {
+        background: #0c0c12;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 8px;
+        width: 100%;
+        max-width: 550px;
+        padding: 2rem;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+      }
+      .modal-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+        color: var(--color-accent, #ffd700);
+      }
+      .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+      }
+      .form-group-full {
+        grid-column: span 2;
+      }
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+      }
+      .form-group label {
+        font-size: 0.75rem;
+        color: #86868b;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+      .form-group input, .form-group select, .form-group textarea {
+        background: #111116;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #fff;
+        padding: 0.55rem;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        outline: none;
+        font-family: inherit;
+      }
+      .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+        border-color: var(--color-accent, #ffd700);
+      }
+      .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+      }
+      .btn-cancel {
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #86868b;
+        padding: 0.55rem 1.2rem;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .btn-cancel:hover {
+        color: #fff;
+        border-color: rgba(255,255,255,0.3);
+      }
+      .btn-submit {
+        background: var(--color-accent, #ffd700);
+        color: #000;
+        border: none;
+        padding: 0.55rem 1.4rem;
+        border-radius: 4px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .btn-submit:hover {
+        background: #fff;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="admin-layout">
+      <!-- Top Navigation -->
+      <header class="admin-header">
+        <div class="admin-logo">Loom<span>Admin</span></div>
+        <nav class="admin-nav">
+          <button class="admin-nav-btn active" data-target="sec-inventory">Inventory</button>
+          <button class="admin-nav-btn" data-target="sec-enquiries">Enquiries</button>
+          <button class="admin-nav-btn" data-target="sec-artisans">Artisans</button>
+          <a href="/index.html" class="admin-nav-btn">← Back to Site</a>
+        </nav>
+      </header>
+
+      <!-- Dashboard Metrics -->
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <span class="metric-label">Total Saree Designs</span>
+          <span class="metric-value" id="metric-total-designs">0</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">Available Stock</span>
+          <span class="metric-value" id="metric-available">0</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">Active Weavers</span>
+          <span class="metric-value" id="metric-weavers">0</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">Open Enquiries</span>
+          <span class="metric-value" id="metric-enquiries">0</span>
+        </div>
+      </div>
+
+      <!-- SECTION 1: INVENTORY MANAGER -->
+      <section id="sec-inventory" class="admin-section active">
+        <div class="action-row">
+          <h3 style="font-family:'Playfair Display', serif; font-size:1.4rem;">Saree Collection Inventory</h3>
+          <button class="btn-add" id="btn-open-add-modal">+ Add New Saree</button>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Saree Name</th>
+                <th>Category</th>
+                <th>Weaver / Artisan</th>
+                <th>Price (₹)</th>
+                <th>Weaving Days</th>
+                <th>Material</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="inventory-table-body">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- SECTION 2: ENQUIRY LOGS -->
+      <section id="sec-enquiries" class="admin-section">
+        <div class="action-row">
+          <h3 style="font-family:'Playfair Display', serif; font-size:1.4rem;">Customer Design Enquiries</h3>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Customer Name</th>
+                <th>Email</th>
+                <th>Saree Interest</th>
+                <th>Message</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="enquiries-table-body">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- SECTION 3: ARTISANS DIRECTORY -->
+      <section id="sec-artisans" class="admin-section">
+        <div class="action-row">
+          <h3 style="font-family:'Playfair Display', serif; font-size:1.4rem;">Artisan & Weaving Registry</h3>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Weaver Name</th>
+                <th>Village Location</th>
+                <th>Years of Experience</th>
+                <th>Bio / Details</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="artisans-table-body">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <!-- ADD NEW SAREE MODAL -->
+    <div class="admin-modal" id="add-saree-modal">
+      <div class="modal-card">
+        <h4 class="modal-title">Register New Handloom Saree</h4>
+        <form id="add-saree-form">
+          <div class="form-grid">
+            <div class="form-group form-group-full">
+              <label for="inp-name">Saree Name</label>
+              <input type="text" id="inp-name" required placeholder="e.g. Sambalpuri Lotus Saree">
+            </div>
+            
+            <div class="form-group">
+              <label for="inp-category">Category</label>
+              <select id="inp-category" required>
+                <!-- Dynamically populated -->
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="inp-artisan">Weaver / Artisan</label>
+              <select id="inp-artisan" required>
+                <!-- Dynamically populated -->
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="inp-price">Price (₹)</label>
+              <input type="number" id="inp-price" required placeholder="e.g. 150000">
+            </div>
+
+            <div class="form-group">
+              <label for="inp-weaving-time">Weaving Time (Days)</label>
+              <input type="number" id="inp-weaving-time" required placeholder="e.g. 28">
+            </div>
+
+            <div class="form-group form-group-full">
+              <label for="inp-material">Material Specifications</label>
+              <input type="text" id="inp-material" required placeholder="e.g. 100% Pure Mulberry Silk">
+            </div>
+
+            <div class="form-group form-group-full">
+              <label for="inp-description">Saree Narrative & Description</label>
+              <textarea id="inp-description" rows="3" placeholder="Brief description of motifs, warp patterns, or provenance details..."></textarea>
+            </div>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn-cancel" id="btn-close-add-modal">Cancel</button>
+            <button type="submit" class="btn-submit">Add to Collection</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Script Entrypoint -->
+    <script type="module" src="/src/admin.js"></script>
+    <!-- Custom Cursor -->
+    <div class="custom-cursor-dot" id="cursor-dot"></div>
+    <div class="custom-cursor-ring" id="cursor-ring"></div>
+  </body>
+</html>

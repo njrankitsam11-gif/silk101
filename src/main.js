@@ -1587,10 +1587,26 @@ function setupShowroomDrape(item) {
   const acquireBtn = document.getElementById('btn-acquire-now');
   const successMsg = document.getElementById('reserve-success-message');
   
-  acquireBtn.onclick = () => {
-    acquireBtn.classList.add('hidden');
-    successMsg.classList.remove('hidden');
-    playShowroomSound(880, 0.08, 0.3);
+  acquireBtn.onclick = async () => {
+    try {
+      const res = await fetch('/api/enquiries', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          item_id: currentAvatarId,
+          customer_name: 'Walk-in Guest',
+          customer_email: 'guest@antigravity.com',
+          message: `Enquired interest in the "${document.getElementById('showroom-title').textContent}"`
+        })
+      });
+      if (res.ok) {
+        acquireBtn.classList.add('hidden');
+        successMsg.classList.remove('hidden');
+        playShowroomSound(880, 0.08, 0.3);
+      }
+    } catch(e) {
+      console.error('Enquiry failed:', e);
+    }
   };
   
   // Keyboard Accessibility spins

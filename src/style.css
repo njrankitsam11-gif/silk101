@@ -1575,3 +1575,13 @@ body.cursor-drag .custom-cursor-ring::after {
   }
 }
 
+/* Saree Layer Model Overlay */
+.saree-layer.layer-model {
+  transform: translateZ(12px);
+  background-size: contain;
+  background-position: bottom center;
+  background-repeat: no-repeat;
+  opacity: 0.85;
+}
+
+

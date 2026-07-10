@@ -371,7 +371,11 @@ app.post('/api/articles/generate', (req, res) => {
   }
 });
 
-// Start Express Server
-app.listen(PORT, () => {
-  console.log(`Express API running on port ${PORT}`);
-});
+// Start Express Server only if not imported as serverless
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`Express API running on port ${PORT}`);
+  });
+}
+
+export default app;

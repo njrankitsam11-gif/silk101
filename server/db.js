@@ -2,8 +2,27 @@ import Database from 'better-sqlite3';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
+import fs from 'fs';
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const dbPath = join(__dirname, 'database.db');
+let dbPath = join(__dirname, 'database.db');
+
+// Enable serverless write path for Vercel
+if (process.env.VERCEL || process.env.NOW_BUILDER || __dirname.includes('/var/task') || __dirname.includes('/tmp')) {
+  const targetPath = '/tmp/database.db';
+  try {
+    if (!fs.existsSync(targetPath)) {
+      const srcPath = join(__dirname, 'database.db');
+      if (fs.existsSync(srcPath)) {
+        fs.copyFileSync(srcPath, targetPath);
+        console.log('Copied database to writable path /tmp/database.db');
+      }
+    }
+    dbPath = targetPath;
+  } catch (err) {
+    console.error('Failed to copy SQLite database to /tmp:', err);
+  }
+}
 
 const db = new Database(dbPath);
 

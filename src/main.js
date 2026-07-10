@@ -820,6 +820,291 @@ function setupMetamorphosis() {
 ========================================================== */
 let sareeCollection = [];
 
+const FALLBACK_INVENTORY = [
+  {
+    id: 1,
+    name: 'Nuapatana Khandua Ikat Saree',
+    category_id: 1,
+    category_name: 'Ikat',
+    artisan_id: 1,
+    artisan_name: 'Smt. Sebati Mohanty',
+    artisan_location: 'Nuapatna, Odisha',
+    price_fiat: 150000,
+    stock_status: 'available',
+    material: '100% Pure Mulberry Silk',
+    weaving_time_days: 28,
+    description: 'A masterpiece of Nuapatna, tie-dyed with organic crimson and gold. Highlights a stylized geometric gold elephant Zari motif on the Pallu.',
+    color_hue: 0,
+    color_saturation: 1.0
+  },
+  {
+    id: 2,
+    name: 'Sambalpuri Lotus Saree',
+    category_id: 1,
+    category_name: 'Ikat',
+    artisan_id: 2,
+    artisan_name: 'Shri Ranjan Meher',
+    artisan_location: 'Maniabandha, Odisha',
+    price_fiat: 135000,
+    stock_status: 'available',
+    material: 'Mulberry Silk',
+    weaving_time_days: 24,
+    description: 'Traditional Sambalpuri Lotus. Bold raspberry red background with gold-plated silver thread Zari portraying organic lotus petals.',
+    color_hue: 320,
+    color_saturation: 1.2
+  },
+  {
+    id: 3,
+    name: 'Kotpad Temple Border Saree',
+    category_id: 2,
+    category_name: 'Chanderi',
+    artisan_id: 1,
+    artisan_name: 'Smt. Sebati Mohanty',
+    artisan_location: 'Nuapatna, Odisha',
+    price_fiat: 125000,
+    stock_status: 'available',
+    material: 'Organic Cotton',
+    weaving_time_days: 35,
+    description: 'Kotpad tribal style, featuring deep forest green with ocher oad-tree roots temple borders. Colored using local organic tree barks.',
+    color_hue: 165,
+    color_saturation: 1.2
+  },
+  {
+    id: 4,
+    name: 'Konark Sundial Relic Saree',
+    category_id: 4,
+    category_name: 'Tissue Silk',
+    artisan_id: 2,
+    artisan_name: 'Shri Ranjan Meher',
+    artisan_location: 'Maniabandha, Odisha',
+    price_fiat: 175000,
+    stock_status: 'available',
+    material: 'Tussar Silk',
+    weaving_time_days: 30,
+    description: 'Dedicated to the Sun God of Konark. The Pallu features a highly detailed, procedurally woven stone relief wheel representing time divisions.',
+    color_hue: 260,
+    color_saturation: 1.3
+  },
+  {
+    id: 5,
+    name: 'Lord Jagannath Provenance Saree',
+    category_id: 1,
+    category_name: 'Ikat',
+    artisan_id: 3,
+    artisan_name: 'Shri Kailash Meher',
+    artisan_location: 'Puri, Odisha',
+    price_fiat: 205000,
+    stock_status: 'available',
+    material: 'Khandua Silk',
+    weaving_time_days: 42,
+    description: 'Sacred Khandua style. Features Balabhadra, Subhadra, and Lord Jagannath in holy shrine, with vertical lotus borders. Woven with ocher and vermilion silk.',
+    color_hue: 45,
+    color_saturation: 0.8
+  },
+  {
+    id: 6,
+    name: 'Maniabandha Grid Saree',
+    category_id: 3,
+    category_name: 'Kanjivaram',
+    artisan_id: 3,
+    artisan_name: 'Shri Kailash Meher',
+    artisan_location: 'Puri, Odisha',
+    price_fiat: 185000,
+    stock_status: 'available',
+    material: 'Fine Silk Blend',
+    weaving_time_days: 28,
+    description: 'Classic Maniabandha grid layout. Geometric diamonds and checkerboard squares representing mathematical symmetry in handloom.',
+    color_hue: 30,
+    color_saturation: 1.1
+  }
+];
+
+const FALLBACK_ARTICLES = [
+  {
+    id: 1,
+    slug: 'buy-khandua-silk-sarees-online',
+    title: 'Buy Khandua Silk Sarees Online — A Global Buyer’s Guide',
+    meta_description: 'Are you looking to buy authentic Khandua Silk sarees online from USA, UK, Canada or UAE? Read our comprehensive 2026 handloom checklist, price guides, and weaver certificate verification.',
+    content_html: `<article>
+      <h1>Buy Khandua Silk Sarees Online — A Global Buyer’s Guide</h1>
+      <p class="intro">For the global Indian diaspora, holding a piece of home is a feeling beyond words. The Khandua Silk saree, originating from the ancient village of Nuapatna in Odisha, represents over eight centuries of sacred weaving heritage.</p>
+      <h2>Why Khandua Silk is Sacred</h2>
+      <p>Traditionally woven for the deities of the Jagannath Temple in Puri, Khandua silk incorporates shlokas from Gita Govinda directly into its weave. Known as the "Loom of Devotion", this fabric uses tie-dyed mulberry silk threads, dyed with local organic turmeric, indigo, and madder root extracts.</p>
+      <h2>How to Verify Authentic Handloom Silk Online</h2>
+      <ul>
+        <li><strong>Look for the Silk Mark Certification:</strong> Authentic pieces carry a government-certified label with a unique hologram.</li>
+        <li><strong>Inspect the Zari Weft:</strong> Genuine gold and silver plated copper threads feel heavy and display a subtle, elegant gleam rather than a harsh metallic shine.</li>
+        <li><strong>Identify Warp Variations:</strong> Unlike powerlooms, handlooms have organic irregularities in thread count and tension, reflecting human craftsmanship.</li>
+      </ul>
+      <h2>Global Shipping and Custom Sizing Details</h2>
+      <p>Our platform delivers directly from Tigiria and Maniabandha weaving cooperatives to international destinations like New York, London, Toronto, Dubai, and Sydney. All custom blouse stitching requests are handled by expert traditional tailors in Odisha.</p>
+    </article>`,
+    topic_keyword: 'buy Khandua silk online',
+    target_locale: 'global',
+    status: 'published',
+    created_at: new Date().toISOString()
+  },
+  {
+    id: 2,
+    slug: 'odisha-handloom-heritage-diaspora',
+    title: 'Odisha Handloom Heritage: Sambalpuri Ikat for the Indian Diaspora',
+    meta_description: 'Discover the legacy of double-Ikat patterns, Sambalpuri Lotus motifs, and Maniabandha weaves. Why global Indian diaspora collectors trust pure handloom drapes.',
+    content_html: `<article>
+      <h1>Odisha Handloom Heritage: Sambalpuri Ikat for the Indian Diaspora</h1>
+      <p class="intro">From the mathematical geometry of Maniabandha grids to the spectacular floral complexity of Sambalpuri Lotus sarees, Odisha's handloom stands as a testament to the country's ancient craftsmanship.</p>
+      <h2>The Art of Ikat</h2>
+      <p>Ikat, or "Bandha", is a resist dyeing technique where the warp and weft threads are tied and dyed prior to weaving. In double-Ikat, both warp and weft are dyed with mathematical precision so they align perfectly on the loom to form motifs of elephants, conch shells, and lotus blooms.</p>
+      <h2>Preserving Heritage Abroad</h2>
+      <p>For Indians residing in countries like Australia, the UK, and the USA, owning an authentic Sambalpuri saree is a way to celebrate cultural pride at festivals, family weddings, and religious gatherings. Powerloom counterfeits have flooded mass marketplaces, which is why sourcing directly from weaver cooperatives remains paramount.</p>
+    </article>`,
+    topic_keyword: 'authentic Sambalpuri saree',
+    target_locale: 'global',
+    status: 'published',
+    created_at: new Date().toISOString()
+  },
+  {
+    id: 3,
+    slug: 'how-to-style-patta-silk-wedding-abroad',
+    title: 'How to Style a Patta Silk Saree for Wedding Season Abroad',
+    meta_description: 'Learn how to style traditional Odisha Patta and Khandua Silk sarees for modern wedding celebrations in the USA, UK, Canada, and Australia.',
+    content_html: `<article>
+      <h1>How to Style a Patta Silk Saree for Wedding Season Abroad</h1>
+      <p class="intro">Odisha Patta Silk is famous for its heavy weight, structural drape, and rich temple borders. Styling it for an international destination wedding requires balancing traditional elegance with modern comfort.</p>
+      <h2>1. The Classic Royal Drape</h2>
+      <p>Drape the saree with a neat, pleated pallu over the left shoulder to highlight the detailed craftsmanship of the Zari-work temple motifs. This drape works best with heavy gold jewelry or high-neck blouses.</p>
+      <h2>2. The Contemporary Jacket Blouse</h2>
+      <p>In colder regions like the UK or Canada, pair your Patta silk with a tailored velvet jacket or brocade crop blouse. This adds structural modern elegance while keeping you warm during winter receptions.</p>
+      <h2>3. Minimalist Modern Styling</h2>
+      <p>Keep accessories minimal with simple diamond studs and a sleek watch. Let the vibrant organic dyes and bold geometric prints of Maniabandha silk occupy center stage.</p>
+    </article>`,
+    topic_keyword: 'traditional Indian saree online',
+    target_locale: 'global',
+    status: 'published',
+    created_at: new Date().toISOString()
+  },
+  {
+    id: 4,
+    slug: 'how-to-identify-real-handloom-silk',
+    title: 'Authentication Checklist: How to Identify Real Handloom Silk vs. Powerloom',
+    meta_description: 'The ultimate guide to distinguishing pure zero-electricity handloom silk sarees from cheap machine-made duplicates. Key checks for Zari, borders, and weave.',
+    content_html: `<article>
+      <h1>Authentication Checklist: How to Identify Real Handloom Silk vs. Powerloom</h1>
+      <p class="intro">As the global demand for Indian handlooms rises, cheap machine duplicates have flooded the market. Use this five-step checklist to ensure you are buying real heritage craft.</p>
+      <h2>1. The Temple Border Joint</h2>
+      <p>On a handloom, the transition border where the body meets the border (often called "Phoda Kumbha" or temple spikes) is woven by interlocking the threads. This leaves a unique hand-joined edge. Powerlooms mimic this with print or loose threads.</p>
+      <h2>2. The Thread Burning Test</h2>
+      <p>Real mulberry silk threads burn with a smell similar to burning hair, leaving behind a crumbly black ash. Synthetic fibers melt, smell like plastic, and form a hard bead.</p>
+      <h2>3. The Reverse Side Check</h2>
+      <p>Look at the reverse side of the pallu. Handloom sarees feature clean, hand-threaded knots and floats. Powerlooms will show mass-clipped, fuzzy loose threads from automated shuttle cutters.</p>
+    </article>`,
+    topic_keyword: 'handloom silk saree Odisha',
+    target_locale: 'global',
+    status: 'published',
+    created_at: new Date().toISOString()
+  }
+];
+
+function initializeLocalStorage() {
+  try {
+    const inv = localStorage.getItem('saree_inventory');
+    if (!inv || JSON.parse(inv).length === 0) {
+      localStorage.setItem('saree_inventory', JSON.stringify(FALLBACK_INVENTORY));
+    }
+  } catch (e) {
+    localStorage.setItem('saree_inventory', JSON.stringify(FALLBACK_INVENTORY));
+  }
+  
+  try {
+    const arts = localStorage.getItem('saree_artisans');
+    if (!arts || JSON.parse(arts).length === 0) {
+      localStorage.setItem('saree_artisans', JSON.stringify([
+        { id: 1, name: 'Smt. Sebati Mohanty', location: 'Nuapatna, Odisha', experience_years: 32, bio: 'Master weaver specializing in sacred Khandua scripture patterns.', status: 'active' },
+        { id: 2, name: 'Shri Ranjan Meher', location: 'Maniabandha, Odisha', experience_years: 28, bio: 'Expert in mathematical geometric double-Ikat patterns.', status: 'active' },
+        { id: 3, name: 'Shri Kailash Meher', location: 'Puri, Odisha', experience_years: 40, bio: 'Renowned for complex mythological and temple architecture drapes.', status: 'active' }
+      ]));
+    }
+  } catch (e) {
+    localStorage.setItem('saree_artisans', JSON.stringify([
+      { id: 1, name: 'Smt. Sebati Mohanty', location: 'Nuapatna, Odisha', experience_years: 32, bio: 'Master weaver specializing in sacred Khandua scripture patterns.', status: 'active' },
+      { id: 2, name: 'Shri Ranjan Meher', location: 'Maniabandha, Odisha', experience_years: 28, bio: 'Expert in mathematical geometric double-Ikat patterns.', status: 'active' },
+      { id: 3, name: 'Shri Kailash Meher', location: 'Puri, Odisha', experience_years: 40, bio: 'Renowned for complex mythological and temple architecture drapes.', status: 'active' }
+    ]));
+  }
+
+  try {
+    const cats = localStorage.getItem('saree_categories');
+    if (!cats || JSON.parse(cats).length === 0) {
+      localStorage.setItem('saree_categories', JSON.stringify([
+        { id: 1, name: 'Ikat', description: 'Tie-dyed warp and weft patterns' },
+        { id: 2, name: 'Chanderi', description: 'Sheer texture and gold border' },
+        { id: 3, name: 'Kanjivaram', description: 'Heavy silk and wide borders' },
+        { id: 4, name: 'Tissue Silk', description: 'Woven with metallic gold threads' }
+      ]));
+    }
+  } catch (e) {
+    localStorage.setItem('saree_categories', JSON.stringify([
+      { id: 1, name: 'Ikat', description: 'Tie-dyed warp and weft patterns' },
+      { id: 2, name: 'Chanderi', description: 'Sheer texture and gold border' },
+      { id: 3, name: 'Kanjivaram', description: 'Heavy silk and wide borders' },
+      { id: 4, name: 'Tissue Silk', description: 'Woven with metallic gold threads' }
+    ]));
+  }
+
+  try {
+    const enqs = localStorage.getItem('saree_enquiries');
+    if (!enqs || JSON.parse(enqs).length === 0) {
+      localStorage.setItem('saree_enquiries', JSON.stringify([
+        { id: 1, item_id: 1, item_name: 'Nuapatana Khandua Ikat Saree', customer_name: 'Aditi Rao', customer_email: 'aditi@example.com', message: 'I would love to schedule a custom sizing enquiry for the Khandua Saree.', status: 'pending', created_at: new Date().toISOString() }
+      ]));
+    }
+  } catch (e) {
+    localStorage.setItem('saree_enquiries', JSON.stringify([
+      { id: 1, item_id: 1, item_name: 'Nuapatana Khandua Ikat Saree', customer_name: 'Aditi Rao', customer_email: 'aditi@example.com', message: 'I would love to schedule a custom sizing enquiry for the Khandua Saree.', status: 'pending', created_at: new Date().toISOString() }
+    ]));
+  }
+
+  try {
+    const articles = localStorage.getItem('saree_articles');
+    if (!articles || JSON.parse(articles).length === 0) {
+      localStorage.setItem('saree_articles', JSON.stringify(FALLBACK_ARTICLES));
+    }
+  } catch (e) {
+    localStorage.setItem('saree_articles', JSON.stringify(FALLBACK_ARTICLES));
+  }
+}
+
+async function fetchInventory() {
+  try {
+    const response = await fetch('/api/inventory');
+    if (response.ok) {
+      const data = await response.json();
+      if (Array.isArray(data) && data.length > 0) {
+        try {
+          localStorage.setItem('saree_inventory', JSON.stringify(data));
+        } catch (e) {}
+        return data;
+      }
+    }
+  } catch (e) {
+    console.warn('API fetch failed, falling back to localStorage:', e);
+  }
+  
+  try {
+    initializeLocalStorage();
+    const stored = localStorage.getItem('saree_inventory');
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed;
+      }
+    }
+  } catch (e) {
+    console.warn('LocalStorage access failed:', e);
+  }
+  
+  return FALLBACK_INVENTORY;
+}
+
 // Dynamic Currency Conversion Utility
 function getLocaleDetails() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -851,9 +1136,7 @@ async function setupVaultTunnel() {
   stage.innerHTML = '<div style="color:var(--color-zari); font-family:\'Outfit\'; font-size:1.1rem; text-align:center; padding:100px 0;">Weaving loom connection...</div>';
 
   try {
-    const response = await fetch('/api/inventory');
-    if (!response.ok) throw new Error('API failed');
-    sareeCollection = await response.json();
+    sareeCollection = await fetchInventory();
     
     stage.innerHTML = ''; // Clear loading indicator
     
@@ -867,6 +1150,27 @@ async function setupVaultTunnel() {
       
       const silk = document.createElement('div');
       silk.className = 'saree-layer layer-silk';
+      
+      // Model draped in saree layer
+      const model = document.createElement('div');
+      model.className = 'saree-layer layer-model';
+      
+      let modelImgSrc = '/avatars/frame_front.png';
+      const hue = item.color_hue || 0;
+      if (hue >= 180 && hue < 240) {
+        modelImgSrc = '/avatars/navy_front.png';
+      } else if (hue >= 100 && hue < 180) {
+        modelImgSrc = '/avatars/green_front.png';
+      } else if (hue >= 240 && hue < 300) {
+        modelImgSrc = '/avatars/purple_front.png';
+      } else if (hue >= 40 && hue < 60) {
+        modelImgSrc = '/avatars/golden_front.png';
+      }
+      model.style.backgroundImage = `url(${modelImgSrc})`;
+      
+      if (hue !== 0 || (item.color_saturation !== undefined && item.color_saturation !== 1.0)) {
+        model.style.filter = `hue-rotate(${hue}deg) saturate(${item.color_saturation || 1.0})`;
+      }
       
       const zari = document.createElement('div');
       zari.className = 'saree-layer layer-zari';
@@ -898,6 +1202,7 @@ async function setupVaultTunnel() {
       
       card.appendChild(shadow);
       card.appendChild(silk);
+      card.appendChild(model);
       card.appendChild(zari);
       card.appendChild(info);
       
@@ -1441,17 +1746,44 @@ function setupShowroomDrape(initialItem, itemsList) {
   
   acquireBtn.onclick = async () => {
     try {
-      const res = await fetch('/api/enquiries', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          item_id: activeItem.id,
-          customer_name: 'Global Loom Guest',
-          customer_email: 'buyer@silk101.global',
-          message: `Enquired interest in buying the "${activeItem.name}" (#${activeItem.id})`
-        })
-      });
-      if (res.ok) {
+      const payload = {
+        item_id: activeItem.id,
+        customer_name: 'Global Loom Guest',
+        customer_email: 'buyer@silk101.global',
+        message: `Enquired interest in buying the "${activeItem.name}" (#${activeItem.id})`
+      };
+      
+      let success = false;
+      try {
+        const res = await fetch('/api/enquiries', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) success = true;
+      } catch (apiErr) {
+        console.warn('API enquiry failed, using localStorage:', apiErr);
+      }
+
+      if (!success) {
+        initializeLocalStorage();
+        const enqList = JSON.parse(localStorage.getItem('saree_enquiries') || '[]');
+        const newEnq = {
+          id: enqList.length + 1,
+          item_id: payload.item_id,
+          item_name: activeItem.name,
+          customer_name: payload.customer_name,
+          customer_email: payload.customer_email,
+          message: payload.message,
+          status: 'pending',
+          created_at: new Date().toISOString()
+        };
+        enqList.push(newEnq);
+        localStorage.setItem('saree_enquiries', JSON.stringify(enqList));
+        success = true;
+      }
+
+      if (success) {
         acquireBtn.classList.add('hidden');
         successMsg.classList.remove('hidden');
         playShowroomSound(880, 0.08, 0.3);

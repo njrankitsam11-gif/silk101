@@ -48,7 +48,7 @@ insertItem.run(
 
 insertItem.run(
   'Kotpad Temple Border Saree',
-  catIkat, artSebati, 125000, 'available',
+  catChanderi, artSebati, 125000, 'available',
   'Organic Cotton', 35,
   'Kotpad tribal style, featuring deep forest green with ocher oad-tree roots temple borders. Colored using local organic tree barks.',
   165, 1.2
@@ -56,7 +56,7 @@ insertItem.run(
 
 insertItem.run(
   'Konark Sundial Relic Saree',
-  catIkat, artRanjan, 175000, 'available',
+  catTissue, artRanjan, 175000, 'available',
   'Tussar Silk', 30,
   'Dedicated to the Sun God of Konark. The Pallu features a highly detailed, procedurally woven stone relief wheel representing time divisions.',
   260, 1.3
@@ -72,7 +72,7 @@ insertItem.run(
 
 insertItem.run(
   'Maniabandha Grid Saree',
-  catIkat, artKailash, 185000, 'available',
+  catKanjivaram, artKailash, 185000, 'available',
   'Fine Silk Blend', 28,
   'Classic Maniabandha grid layout. Geometric diamonds and checkerboard squares representing mathematical symmetry in handloom.',
   30, 1.1

@@ -881,7 +881,7 @@ async function setupVaultTunnel() {
       const zariCanvas = document.createElement('canvas');
       zariCanvas.width = 420;
       zariCanvas.height = 580;
-      drawZariPattern(zariCanvas.getContext('2d'), item.id, item.category_name);
+      drawZariPattern(zariCanvas.getContext('2d'), item);
       zari.style.backgroundImage = `url(${zariCanvas.toDataURL()})`;
       
       const isSold = item.stock_status === 'sold';
@@ -912,7 +912,7 @@ async function setupVaultTunnel() {
         const zariCtx = zariCanvas.getContext('2d');
         zariCtx.clearRect(0, 0, 420, 580);
         
-        drawZariPattern(zariCtx, item.id, item.category_name);
+        drawZariPattern(zariCtx, item);
         
         zariCtx.save();
         zariCtx.globalCompositeOperation = 'source-atop';
@@ -932,7 +932,7 @@ async function setupVaultTunnel() {
       card.addEventListener('mouseleave', () => {
         const zariCtx = zariCanvas.getContext('2d');
         zariCtx.clearRect(0, 0, 420, 580);
-        drawZariPattern(zariCtx, item.id, item.category_name);
+        drawZariPattern(zariCtx, item);
         zari.style.backgroundImage = `url(${zariCanvas.toDataURL()})`;
       });
       
@@ -1021,12 +1021,28 @@ function drawSilkTexture(ctx, hue, sat) {
   }
 }
 
-function drawZariPattern(ctx, id, category_name) {
-  const cat = (category_name || '').toLowerCase();
+function drawZariPattern(ctx, itemOrId, category_name) {
+  let name = '';
+  let cat = '';
   
-  if (cat.includes('ikat')) {
-    ctx.strokeStyle = 'rgba(255, 215, 0, 0.95)';
-    ctx.fillStyle = 'rgba(212, 175, 55, 0.25)';
+  if (itemOrId && typeof itemOrId === 'object') {
+    name = (itemOrId.name || '').toLowerCase();
+    cat = (itemOrId.category_name || '').toLowerCase();
+  } else {
+    const cardId = parseInt(itemOrId);
+    const item = sareeCollection.find(s => s.id === cardId);
+    if (item) {
+      name = (item.name || '').toLowerCase();
+      cat = (item.category_name || '').toLowerCase();
+    } else {
+      cat = (category_name || '').toLowerCase();
+    }
+  }
+  
+  if (name.includes('lotus')) {
+    // Sambalpuri Lotus pattern
+    ctx.strokeStyle = 'rgba(255, 0, 127, 0.95)';
+    ctx.fillStyle = 'rgba(255, 215, 0, 0.55)';
     ctx.lineWidth = 2.5;
     for (let y = 100; y < 580; y += 160) {
       ctx.save();
@@ -1036,28 +1052,40 @@ function drawZariPattern(ctx, id, category_name) {
       else drawLotusPath(ctx);
       ctx.restore();
     }
-  } else if (cat.includes('chanderi')) {
-    ctx.strokeStyle = 'rgba(255, 215, 0, 0.95)';
-    ctx.fillStyle = 'rgba(186, 26, 8, 0.15)';
+  } else if (name.includes('temple') || name.includes('border') || cat.includes('chanderi')) {
+    // Kotpad Temple Border pattern
+    ctx.strokeStyle = 'rgba(244, 208, 63, 0.95)';
+    ctx.fillStyle = 'rgba(186, 26, 8, 0.5)';
     ctx.lineWidth = 3;
     ctx.beginPath();
     for (let x = 30; x <= 390; x += 60) {
-      ctx.moveTo(x, 50); ctx.lineTo(x + 30, 180); ctx.lineTo(x + 60, 50);
-      ctx.moveTo(x, 530); ctx.lineTo(x + 30, 400); ctx.lineTo(x + 60, 530);
+      ctx.moveTo(x, 50);
+      ctx.lineTo(x + 30, 200);
+      ctx.lineTo(x + 60, 50);
+      
+      ctx.moveTo(x, 530);
+      ctx.lineTo(x + 30, 380);
+      ctx.lineTo(x + 60, 530);
     }
     ctx.stroke();
-  } else if (cat.includes('kanjivaram')) {
-    ctx.strokeStyle = 'rgba(255, 215, 0, 0.95)';
-    ctx.fillStyle = 'rgba(255, 0, 127, 0.1)';
+  } else if (name.includes('grid') || name.includes('checkerboard') || cat.includes('kanjivaram')) {
+    // Maniabandha Grid pattern
+    ctx.strokeStyle = 'rgba(0, 191, 255, 0.95)';
+    ctx.fillStyle = 'rgba(255, 0, 127, 0.45)';
     ctx.lineWidth = 2.5;
     ctx.beginPath();
     for (let x = 70; x < 420; x += 140) {
       for (let y = 100; y < 580; y += 180) {
-        ctx.moveTo(x, y - 40); ctx.lineTo(x + 40, y); ctx.lineTo(x, y + 40); ctx.lineTo(x - 40, y); ctx.closePath();
+        ctx.moveTo(x, y - 40);
+        ctx.lineTo(x + 40, y);
+        ctx.lineTo(x, y + 40);
+        ctx.lineTo(x - 40, y);
+        ctx.closePath();
       }
     }
     ctx.stroke();
-  } else if (cat.includes('tissue')) {
+  } else if (name.includes('sundial') || name.includes('konark') || name.includes('relic') || cat.includes('tissue')) {
+    // Konark Sundial Relic Pattern
     ctx.strokeStyle = 'rgba(255, 215, 0, 0.95)';
     ctx.lineWidth = 2;
     ctx.save();
@@ -1068,15 +1096,107 @@ function drawZariPattern(ctx, id, category_name) {
     ctx.stroke();
     for (let i = 0; i < 8; i++) {
       const angle = (i * Math.PI) / 4;
-      ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(Math.cos(angle) * 100, Math.sin(angle) * 100); ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(Math.cos(angle) * 100, Math.sin(angle) * 100);
+      ctx.stroke();
     }
     for (let t = 0; t < 24; t++) {
       const angle = (t * Math.PI * 2) / 24;
-      ctx.beginPath(); ctx.moveTo(Math.cos(angle) * 85, Math.sin(angle) * 85); ctx.lineTo(Math.cos(angle) * 100, Math.sin(angle) * 100); ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(Math.cos(angle) * 85, Math.sin(angle) * 85);
+      ctx.lineTo(Math.cos(angle) * 100, Math.sin(angle) * 100);
+      ctx.stroke();
     }
-    ctx.beginPath(); ctx.arc(0, 0, 25, 0, Math.PI * 2); ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(0, 0, 25, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  } else if (name.includes('jagannath') || name.includes('provenance') || name.includes('shrine')) {
+    // Lord Jagannath Provenance Pattern (The Holy Trinity)
+    ctx.save();
+    
+    ctx.strokeStyle = 'rgba(212, 175, 55, 0.7)';
+    ctx.lineWidth = 1.5;
+    ctx.fillStyle = 'rgba(212, 175, 55, 0.15)';
+    ctx.beginPath();
+    ctx.strokeRect(10, 20, 30, 540);
+    ctx.strokeRect(380, 20, 30, 540);
+    for (let y = 40; y < 560; y += 40) {
+      ctx.beginPath(); ctx.arc(25, y, 6, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(395, y, 6, 0, Math.PI * 2); ctx.stroke();
+    }
+    
+    ctx.translate(210, 290);
+    
+    ctx.strokeStyle = 'rgba(212, 175, 55, 0.85)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(-150, 120);
+    ctx.lineTo(-150, 0);
+    ctx.quadraticCurveTo(-150, -110, 0, -110);
+    ctx.quadraticCurveTo(150, -110, 150, 0);
+    ctx.lineTo(150, 120);
+    ctx.stroke();
+    
+    ctx.lineWidth = 1;
+    ctx.strokeRect(-160, 0, 10, 120);
+    ctx.strokeRect(150, 0, 10, 120);
+    
+    // Balabhadra
+    ctx.save();
+    ctx.translate(-75, 40);
+    ctx.strokeStyle = 'rgba(212, 175, 55, 0.9)';
+    ctx.lineWidth = 2;
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+    ctx.beginPath(); ctx.arc(0, 0, 32, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.arc(-13, -2, 10, 0, Math.PI * 2); ctx.stroke();
+    ctx.beginPath(); ctx.arc(13, -2, 10, 0, Math.PI * 2); ctx.stroke();
+    ctx.fillStyle = 'rgba(212, 175, 55, 0.9)';
+    ctx.beginPath(); ctx.arc(-13, -2, 4, 0, Math.PI * 2); ctx.arc(13, -2, 4, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = 'rgba(212, 175, 55, 0.9)'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(-22, -22); ctx.lineTo(0, -50); ctx.lineTo(22, -22); ctx.closePath(); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-32, 10); ctx.lineTo(-45, 10); ctx.lineTo(-45, -5);
+    ctx.moveTo(32, 10); ctx.lineTo(45, 10); ctx.lineTo(45, -5); ctx.stroke();
+    ctx.restore();
+    
+    // Subhadra
+    ctx.save();
+    ctx.translate(0, 50);
+    ctx.strokeStyle = 'rgba(212, 175, 55, 0.9)';
+    ctx.lineWidth = 2;
+    ctx.fillStyle = 'rgba(241, 196, 15, 0.15)';
+    ctx.beginPath(); ctx.ellipse(0, 0, 24, 28, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.strokeStyle = 'rgba(212, 175, 55, 0.95)'; ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.arc(-9, -2, 8, 0, Math.PI * 2); ctx.stroke();
+    ctx.beginPath(); ctx.arc(9, -2, 8, 0, Math.PI * 2); ctx.stroke();
+    ctx.fillStyle = 'rgba(212, 175, 55, 0.9)';
+    ctx.beginPath(); ctx.arc(-9, -2, 3, 0, Math.PI * 2); ctx.arc(9, -2, 3, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(-16, -24); ctx.lineTo(0, -48); ctx.lineTo(16, -24); ctx.closePath(); ctx.stroke();
+    ctx.restore();
+    
+    // Jagannath
+    ctx.save();
+    ctx.translate(75, 40);
+    ctx.strokeStyle = 'rgba(212, 175, 55, 0.95)';
+    ctx.lineWidth = 2;
+    ctx.fillStyle = 'rgba(10, 10, 10, 0.7)';
+    ctx.beginPath(); ctx.arc(0, 0, 32, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.strokeStyle = 'rgba(212, 175, 55, 0.95)'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.arc(-13, -2, 10, 0, Math.PI * 2); ctx.stroke();
+    ctx.beginPath(); ctx.arc(13, -2, 10, 0, Math.PI * 2); ctx.stroke();
+    ctx.fillStyle = 'rgba(212, 175, 55, 0.95)';
+    ctx.beginPath(); ctx.arc(-13, -2, 4, 0, Math.PI * 2); ctx.arc(13, -2, 4, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(-22, -22); ctx.lineTo(0, -50); ctx.lineTo(22, -22); ctx.closePath(); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-32, 10); ctx.lineTo(-45, 10); ctx.lineTo(-45, -5);
+    ctx.moveTo(32, 10); ctx.lineTo(45, 10); ctx.lineTo(45, -5); ctx.stroke();
+    ctx.restore();
+    
     ctx.restore();
   } else {
+    // Default Nuapatana Khandua Saree Elephant Motif
     ctx.strokeStyle = 'rgba(212, 175, 55, 0.9)';
     ctx.fillStyle = 'rgba(212, 175, 55, 0.35)';
     ctx.lineWidth = 2;

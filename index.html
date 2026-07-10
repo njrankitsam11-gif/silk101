@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The Loom of Time | Antigraviti x Odisha Patta Silk</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <!-- Premium Loading Overlay -->
+    <div id="loader" class="loader-overlay">
+      <div class="loader-content">
+        <span class="loader-tagline">ANTIGRAVITI PRESENTS</span>
+        <h1 class="loader-title">The Loom of Time</h1>
+        <div class="loader-bar-wrap">
+          <div class="loader-bar"></div>
+        </div>
+        <span class="loader-status">Preparing digital threads...</span>
+      </div>
+    </div>
+
+    <!-- Spatial Audio Start Screen -->
+    <div id="audio-modal" class="audio-prompt-overlay hidden">
+      <div class="audio-prompt-card">
+        <h2 class="audio-prompt-title">Experience the Loom</h2>
+        <p class="audio-prompt-desc">This digital showcase utilizes spatial ambient synthesizers and generative rhythmic audio to translate the tactile feel of the handloom. For the intended experience, please enable sound.</p>
+        <div class="audio-prompt-buttons">
+          <button id="btn-sound-on" class="btn btn-primary">Enter with Audio</button>
+          <button id="btn-sound-off" class="btn btn-secondary">Enter Silently</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Container -->
+    <main id="viewport">
+      <!-- Rhythmic Loom Audio & Synth Controller -->
+      <button id="audio-toggle" class="audio-indicator" aria-label="Mute/Unmute Audio">
+        <div class="sound-bars">
+          <span></span><span></span><span></span><span></span>
+        </div>
+        <span class="audio-text">AUDIO ON</span>
+      </button>
+
+      <!-- SECTION 1: THE GENESIS (Hero Drop) -->
+      <section id="genesis" class="scroll-section">
+        <div class="canvas-container">
+          <canvas id="canvas-genesis"></canvas>
+        </div>
+        <div class="content-overlay center-content">
+          <div class="text-mask-reveal">
+            <h2 class="embroidered-text">Woven Heritage.</h2>
+            <h2 class="embroidered-text accent">Preserved Forever.</h2>
+          </div>
+          <span class="scroll-hint">SCROLL TO WEAVE</span>
+        </div>
+      </section>
+
+      <!-- SECTION 2: THE ARTISAN'S PULSE -->
+      <section id="artisan-pulse" class="scroll-section horizontal-trigger">
+        <div class="horizontal-wrapper">
+          <div class="horizontal-scroll-section flex-row">
+            
+            <!-- Intro Card -->
+            <div class="slide slide-text flex-center">
+              <div class="slide-content">
+                <span class="section-label">01 / THE HUMAN CONNECTION</span>
+                <h3 class="slide-heading">The Artisan's Pulse</h3>
+                <p class="slide-desc">Every masterpiece begins in the hands of a master weaver in Nuapatna and Maniabandha. Their rhythm is the clock cycle of heritage.</p>
+              </div>
+            </div>
+
+            <!-- Left: Artisan Video/Simulation -->
+            <div class="slide slide-interactive flex-center">
+              <div class="interactive-split">
+                <div class="split-left">
+                  <div class="artisan-canvas-wrap">
+                    <canvas id="canvas-artisan"></canvas>
+                    <div class="hover-tag" id="artisan-tooltip">
+                      <div class="tag-glow"></div>
+                      <div class="tag-details">
+                        <span class="tag-title">Shri Ranjan Meher</span>
+                        <span class="tag-subtitle">Maniabandha Village</span>
+                        <span class="tag-stat">42 Years of Master Weaving</span>
+                      </div>
+                    </div>
+                  </div>
+                  <span class="caption">Hover above the hands to view weaver credentials.</span>
+                </div>
+                <div class="split-right">
+                  <div class="digital-loom-matrix">
+                    <canvas id="canvas-punchcard"></canvas>
+                    <div class="floating-code-overlay">
+                      <code>LOOM CONSOLE ACTIVE</code>
+                      <code>PATTERN ID: SHA-WOVEN</code>
+                      <code id="console-live-hash" class="hash">THREAD COUNT: 4200+</code>
+                    </div>
+                  </div>
+                  <div class="loom-controls">
+                    <h4 class="controls-title">Warp Console Settings</h4>
+                    <div class="control-row">
+                      <label for="slider-tension">Warp Tension</label>
+                      <input type="range" id="slider-tension" min="0.2" max="2.0" step="0.1" value="1.0">
+                      <span id="val-tension">1.0</span>
+                    </div>
+                    <div class="control-row">
+                      <label for="slider-density">Thread Count</label>
+                      <input type="range" id="slider-density" min="15" max="95" step="5" value="45">
+                      <span id="val-density">45</span>
+                    </div>
+                    <div class="control-row">
+                      <label for="select-pattern">Border Motif</label>
+                      <select id="select-pattern">
+                        <option value="lotus">Sambalpuri Lotus</option>
+                        <option value="temple">Kotpad Triangle</option>
+                        <option value="grid">Maniabandha Grid</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Slide 3: Our Story & Sustainability -->
+            <div class="slide slide-narrative flex-center">
+              <div class="narrative-split">
+                <!-- Left: Our Story -->
+                <div class="narrative-col">
+                  <span class="section-label">01B / EIGHT CENTURIES OF CRAFT</span>
+                  <h3 class="narrative-heading">Devotion & Struggle</h3>
+                  <p class="narrative-text">For eight centuries, the handloom artisans of Nuapatna have woven <strong>Khandua Silk</strong> as a sacred offering for Odisha's Ratha Yatra, dressing the towering temple chariots of Puri. This thread of faith survived the British colonial era, when machine-made cheap imports flooded the markets and policies restricted local silk production. The weavers' unwavering devotion is the soul that kept the loom alive.</p>
+                </div>
+                <!-- Right: Sustainability -->
+                <div class="narrative-col border-left">
+                  <span class="section-label">01C / THE ECO LOGIC</span>
+                  <h3 class="narrative-heading">Inherently Low Carbon</h3>
+                  <p class="narrative-text">Our heritage is naturally sustainable. Every saree is crafted on zero-electricity wooden handlooms, colored with organic dyes extracted from local madder roots, turmeric, and indigo. Partnering with <strong>Brahma Weavers Company (BWC)</strong>, we secure ethical livelihoods, fair-trade wages, and mathematical provenance for over 120 weaver families in Nuapatna and Maniabandha.</p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 3: THE METAMORPHOSIS (Physical to Digital NFT) -->
+      <section id="metamorphosis" class="scroll-section">
+        <div class="canvas-container">
+          <canvas id="canvas-meta"></canvas>
+        </div>
+        <div class="content-overlay left-content">
+          <div class="meta-card">
+            <span class="section-label">02 / CRYPTOGRAPHIC WEAVE</span>
+            <h3 class="meta-heading">The Metamorphosis</h3>
+            <p class="meta-desc">A premium Patta Saree meets the digital ledger. As you zoom into the Pallu, a secure cryptographic grid binds the silk threads with a unique blockchain ID, shielding the lineage from counterfeit clones.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 4: THE VAULT (1-of-1 Collection Gallery) -->
+      <section id="vault" class="scroll-section">
+        <div class="vault-heading-wrap">
+          <span class="section-label">03 / THE COLLECTION</span>
+          <h3 class="vault-title">The Vault</h3>
+          <p class="vault-subtitle">Scroll to fly through the 3D archive. <strong>Click any card to enter the 3D Window Shopping Showroom!</strong></p>
+        </div>
+        
+        <div class="tunnel-container">
+          <div class="tunnel-stage" id="tunnel-stage">
+            <!-- Saree cards are generated dynamically with Layer 1, 2, 3 and are interactive -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer / Outro -->
+      <footer class="scroll-section outro-section flex-center">
+        <div class="outro-content">
+          <h2 class="outro-logo">ANTIGRAVITI</h2>
+          <p class="outro-tagline">Crafting the Interface of Heritage and Tomorrow.</p>
+          <div class="footer-links">
+            <a href="#" class="footer-link">The Collection</a>
+            <a href="#" class="footer-link">Artisan Stories</a>
+            <a href="#" class="footer-link">Contact</a>
+          </div>
+        </div>
+      </footer>
+    </main>
+
+    <!-- IMMERSIVE SHOWROOM MODAL -->
+    <div id="unweave-modal" class="modal-overlay hidden">
+      <div class="modal-bg-glow"></div>
+      <div class="modal-close-btn" id="close-modal">&times;</div>
+
+      <!-- Full-screen Avatar Stage -->
+      <div class="showroom-fullscreen" id="showroom-tab-container">
+
+        <!-- Canvas fills the entire modal -->
+        <div class="drape-stage-full">
+          <canvas id="canvas-drape"></canvas>
+          <div class="loupe-indicator" id="loupe-indicator">Spotlight — hover to pan light</div>
+        </div>
+
+        <!-- Floating title strip at top -->
+        <div class="showroom-title-strip">
+          <div class="showroom-title-left">
+            <span class="showroom-archive-label">ODISHA HANDLOOM COLLECTION</span>
+            <h2 id="showroom-title">Nuapatana Khandua Ikat Saree</h2>
+            <span class="artisan-name-inline" id="showroom-artisan-name">Smt. Sebati Mohanty &nbsp;·&nbsp; Nuapatna, Odisha</span>
+          </div>
+          <div class="showroom-title-right">
+            <span class="price-label-top">STARTING FROM</span>
+            <span class="price-fiat-top" id="showroom-price-fiat">₹1,85,000</span>
+          </div>
+        </div>
+
+        <!-- Avatar portrait grid overlay (left side) -->
+        <div class="avatar-sidebar">
+          <span class="avatar-sidebar-label">COLLECTIONS</span>
+          <div class="avatar-thumbs">
+            <div class="avatar-thumb active" data-id="1"  style="background-color:#7a0515;">01</div>
+            <div class="avatar-thumb"        data-id="2"  style="background-color:#0d331d;">02</div>
+            <div class="avatar-thumb"        data-id="3"  style="background-color:#3e0d49;">03</div>
+            <div class="avatar-thumb"        data-id="4"  style="background-color:#0d2242;">04</div>
+            <div class="avatar-thumb"        data-id="5"  style="background-color:#7c0008;">05</div>
+            <div class="avatar-thumb"        data-id="6"  style="background-color:#44091a;">06</div>
+            <div class="avatar-thumb"        data-id="7"  style="background-color:#0f353a;">07</div>
+            <div class="avatar-thumb"        data-id="8"  style="background-color:#5c3d0b;">08</div>
+            <div class="avatar-thumb"        data-id="9"  style="background-color:#222f3e;">09</div>
+            <div class="avatar-thumb"        data-id="10" style="background-color:#5f27cd;">10</div>
+            <div class="avatar-thumb"        data-id="11" style="background-color:#833471;">11</div>
+            <div class="avatar-thumb"        data-id="12" style="background-color:#1e272e;">12</div>
+          </div>
+        </div>
+
+        <!-- Floating bottom control bar -->
+        <div class="showroom-bottom-bar">
+          <div class="bottom-bar-group">
+            <span class="bbar-label">INSPECT</span>
+            <div class="bbar-btns">
+              <button class="bbar-btn inspect-btn active" id="btn-spotlight">Spotlight</button>
+              <button class="bbar-btn inspect-btn"        id="btn-loupe">Loupe</button>
+            </div>
+          </div>
+          <div class="bottom-bar-group">
+            <span class="bbar-label">LIGHT</span>
+            <div class="bbar-btns">
+              <button class="bbar-btn light-btn active" data-light="sunset">Sunset</button>
+              <button class="bbar-btn light-btn"        data-light="neon">Neon</button>
+              <button class="bbar-btn light-btn"        data-light="zari">Gold</button>
+            </div>
+          </div>
+          <div class="bottom-bar-group">
+            <span class="bbar-label">ZOOM <span id="zoom-display" style="opacity:.5;">1.00×</span></span>
+            <div class="bbar-btns">
+              <button class="bbar-btn" id="btn-zoom-out">－</button>
+              <button class="bbar-btn" id="btn-zoom-reset">⊙</button>
+              <button class="bbar-btn" id="btn-zoom-in">＋</button>
+            </div>
+          </div>
+          <div class="bottom-bar-group bbar-cta">
+            <button class="acquire-btn" id="btn-acquire-now">
+              <span>Enquire</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+            <div class="reserve-success hidden" id="reserve-success-message">
+              <span>✓ Message sent!</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hidden select (needed by JS) -->
+        <select id="select-avatar-asset" style="display:none;">
+          <option value="1">1</option><option value="2">2</option><option value="3">3</option>
+          <option value="4">4</option><option value="5">5</option><option value="6">6</option>
+          <option value="7">7</option><option value="8">8</option><option value="9">9</option>
+          <option value="10">10</option><option value="11">11</option><option value="12">12</option>
+        </select>
+        <!-- Hidden stub buttons needed by JS -->
+        <button id="btn-view-front"   style="display:none;" class="active"></button>
+        <button id="btn-view-profile" style="display:none;"></button>
+      </div>
+    </div>
+
+    <!-- Script Entrypoint -->
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

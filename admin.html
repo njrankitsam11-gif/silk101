@@ -288,6 +288,7 @@
           <button class="admin-nav-btn active" data-target="sec-inventory">Inventory</button>
           <button class="admin-nav-btn" data-target="sec-enquiries">Enquiries</button>
           <button class="admin-nav-btn" data-target="sec-artisans">Artisans</button>
+          <button class="admin-nav-btn" data-target="sec-articles">SEO Articles</button>
           <a href="/index.html" class="admin-nav-btn">← Back to Site</a>
         </nav>
       </header>
@@ -382,6 +383,74 @@
               </tr>
             </thead>
             <tbody id="artisans-table-body">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- SECTION 4: SEO ARTICLES AUTOMATED GENERATION PANEL -->
+      <section id="sec-articles" class="admin-section">
+        <div class="action-row">
+          <h3 style="font-family:'Playfair Display', serif; font-size:1.4rem;">Automated SEO Article Engine</h3>
+        </div>
+
+        <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.04); border-radius:8px; padding:2rem; margin-bottom:2.5rem;">
+          <h4 style="font-family:'Playfair Display', serif; font-size:1.1rem; color:var(--color-accent, #ffd700); margin-bottom:1.5rem;">Generate Diaspora-Targeted SEO Post</h4>
+          <form id="generate-article-form">
+            <div style="display:grid; grid-template-columns:repeat(3, 1fr) auto; gap:1.5rem; align-items:end;">
+              <div class="form-group">
+                <label for="art-theme">SEO Theme</label>
+                <select id="art-theme" required>
+                  <option value="heritage">Sacred Weaving Heritage</option>
+                  <option value="wedding">Wedding Season Styling Guide</option>
+                  <option value="connoisseur">Connoisseur buying check</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="art-region">Target Global Region</label>
+                <select id="art-region" required>
+                  <option value="global">Global Diaspora (USD)</option>
+                  <option value="US">United States (USD)</option>
+                  <option value="UK">United Kingdom (GBP)</option>
+                  <option value="CA">Canada (CAD)</option>
+                  <option value="AU">Australia (AUD)</option>
+                  <option value="UAE">United Arab Emirates (AED)</option>
+                  <option value="SG">Singapore (SGD)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="art-keyword">Topic Keyword (e.g. Sambalpuri Ikat)</label>
+                <input type="text" id="art-keyword" required placeholder="e.g. Khandua Silk Saree">
+              </div>
+
+              <div>
+                <button type="submit" class="btn-submit" style="padding: 0.6rem 2rem;">Auto-Generate</button>
+              </div>
+            </div>
+          </form>
+          <div id="generation-status" style="margin-top:1rem; font-size:0.85rem; color:var(--color-accent, #ffd700);"></div>
+        </div>
+
+        <div class="action-row">
+          <h3 style="font-family:'Playfair Display', serif; font-size:1.2rem;">Generated Articles Database</h3>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Keyword / Topic</th>
+                <th>Region</th>
+                <th>Slug (URL Path)</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="articles-table-body">
               <!-- Dynamically populated -->
             </tbody>
           </table>

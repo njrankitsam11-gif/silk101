@@ -51,6 +51,19 @@ db.exec(`
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (item_id) REFERENCES inventory(id) ON DELETE SET NULL
   );
+
+  CREATE TABLE IF NOT EXISTS articles (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    slug TEXT UNIQUE NOT NULL,
+    title TEXT NOT NULL,
+    meta_description TEXT,
+    content_html TEXT NOT NULL,
+    topic_keyword TEXT,
+    target_locale TEXT,
+    status TEXT DEFAULT 'draft', -- 'draft', 'published'
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
 `);
 
 export default db;

@@ -1,0 +1,11 @@
+# Robots.txt for Silk101 / The Loom of Time
+
+User-agent: *
+Allow: /
+Allow: /index.html
+Allow: /articles.html
+Allow: /assets/
+Disallow: /admin.html
+Disallow: /api/
+
+Sitemap: https://silk101.vercel.app/sitemap.xml

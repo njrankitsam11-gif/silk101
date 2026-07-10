@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <!-- Main Home Page -->
+  <url>
+    <loc>https://silk101.vercel.app/</loc>
+    <lastmod>2026-07-10</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://silk101.vercel.app/?lang=en-US" />
+    <xhtml:link rel="alternate" hreflang="en-GB" href="https://silk101.vercel.app/?lang=en-GB" />
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://silk101.vercel.app/?lang=en-CA" />
+    <xhtml:link rel="alternate" hreflang="en-AU" href="https://silk101.vercel.app/?lang=en-AU" />
+    <xhtml:link rel="alternate" hreflang="en-AE" href="https://silk101.vercel.app/?lang=en-AE" />
+    <xhtml:link rel="alternate" hreflang="en-SG" href="https://silk101.vercel.app/?lang=en-SG" />
+    <xhtml:link rel="alternate" hreflang="en-IN" href="https://silk101.vercel.app/?lang=en-IN" />
+    <xhtml:link rel="alternate" hreflang="hi-IN" href="https://silk101.vercel.app/?lang=hi-IN" />
+  </url>
+
+  <!-- Weaving Journal (Article Directory) -->
+  <url>
+    <loc>https://silk101.vercel.app/articles.html</loc>
+    <lastmod>2026-07-10</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Article 1: Global Buyer Guide -->
+  <url>
+    <loc>https://silk101.vercel.app/articles.html?slug=buy-khandua-silk-sarees-online</loc>
+    <lastmod>2026-07-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Article 2: Artisan Stories -->
+  <url>
+    <loc>https://silk101.vercel.app/articles.html?slug=odisha-handloom-heritage-diaspora</loc>
+    <lastmod>2026-07-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Article 3: Styling Guide -->
+  <url>
+    <loc>https://silk101.vercel.app/articles.html?slug=how-to-style-patta-silk-wedding-abroad</loc>
+    <lastmod>2026-07-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Article 4: Authenticity Check -->
+  <url>
+    <loc>https://silk101.vercel.app/articles.html?slug=how-to-identify-real-handloom-silk</loc>
+    <lastmod>2026-07-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+</urlset>

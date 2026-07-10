@@ -1,9 +1,8 @@
-// ── ADMIN PANEL SCRIPTS ───────────────────────────────────────────────────
-
 let inventory = [];
 let enquiries = [];
 let artisans = [];
 let categories = [];
+let articles = [];
 
 // Tab switching
 const navBtns = document.querySelectorAll('.admin-nav-btn[data-target]');
@@ -23,19 +22,22 @@ navBtns.forEach(btn => {
 // Fetch all database records
 async function fetchData() {
   try {
-    const [resInv, resEnq, resArt, resCat] = await Promise.all([
+    const [resInv, resEnq, resArt, resCat, resArtic] = await Promise.all([
       fetch('/api/inventory'),
       fetch('/api/enquiries'),
       fetch('/api/artisans'),
-      fetch('/api/categories')
+      fetch('/api/categories'),
+      fetch('/api/articles')
     ]);
 
     inventory = await resInv.json();
     enquiries = await resEnq.json();
     artisans = await resArt.json();
     categories = await resCat.json();
+    articles = await resArtic.json();
 
     renderDashboard();
+    renderArticles();
   } catch (err) {
     console.error('Error fetching admin data:', err);
   }
@@ -118,6 +120,32 @@ function renderDashboard() {
   populateFormDropdowns();
 }
 
+// Render articles database in table list
+function renderArticles() {
+  const artBody = document.getElementById('articles-table-body');
+  artBody.innerHTML = articles.map(art => `
+    <tr>
+      <td style="font-family:monospace; color:#86868b;">#${String(art.id).padStart(3, '0')}</td>
+      <td style="font-weight:600; color:#fff;">${art.title}</td>
+      <td style="color:var(--color-accent);">${art.topic_keyword || '---'}</td>
+      <td style="font-family:monospace; font-size:0.8rem; text-transform:uppercase;">${art.target_locale || 'global'}</td>
+      <td style="font-family:monospace; font-size:0.85rem; color:#86868b;">/articles.html?slug=${art.slug}</td>
+      <td>
+        <select class="status-select ${art.status}" onchange="updateArticleStatus(${art.id}, this.value)">
+          <option value="draft" ${art.status === 'draft' ? 'selected' : ''}>Draft</option>
+          <option value="published" ${art.status === 'published' ? 'selected' : ''}>Published</option>
+        </select>
+      </td>
+      <td>
+        <div style="display:flex; gap:8px;">
+          <a href="/articles.html?slug=${art.slug}" target="_blank" class="btn-cancel" style="text-decoration:none; padding:0.25rem 0.6rem; font-size:0.75rem; display:inline-block;">View</a>
+          <button class="btn-delete" onclick="deleteArticle(${art.id})">Delete</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
 // Form dropdown values
 function populateFormDropdowns() {
   const catSelect = document.getElementById('inp-category');
@@ -154,6 +182,19 @@ window.updateEnquiryStatus = async (id, status) => {
   }
 };
 
+window.updateArticleStatus = async (id, status) => {
+  try {
+    const res = await fetch(`/api/articles/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status })
+    });
+    if (res.ok) fetchData();
+  } catch (err) {
+    console.error('Error updating status:', err);
+  }
+};
+
 window.deleteItem = async (id) => {
   if (!confirm('Are you sure you want to delete this saree design?')) return;
   try {
@@ -161,6 +202,16 @@ window.deleteItem = async (id) => {
     if (res.ok) fetchData();
   } catch (err) {
     console.error('Error deleting item:', err);
+  }
+};
+
+window.deleteArticle = async (id) => {
+  if (!confirm('Are you sure you want to delete this article?')) return;
+  try {
+    const res = await fetch(`/api/articles/${id}`, { method: 'DELETE' });
+    if (res.ok) fetchData();
+  } catch (err) {
+    console.error('Error deleting article:', err);
   }
 };
 
@@ -200,6 +251,42 @@ document.getElementById('add-saree-form').onsubmit = async (e) => {
     console.error('Error adding new saree:', err);
   }
 };
+
+// Submit automated article generator
+const genForm = document.getElementById('generate-article-form');
+const genStatus = document.getElementById('generation-status');
+
+if (genForm) {
+  genForm.onsubmit = async (e) => {
+    e.preventDefault();
+    genStatus.textContent = 'Weaving SEO article threads... please wait...';
+    
+    const body = {
+      theme: document.getElementById('art-theme').value,
+      target_region: document.getElementById('art-region').value,
+      keyword: document.getElementById('art-keyword').value
+    };
+
+    try {
+      const res = await fetch('/api/articles/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+      if (res.ok) {
+        genStatus.innerHTML = `<span style="color:#2ecc71;">✓ Success! Published: <a href="/articles.html?slug=${data.slug}" target="_blank" style="color:#fff;">${data.title}</a></span>`;
+        genForm.reset();
+        fetchData();
+      } else {
+        genStatus.textContent = `Error: ${data.error}`;
+      }
+    } catch (err) {
+      console.error(err);
+      genStatus.textContent = 'Failed to generate article.';
+    }
+  };
+}
 
 // ── Custom Trailing Cursor for Admin Page ──────────────────────────────────
 function setupAdminCursor() {

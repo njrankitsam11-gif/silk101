@@ -11,6 +11,7 @@ let clackTimer = null;
 let isAudioPlaying = false;
 let scrollVelocity = 0;
 let lastScrollY = 0;
+const entryAnimation = { scale: 5.0 };
 
 // Loom Console Parameters
 let warpTension = 1.0;
@@ -208,11 +209,26 @@ document.getElementById('btn-sound-on').addEventListener('click', () => {
   isAudioPlaying = true;
   document.getElementById('audio-modal').classList.add('hidden');
   document.getElementById('audio-toggle').classList.add('playing');
+  document.getElementById('audio-toggle').setAttribute('aria-pressed', 'true');
+  document.getElementById('audio-toggle').setAttribute('aria-label', 'Turn ambient audio off');
+  document.querySelector('#audio-toggle .audio-text').textContent = 'AUDIO ON';
+  gsap.to(entryAnimation, {
+    scale: 1.0,
+    duration: 2.2,
+    ease: 'power4.out'
+  });
 });
 
 document.getElementById('btn-sound-off').addEventListener('click', () => {
   document.getElementById('audio-modal').classList.add('hidden');
   document.getElementById('audio-toggle').classList.remove('playing');
+  document.getElementById('audio-toggle').setAttribute('aria-pressed', 'false');
+  document.getElementById('audio-toggle').setAttribute('aria-label', 'Turn ambient audio on');
+  gsap.to(entryAnimation, {
+    scale: 1.0,
+    duration: 2.2,
+    ease: 'power4.out'
+  });
 });
 
 document.getElementById('audio-toggle').addEventListener('click', () => {
@@ -221,6 +237,8 @@ document.getElementById('audio-toggle').addEventListener('click', () => {
     isAudioPlaying = false;
     toggle.classList.remove('playing');
     toggle.querySelector('.audio-text').textContent = 'AUDIO OFF';
+    toggle.setAttribute('aria-pressed', 'false');
+    toggle.setAttribute('aria-label', 'Turn ambient audio on');
     if (synthNode) synthNode.padGain.gain.setValueAtTime(0, audioCtx.currentTime);
   } else {
     initAudio();
@@ -230,6 +248,8 @@ document.getElementById('audio-toggle').addEventListener('click', () => {
     isAudioPlaying = true;
     toggle.classList.add('playing');
     toggle.querySelector('.audio-text').textContent = 'AUDIO ON';
+    toggle.setAttribute('aria-pressed', 'true');
+    toggle.setAttribute('aria-label', 'Turn ambient audio off');
     if (synthNode) synthNode.padGain.gain.setValueAtTime(0.12, audioCtx.currentTime);
   }
 });
@@ -278,7 +298,77 @@ function setupGenesisCanvas() {
     
     const cx = canvas.width / 2;
     const cy = canvas.height / 2;
-    const scale = 1 - scrollProgress * 0.75;
+
+    // 0. Nandighosa Chariot Parallax Background
+    if (scrollProgress > 0.01) {
+      const chariotY = canvas.height - (scrollProgress * 400);
+      ctx.save();
+      
+      // Draw background red-yellow layered canopy
+      ctx.fillStyle = 'rgba(211, 47, 47, 0.12)';
+      ctx.beginPath();
+      ctx.moveTo(cx - 180, canvas.height);
+      ctx.lineTo(cx - 100, chariotY + 80);
+      ctx.lineTo(cx, chariotY - 60);
+      ctx.lineTo(cx + 100, chariotY + 80);
+      ctx.lineTo(cx + 180, canvas.height);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = 'rgba(255, 199, 44, 0.15)';
+      ctx.beginPath();
+      ctx.moveTo(cx - 120, canvas.height);
+      ctx.lineTo(cx - 60, chariotY + 120);
+      ctx.lineTo(cx, chariotY);
+      ctx.lineTo(cx + 60, chariotY + 120);
+      ctx.lineTo(cx + 120, canvas.height);
+      ctx.closePath();
+      ctx.fill();
+
+      // Top Kalasa spire dome
+      ctx.fillStyle = 'rgba(212, 175, 55, 0.3)';
+      ctx.beginPath();
+      ctx.arc(cx, chariotY - 60, 10, 0, Math.PI, true);
+      ctx.fill();
+
+      // Left Chariot Wheel (Rotates clockwise)
+      ctx.save();
+      ctx.translate(cx - 240, canvas.height - 100 + (scrollProgress * 80));
+      ctx.rotate(scrollProgress * Math.PI * 1.5);
+      ctx.strokeStyle = 'rgba(212, 175, 55, 0.18)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(0, 0, 90, 0, Math.PI * 2);
+      ctx.stroke();
+      for (let s = 0; s < 16; s++) {
+        const ang = (s * Math.PI) / 8;
+        ctx.moveTo(0, 0);
+        ctx.lineTo(Math.cos(ang) * 90, Math.sin(ang) * 90);
+      }
+      ctx.stroke();
+      ctx.restore();
+
+      // Right Chariot Wheel (Rotates counter-clockwise)
+      ctx.save();
+      ctx.translate(cx + 240, canvas.height - 100 + (scrollProgress * 80));
+      ctx.rotate(-scrollProgress * Math.PI * 1.5);
+      ctx.strokeStyle = 'rgba(212, 175, 55, 0.18)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(0, 0, 90, 0, Math.PI * 2);
+      ctx.stroke();
+      for (let s = 0; s < 16; s++) {
+        const ang = (s * Math.PI) / 8;
+        ctx.moveTo(0, 0);
+        ctx.lineTo(Math.cos(ang) * 90, Math.sin(ang) * 90);
+      }
+      ctx.stroke();
+      ctx.restore();
+
+      ctx.restore();
+    }
+    
+    const scale = (1 - scrollProgress * 0.75) * entryAnimation.scale;
     
     ctx.save();
     ctx.translate(cx, cy);
@@ -372,6 +462,56 @@ function setupGenesisCanvas() {
     ctx.stroke();
     
     ctx.restore();
+
+    // 1B. Sacred Triad Face Silhouette (Fades in on scroll)
+    if (scrollProgress > 0.05) {
+      ctx.save();
+      ctx.translate(0, driftY - 100);
+      
+      const triadAlpha = Math.min((scrollProgress - 0.05) * 2, 0.45);
+      
+      // Draw Central deity (Jagannath: large black round face, circular eyes)
+      ctx.fillStyle = `rgba(10, 10, 10, ${triadAlpha})`;
+      ctx.beginPath();
+      ctx.arc(0, 0, 48, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Left eye
+      ctx.fillStyle = `rgba(255, 255, 255, ${triadAlpha * 1.5})`;
+      ctx.beginPath();
+      ctx.arc(-16, -5, 12, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = `rgba(195, 27, 27, ${triadAlpha * 1.5})`;
+      ctx.beginPath();
+      ctx.arc(-16, -5, 8, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = `rgba(10, 10, 10, ${triadAlpha * 2})`;
+      ctx.beginPath();
+      ctx.arc(-16, -5, 4, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Right eye
+      ctx.fillStyle = `rgba(255, 255, 255, ${triadAlpha * 1.5})`;
+      ctx.beginPath();
+      ctx.arc(16, -5, 12, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = `rgba(195, 27, 27, ${triadAlpha * 1.5})`;
+      ctx.beginPath();
+      ctx.arc(16, -5, 8, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = `rgba(10, 10, 10, ${triadAlpha * 2})`;
+      ctx.beginPath();
+      ctx.arc(16, -5, 4, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Tilaka
+      ctx.fillStyle = `rgba(212, 175, 55, ${triadAlpha * 2})`;
+      ctx.beginPath();
+      ctx.arc(0, -18, 4, 0, Math.PI * 2);
+      ctx.fill();
+      
+      ctx.restore();
+    }
     
     // 2. Drawing Saree Border Geometry
     const borderProgress = Math.min(scrollProgress * 1.5, 1);
@@ -452,14 +592,32 @@ function setupHorizontalPulse() {
   const scrollSection = document.querySelector('.horizontal-scroll-section');
   
   gsap.to(scrollSection, {
-    x: '-200vw',
+    x: '-400vw',
     ease: 'none',
     scrollTrigger: {
       trigger: '#artisan-pulse',
       pin: true,
       scrub: 1,
       start: 'top top',
-      end: '+=2000',
+      end: '+=3000',
+    }
+  });
+
+  ScrollTrigger.create({
+    trigger: '#artisan-pulse',
+    start: 'top top',
+    end: '+=3000',
+    scrub: true,
+    onUpdate: (self) => {
+      const progress = self.progress;
+      const bg = document.querySelector('.patta-bg');
+      const mid = document.querySelector('.patta-mid');
+      const fore = document.querySelector('.patta-fore');
+      if (bg && mid && fore) {
+        bg.style.transform = `translateX(${-progress * 250}px)`;
+        mid.style.transform = `translateX(${-progress * 550}px)`;
+        fore.style.transform = `translateX(${-progress * 950}px)`;
+      }
     }
   });
   
@@ -623,10 +781,43 @@ function setupHorizontalPulse() {
         
         const cx = c * cw + cw / 2;
         
-        ctxRight.fillStyle = val === 1 ? 'rgba(212, 175, 55, 0.4)' : 'rgba(255, 255, 255, 0.03)';
-        ctxRight.beginPath();
-        ctxRight.arc(cx, dy, val === 1 ? 5 : 2, 0, Math.PI * 2);
-        ctxRight.fill();
+        if (val === 1) {
+          if (borderPattern === 'lotus') {
+            ctxRight.fillStyle = 'rgba(224, 17, 95, 0.65)';
+            ctxRight.beginPath();
+            ctxRight.moveTo(cx, dy - 6);
+            ctxRight.quadraticCurveTo(cx - 6, dy - 2, cx - 2, dy + 6);
+            ctxRight.quadraticCurveTo(cx, dy + 2, cx + 2, dy + 6);
+            ctxRight.quadraticCurveTo(cx + 6, dy - 2, cx, dy - 6);
+            ctxRight.fill();
+          } else if (borderPattern === 'temple') {
+            ctxRight.fillStyle = 'rgba(212, 175, 55, 0.65)';
+            ctxRight.beginPath();
+            ctxRight.moveTo(cx, dy - 6);
+            ctxRight.lineTo(cx - 6, dy + 6);
+            ctxRight.lineTo(cx + 6, dy + 6);
+            ctxRight.closePath();
+            ctxRight.fill();
+          } else if (borderPattern === 'grid') {
+            const odiaChars = ["ଅ", "ଇ", "ଉ", "କ", "ଖ", "ଗ", "ଘ", "ଚ", "ଛ", "ଜ", "ଝ", "ଟ", "ଠ", "ଡ", "ତ", "ଥ", "ଦ", "ଧ", "ନ", "ପ", "ଫ", "ବ", "ଭ", "ମ", "ଯ", "ର", "ଲ", "ଶ", "ସ", "ହ"];
+            const charIndex = Math.abs(Math.floor(cx + dy)) % odiaChars.length;
+            ctxRight.fillStyle = 'rgba(212, 175, 55, 0.75)';
+            ctxRight.font = "bold 11px sans-serif";
+            ctxRight.textAlign = "center";
+            ctxRight.textBaseline = "middle";
+            ctxRight.fillText(odiaChars[charIndex], cx, dy);
+          } else {
+            ctxRight.fillStyle = 'rgba(212, 175, 55, 0.4)';
+            ctxRight.beginPath();
+            ctxRight.arc(cx, dy, 5, 0, Math.PI * 2);
+            ctxRight.fill();
+          }
+        } else {
+          ctxRight.fillStyle = 'rgba(255, 255, 255, 0.03)';
+          ctxRight.beginPath();
+          ctxRight.arc(cx, dy, 2, 0, Math.PI * 2);
+          ctxRight.fill();
+        }
         
         if (val === 1) {
           ctxRight.strokeStyle = 'rgba(212, 175, 55, 0.1)';
@@ -723,35 +914,107 @@ function setupMetamorphosis() {
     const zoom = Math.pow(scrollProgress, 3) * 6;
     const scale = 1 + zoom;
     
-    const physDrift = -scrollProgress * 200;
-    const digiDrift = scrollProgress * 180;
+    const physDrift = -scrollProgress * 240;
+    const digiDrift = scrollProgress * 220;
+    const time = Date.now() * 0.001;
     
-    // 1. Physical Saree
+    // ==========================================
+    // 1. TRADITIONAL SIDE (Puri Spire & Jagannath Netranayana)
+    // ==========================================
     ctx.save();
-    ctx.translate(cx + physDrift, cy);
-    ctx.scale(scale, scale);
+    ctx.translate(cx + physDrift - (window.innerWidth < 768 ? 0 : 150), cy);
+    ctx.scale(scale * 0.75, scale * 0.75);
     
-    ctx.fillStyle = '#800020';
+    // A. Sacred Temple Spire (Deula) Silhouette in background
+    ctx.fillStyle = 'rgba(128, 0, 32, 0.12)';
     ctx.beginPath();
-    ctx.arc(0, 0, 260, 0, Math.PI * 2);
+    ctx.moveTo(-160, 240);
+    ctx.quadraticCurveTo(-100, -100, -50, -160);
+    ctx.quadraticCurveTo(-10, -220, 0, -250); // top spire point
+    ctx.quadraticCurveTo(10, -220, 50, -160);
+    ctx.quadraticCurveTo(100, -100, 160, 240);
+    ctx.closePath();
     ctx.fill();
-    
-    const waveCount = 5;
-    for (let w = 0; w < waveCount; w++) {
-      ctx.fillStyle = `rgba(100, 0, 16, ${0.4 - w * 0.05})`;
-      ctx.beginPath();
-      ctx.moveTo(-300, -200 + w * 60);
-      ctx.bezierCurveTo(-100, -50 + w * 40, 100, -300 + w * 40, 300, -100 + w * 60);
-      ctx.lineTo(300, 300);
-      ctx.lineTo(-300, 300);
-      ctx.closePath();
-      ctx.fill();
+
+    // Spire steps
+    ctx.fillStyle = 'rgba(128, 0, 32, 0.2)';
+    for(let sy = -120; sy < 200; sy += 40) {
+      ctx.fillRect(-100 + (sy+120)*0.2, sy, 200 - (sy+120)*0.4, 6);
     }
     
-    ctx.strokeStyle = 'rgba(212, 175, 55, 0.18)';
+    // B. Jagannath Eyes (Netranayana)
+    const eyeRadius = 60;
+    const eyeSpacing = 75;
+    
+    // Draw Left and Right Eyes
+    [-1, 1].forEach(side => {
+      const ex = side * eyeSpacing;
+      const ey = 40;
+      
+      // Outer border (Black rim)
+      ctx.fillStyle = '#0a0a0a';
+      ctx.beginPath();
+      ctx.arc(ex, ey, eyeRadius + 4, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Outer White
+      ctx.fillStyle = '#f7f4eb';
+      ctx.beginPath();
+      ctx.arc(ex, ey, eyeRadius, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Red ring
+      ctx.fillStyle = '#b31b1b';
+      ctx.beginPath();
+      ctx.arc(ex, ey, eyeRadius * 0.75, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Yellow ring
+      ctx.fillStyle = '#e5a93b';
+      ctx.beginPath();
+      ctx.arc(ex, ey, eyeRadius * 0.5, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Inner Black Pupil
+      ctx.fillStyle = '#0a0a0a';
+      ctx.beginPath();
+      ctx.arc(ex, ey, eyeRadius * 0.3, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // White reflection dot
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(ex - 4, ey - 4, 4, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Eye lashes/rays (Traditional painting details)
+      ctx.strokeStyle = '#0a0a0a';
+      ctx.lineWidth = 2;
+      for (let a = 0; a < Math.PI * 2; a += Math.PI / 8) {
+        ctx.beginPath();
+        ctx.moveTo(ex + Math.cos(a) * eyeRadius, ey + Math.sin(a) * eyeRadius);
+        ctx.lineTo(ex + Math.cos(a) * (eyeRadius + 6), ey + Math.sin(a) * (eyeRadius + 6));
+        ctx.stroke();
+      }
+    });
+    
+    // C. Forehead Tilaka (Crescent and Dot)
+    ctx.fillStyle = '#d4af37';
+    ctx.beginPath();
+    ctx.arc(0, -10, 10, 0, Math.PI, true);
+    ctx.lineTo(0, -35);
+    ctx.closePath();
+    ctx.fill();
+    
+    ctx.beginPath();
+    ctx.arc(0, -45, 6, 0, Math.PI * 2);
+    ctx.fill();
+
+    // D. Silk grid threads overlay
+    ctx.strokeStyle = 'rgba(212, 175, 55, 0.15)';
     ctx.lineWidth = 0.55;
     ctx.beginPath();
-    for (let d = -200; d <= 200; d += 8) {
+    for (let d = -200; d <= 200; d += 10) {
       ctx.moveTo(d, -200);
       ctx.lineTo(d, 200);
       ctx.moveTo(-200, d);
@@ -759,53 +1022,102 @@ function setupMetamorphosis() {
     }
     ctx.stroke();
     
-    ctx.strokeStyle = 'rgba(212, 175, 55, 0.65)';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.arc(0, 0, 50, 0, Math.PI * 2);
-    ctx.stroke();
-    
     ctx.restore();
     
-    // 2. Cryptographic lattice
+    // ==========================================
+    // 2. DIGITAL SIDE (Holographic Konark Wheel & Kumbha Borders)
+    // ==========================================
     ctx.save();
-    ctx.translate(cx + digiDrift, cy);
-    ctx.scale(scale, scale);
+    ctx.translate(cx + digiDrift + (window.innerWidth < 768 ? 0 : 150), cy);
+    ctx.scale(scale * 0.75, scale * 0.75);
     
     const latticeAlpha = Math.min(scrollProgress * 1.5, 0.95);
-    ctx.strokeStyle = `rgba(212, 175, 55, ${latticeAlpha * 0.55})`;
+    
+    // A. Digital Kumbha (Temple border triangles) along the sides
+    ctx.fillStyle = `rgba(224, 17, 95, ${latticeAlpha * 0.12})`;
+    ctx.strokeStyle = `rgba(224, 17, 95, ${latticeAlpha * 0.5})`;
     ctx.lineWidth = 1;
     
-    ctx.beginPath();
-    const radius = 70;
-    for (let i = 0; i < 6; i++) {
-      const angle = (i * Math.PI) / 3;
-      const x = Math.cos(angle) * radius;
-      const y = Math.sin(angle) * radius;
-      ctx.moveTo(0, 0);
-      ctx.lineTo(x, y);
-      const nextAngle = ((i + 1) * Math.PI) / 3;
-      ctx.lineTo(Math.cos(nextAngle) * radius, Math.sin(nextAngle) * radius);
+    for (let i = -3; i <= 3; i++) {
+      const ty = i * 60;
+      // Left Kumbha triangle pointing right
+      ctx.beginPath();
+      ctx.moveTo(-180, ty - 20);
+      ctx.lineTo(-140, ty);
+      ctx.lineTo(-180, ty + 20);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      // Right Kumbha triangle pointing left
+      ctx.beginPath();
+      ctx.moveTo(180, ty - 20);
+      ctx.lineTo(140, ty);
+      ctx.lineTo(180, ty + 20);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
     }
+    
+    // B. Holographic Konark Sun Wheel rotating
+    ctx.save();
+    ctx.rotate(time * 0.12);
+    
+    ctx.strokeStyle = `rgba(212, 175, 55, ${latticeAlpha * 0.6})`;
+    ctx.lineWidth = 1.5;
+    
+    // Outer Wheel Rim
+    ctx.beginPath();
+    ctx.arc(0, 0, 100, 0, Math.PI * 2);
     ctx.stroke();
     
-    ctx.fillStyle = '#fff';
-    for (let i = 0; i < 6; i++) {
-      const angle = (i * Math.PI) / 3;
-      ctx.beginPath();
-      ctx.arc(Math.cos(angle) * radius, Math.sin(angle) * radius, 3, 0, Math.PI * 2);
-      ctx.fill();
-    }
+    // Inner Wheel Rim
+    ctx.beginPath();
+    ctx.arc(0, 0, 85, 0, Math.PI * 2);
+    ctx.stroke();
     
-    ctx.shadowBlur = 10;
-    ctx.shadowColor = 'rgba(212, 175, 55, 0.8)';
-    ctx.fillStyle = 'rgba(212, 175, 55, 0.9)';
-    ctx.fillRect(-10, -10, 20, 20);
-    ctx.fillStyle = '#000';
-    ctx.fillRect(-6, -6, 12, 12);
-    ctx.fillStyle = 'rgba(212, 175, 55, 0.9)';
-    ctx.fillRect(-3, -3, 6, 6);
-    ctx.shadowBlur = 0;
+    // Hub
+    ctx.fillStyle = `rgba(212, 175, 55, ${latticeAlpha * 0.85})`;
+    ctx.beginPath();
+    ctx.arc(0, 0, 20, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // 8 spokes
+    for (let i = 0; i < 8; i++) {
+      const angle = (i * Math.PI) / 4;
+      ctx.rotate(angle);
+      
+      // Main spoke vector line
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(0, -85);
+      ctx.stroke();
+      
+      // Spoke vertex point
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(0, -85, 3, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Spoke decorative wheel details
+      ctx.strokeStyle = `rgba(255, 255, 255, ${latticeAlpha * 0.4})`;
+      ctx.beginPath();
+      ctx.arc(0, -45, 8, 0, Math.PI * 2);
+      ctx.stroke();
+      
+      ctx.rotate(-angle);
+    }
+    ctx.restore();
+
+    // C. Binary Weaving Data Matrix
+    ctx.font = "8px monospace";
+    ctx.fillStyle = `rgba(212, 175, 55, ${latticeAlpha * 0.35})`;
+    for (let col = -120; col <= 120; col += 40) {
+      for (let row = -120; row <= 120; row += 30) {
+        const binVal = Math.round(Math.random()) ? "1" : "0";
+        ctx.fillText(binVal, col + Math.sin(time + row)*2, row);
+      }
+    }
     
     ctx.restore();
     
@@ -1155,22 +1467,16 @@ async function setupVaultTunnel() {
       const model = document.createElement('div');
       model.className = 'saree-layer layer-model';
       
-      let modelImgSrc = '/avatars/frame_front.png';
-      const hue = item.color_hue || 0;
-      if (hue >= 180 && hue < 240) {
-        modelImgSrc = '/avatars/navy_front.png';
-      } else if (hue >= 100 && hue < 180) {
-        modelImgSrc = '/avatars/green_front.png';
-      } else if (hue >= 240 && hue < 300) {
-        modelImgSrc = '/avatars/purple_front.png';
-      } else if (hue >= 40 && hue < 60) {
-        modelImgSrc = '/avatars/golden_front.png';
-      }
+      const modelLook = ((Number(item.id) - 1) % 5) + 1;
+      const modelSources = {
+        1: '/avatars/frame_front.png',
+        2: '/avatars/navy_front.png',
+        3: '/avatars/green_front.png',
+        4: '/avatars/purple_front.png',
+        5: '/avatars/golden_front.png'
+      };
+      const modelImgSrc = modelSources[modelLook];
       model.style.backgroundImage = `url(${modelImgSrc})`;
-      
-      if (hue !== 0 || (item.color_saturation !== undefined && item.color_saturation !== 1.0)) {
-        model.style.filter = `hue-rotate(${hue}deg) saturate(${item.color_saturation || 1.0})`;
-      }
       
       const zari = document.createElement('div');
       zari.className = 'saree-layer layer-zari';
@@ -1576,6 +1882,7 @@ function setupShowroomDrape(initialItem, itemsList) {
   let inspectMode = 'spotlight'; 
   let lightTheme = 'sunset'; 
   let viewAngle = 'front';
+  let selectedModel = 1;
 
   function loadImg(src) { const i = new Image(); i.src = src; return i; }
 
@@ -1594,22 +1901,7 @@ function setupShowroomDrape(initialItem, itemsList) {
   ];
 
   function getAvatarFrames() {
-    const hue = activeItem.color_hue || 0;
-    const sat = activeItem.color_saturation || 1.0;
-    
-    // Choose base texture images based on hue ranges
-    let frames = baseFrames;
-    if (hue >= 180 && hue < 240) {
-      frames = avatarCollections[2].frames; // Navy base
-    } else if (hue >= 100 && hue < 180) {
-      frames = avatarCollections[3].frames; // Green base
-    } else if (hue >= 240 && hue < 300) {
-      frames = avatarCollections[4].frames; // Purple base
-    } else if (hue >= 40 && hue < 60) {
-      frames = avatarCollections[5].frames; // Golden base
-    }
-    
-    return { frames, hue, sat };
+    return { frames: avatarCollections[selectedModel].frames };
   }
 
   function playShowroomSound(freq = 440, vol = 0.04, duration = 0.08) {
@@ -1690,6 +1982,11 @@ function setupShowroomDrape(initialItem, itemsList) {
   
   function updateActiveItem(selectedItem) {
     activeItem = selectedItem;
+    const hue = Number(selectedItem.color_hue || 0);
+    selectedModel = hue >= 180 && hue < 240 ? 2 : hue >= 100 && hue < 180 ? 3 : hue >= 240 && hue < 300 ? 4 : hue >= 40 && hue < 60 ? 5 : 1;
+    document.querySelectorAll('.model-option').forEach(button => {
+      button.classList.toggle('active', Number(button.dataset.model) === selectedModel);
+    });
     
     // Update active thumbnail borders
     if (thumbsContainer) {
@@ -1723,7 +2020,9 @@ function setupShowroomDrape(initialItem, itemsList) {
   if (thumbsContainer && itemsList) {
     thumbsContainer.innerHTML = itemsList.map((itm, idx) => {
       const activeClass = itm.id === activeItem.id ? 'active' : '';
-      return `<div class="avatar-thumb ${activeClass}" data-id="${itm.id}" style="background-color: hsl(${itm.color_hue || 0}, 80%, 25%);">${String(idx + 1).padStart(2, '0')}</div>`;
+      const column = idx % 4;
+      const row = Math.floor(idx / 4) % 3;
+      return `<button class="avatar-thumb ${activeClass}" data-id="${itm.id}" aria-label="View ${itm.name}" style="background-image:url('/avatars/portraits_grid.png'); background-position:${column * 33.333}% ${row * 50}%;">${String(idx + 1).padStart(2, '0')}</button>`;
     }).join('');
     
     thumbsContainer.querySelectorAll('.avatar-thumb').forEach(thumb => {
@@ -1741,25 +2040,13 @@ function setupShowroomDrape(initialItem, itemsList) {
   let customSat = 1.0;
   let customPattern = 'lotus';
 
-  // Overwrite getAvatarFrames to support custom configuration
-  const originalGetAvatarFrames = getAvatarFrames;
-  getAvatarFrames = function() {
-    const hue = isCustomMode ? customHue : (activeItem.color_hue || 0);
-    const sat = isCustomMode ? customSat : (activeItem.color_saturation || 1.0);
-    
-    let frames = baseFrames;
-    if (hue >= 180 && hue < 240) {
-      frames = avatarCollections[2].frames; // Navy base
-    } else if (hue >= 100 && hue < 180) {
-      frames = avatarCollections[3].frames; // Green base
-    } else if (hue >= 240 && hue < 300) {
-      frames = avatarCollections[4].frames; // Purple base
-    } else if (hue >= 40 && hue < 60) {
-      frames = avatarCollections[5].frames; // Golden base
-    }
-    
-    return { frames, hue, sat };
-  };
+  document.querySelectorAll('.model-option').forEach(option => {
+    option.onclick = () => {
+      selectedModel = Number(option.dataset.model);
+      document.querySelectorAll('.model-option').forEach(button => button.classList.toggle('active', button === option));
+      playShowroomSound(620, 0.035, 0.06);
+    };
+  });
 
   // Bind sidebar tab switching
   const tabCollection = document.getElementById('tab-collection');
@@ -1931,6 +2218,12 @@ function setupShowroomDrape(initialItem, itemsList) {
       } else {
         btnSpotlight.click();
       }
+    } else if (e.key.toLowerCase() === 'q') {
+      applyZoom(-0.2);
+    } else if (e.key.toLowerCase() === 'e') {
+      applyZoom(0.2);
+    } else if (e.key === '0') {
+      zoomTarget = 1.0;
     }
   };
   window.addEventListener('keydown', handleKeys);
@@ -1940,16 +2233,16 @@ function setupShowroomDrape(initialItem, itemsList) {
   let startX = 0;
   let velocity = 0.012;
   let lastDx = 0;
-  const FRICTION       = 0.92;
-  const MAX_VELOCITY   = 0.35;
-  const MIN_AUTO_SPIN  = 0.0015;
+  const FRICTION       = 0.955;
+  const MAX_VELOCITY   = 0.12;
+  const IDLE_SPIN      = 0.0012;
   let particles = [];
 
   let zoomLevel  = 1.0;
   let zoomTarget = 1.0;
-  const ZOOM_MIN = 0.6;
-  const ZOOM_MAX = 3.2;
-  const ZOOM_SPRING = 0.12;
+  const ZOOM_MIN = 0.72;
+  const ZOOM_MAX = 2.15;
+  const ZOOM_SPRING = 0.16;
 
   let lastPinchDist = null;
 
@@ -1960,7 +2253,7 @@ function setupShowroomDrape(initialItem, itemsList) {
 
   canvas.addEventListener('wheel', (e) => {
     e.preventDefault();
-    const factor = e.deltaY < 0 ? 0.15 : -0.15;
+    const factor = e.deltaY < 0 ? 0.12 : -0.12;
     applyZoom(factor);
   }, { passive: false });
 
@@ -1968,11 +2261,21 @@ function setupShowroomDrape(initialItem, itemsList) {
     const btnZoomIn  = document.getElementById('btn-zoom-in');
     const btnZoomOut = document.getElementById('btn-zoom-out');
     const btnZoomReset = document.getElementById('btn-zoom-reset');
-    if (btnZoomIn)    btnZoomIn.onclick    = () => applyZoom(0.3);
-    if (btnZoomOut)   btnZoomOut.onclick   = () => applyZoom(-0.3);
+    if (btnZoomIn)    btnZoomIn.onclick    = () => applyZoom(0.2);
+    if (btnZoomOut)   btnZoomOut.onclick   = () => applyZoom(-0.2);
     if (btnZoomReset) btnZoomReset.onclick = () => { zoomTarget = 1.0; };
   }
   attachZoomButtons();
+
+  function attachSpinButtons() {
+    const spinLeft = document.getElementById('btn-spin-left');
+    const spinRight = document.getElementById('btn-spin-right');
+    const spinReset = document.getElementById('btn-spin-reset');
+    if (spinLeft) spinLeft.onclick = () => { velocity = -0.045; playShowroomSound(410, 0.03, 0.05); };
+    if (spinRight) spinRight.onclick = () => { velocity = 0.045; playShowroomSound(520, 0.03, 0.05); };
+    if (spinReset) spinReset.onclick = () => { rotation = 0; velocity = IDLE_SPIN; playShowroomSound(600, 0.03, 0.05); };
+  }
+  attachSpinButtons();
 
   canvas.onmousedown = (e) => {
     isDragging = true;
@@ -1983,7 +2286,7 @@ function setupShowroomDrape(initialItem, itemsList) {
 
   window.onmouseup = () => {
     if (isDragging) {
-      velocity = Math.max(-MAX_VELOCITY, Math.min(MAX_VELOCITY, lastDx * 0.015));
+      velocity = Math.max(-MAX_VELOCITY, Math.min(MAX_VELOCITY, lastDx * 0.006));
     }
     isDragging = false;
     canvas.style.cursor = 'grab';
@@ -1998,8 +2301,7 @@ function setupShowroomDrape(initialItem, itemsList) {
     if (isDragging) {
       const dx = e.clientX - startX;
       lastDx = dx;
-      const dv = dx * 0.008;
-      rotation += dv;
+      rotation += dx * 0.007;
       startX = e.clientX;
 
       if (Math.abs(dx) > 2) {
@@ -2036,7 +2338,7 @@ function setupShowroomDrape(initialItem, itemsList) {
 
   canvas.addEventListener('touchend', (e) => {
     if (e.touches.length === 0) {
-      velocity = Math.max(-MAX_VELOCITY, Math.min(MAX_VELOCITY, lastDx * 0.015));
+      velocity = Math.max(-MAX_VELOCITY, Math.min(MAX_VELOCITY, lastDx * 0.006));
       isDragging = false;
       lastPinchDist = null;
     }
@@ -2050,7 +2352,7 @@ function setupShowroomDrape(initialItem, itemsList) {
       isHovered = true;
       const dx = e.touches[0].clientX - startX;
       lastDx = dx;
-      rotation += dx * 0.008;
+      rotation += dx * 0.007;
       startX = e.touches[0].clientX;
     } else if (e.touches.length === 2 && lastPinchDist !== null) {
       const dx = e.touches[0].clientX - e.touches[1].clientX;
@@ -2068,11 +2370,8 @@ function setupShowroomDrape(initialItem, itemsList) {
     zoomLevel += (zoomTarget - zoomLevel) * ZOOM_SPRING;
 
     if (!isDragging) {
-      rotation += velocity;
+      rotation += velocity + IDLE_SPIN;
       velocity *= FRICTION;
-      if (Math.abs(velocity) < MIN_AUTO_SPIN) {
-        velocity = MIN_AUTO_SPIN;
-      }
     }
 
     const TAU = Math.PI * 2;
@@ -2084,18 +2383,14 @@ function setupShowroomDrape(initialItem, itemsList) {
     const blendT = (normRot % segmentAngle) / segmentAngle;
     const nextFrameIndex = (frameIndex + 1) % FRAME_COUNT;
 
-    const { frames, hue, sat } = getAvatarFrames();
+    const { frames } = getAvatarFrames();
     const currentFrame = frames[frameIndex];
     const nextFrame = frames[nextFrameIndex];
 
     const cw = canvas.width;
     const ch = canvas.height;
 
-    if (hue !== 0 || sat !== 1) {
-      ctx.filter = `hue-rotate(${hue}deg) saturate(${sat})`;
-    } else {
-      ctx.filter = 'none';
-    }
+    ctx.filter = 'none';
 
     ctx.fillStyle = '#030303';
     ctx.fillRect(0, 0, cw, ch);
@@ -2197,13 +2492,14 @@ function setupShowroomDrape(initialItem, itemsList) {
     ctx.fillStyle = 'rgba(255, 215, 0, 0.25)';
     ctx.fillText('↔ CLICK & DRAG TO ROTATE · TOUCH SUPPORTED', cw / 2, ch - 18);
 
-    particles.forEach((p, index) => {
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
       p.angle += p.speedR;
       p.y += p.speedY;
       p.alpha -= 0.012;
       const swirlX = cw / 2 + Math.cos(p.angle) * p.radius;
       if (p.alpha <= 0) {
-        particles.splice(index, 1);
+        particles.splice(i, 1);
       } else {
         ctx.save();
         ctx.globalAlpha = p.alpha;
@@ -2215,7 +2511,7 @@ function setupShowroomDrape(initialItem, itemsList) {
         ctx.fill();
         ctx.restore();
       }
-    });
+    }
 
     if (isHovered) {
       if (inspectMode === 'spotlight') {
@@ -2309,6 +2605,8 @@ window.addEventListener('DOMContentLoaded', () => {
   setupVaultTunnel();
   setupCustomCursor();
   setupInteractiveExtensions();
+  setupMythosAnimation();
+  setupHeritageSoulSection();
 });
 
 function setupInteractiveExtensions() {
@@ -2550,4 +2848,827 @@ function setupCustomCursor() {
       document.body.classList.remove('cursor-drag');
     });
   });
+}
+
+function setupMythosAnimation() {
+  // Tabs switcher
+  const tabs = document.querySelectorAll('.mythos-tabs .btn');
+  const storyPanes = document.querySelectorAll('.mythos-story-pane');
+  let currentStory = 'gitagovinda';
+  
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      
+      const targetStory = tab.getAttribute('data-story');
+      currentStory = targetStory;
+      
+      storyPanes.forEach(pane => {
+        if (pane.id === `story-${targetStory}`) {
+          pane.classList.remove('hidden');
+          pane.classList.add('active');
+        } else {
+          pane.classList.add('hidden');
+          pane.classList.remove('active');
+        }
+      });
+      
+      // Play a subtle thread synth sound on tab change
+      if (audioCtx && audioCtx.state === 'running') {
+        try {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(targetStory === 'gitagovinda' ? 330 : 440, audioCtx.currentTime);
+          gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.3);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+        } catch(e){}
+      }
+    });
+  });
+
+  const canvas = document.getElementById('canvas-mythos');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  // Fixed coordinate system to prevent off-screen collapse and clipping bugs
+  const width = 800;
+  const height = 600;
+  canvas.width = width;
+  canvas.height = height;
+  
+  let shlokas = [
+    { text: "कंसारिरपि संसार", x: width * 0.15, y: height * 0.3, tx: width * 0.15, ty: height * 0.3 },
+    { text: "ललित लवङ्ग लता", x: width * 0.75, y: height * 0.25, tx: width * 0.75, ty: height * 0.25 },
+    { text: "देହି ପଦ ପଲ୍ଲବମ", x: width * 0.2, y: height * 0.75, tx: width * 0.2, ty: height * 0.75 },
+    { text: "ଗୀତ ଗୋବିନ୍ଦମ", x: width * 0.7, y: height * 0.7, tx: width * 0.7, ty: height * 0.7 }
+  ];
+
+  let motifs = [
+    { text: "ଶଙ୍ଖ (Conch)", x: width * 0.15, y: height * 0.3, tx: width * 0.15, ty: height * 0.3 },
+    { text: "ଚକ୍ର (Chakra)", x: width * 0.75, y: height * 0.25, tx: width * 0.75, ty: height * 0.25 },
+    { text: "ପଦ୍ମ (Lotus)", x: width * 0.2, y: height * 0.75, tx: width * 0.2, ty: height * 0.75 },
+    { text: "ହଳ (Plough)", x: width * 0.7, y: height * 0.7, tx: width * 0.7, ty: height * 0.7 }
+  ];
+
+  let mouse = { x: width / 2, y: height / 2, active: false };
+  canvas.addEventListener('mousemove', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    if (rect.width > 0 && rect.height > 0) {
+      mouse.x = (e.clientX - rect.left) * (width / rect.width);
+      mouse.y = (e.clientY - rect.top) * (height / rect.height);
+      mouse.active = true;
+    }
+  });
+  canvas.addEventListener('mouseleave', () => {
+    mouse.active = false;
+  });
+
+  // Tap/click triggers a flare
+  let flares = [];
+  canvas.addEventListener('click', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    if (rect.width > 0 && rect.height > 0) {
+      const cxVal = (e.clientX - rect.left) * (width / rect.width);
+      const cyVal = (e.clientY - rect.top) * (height / rect.height);
+      
+      // Add particle burst
+      for (let i = 0; i < 24; i++) {
+        flares.push({
+          x: cxVal,
+          y: cyVal,
+          vx: (Math.random() - 0.5) * 12,
+          vy: (Math.random() - 0.5) * 12,
+          radius: Math.random() * 6 + 2,
+          life: 1.0,
+          decay: Math.random() * 0.04 + 0.02,
+          color: currentStory === 'gitagovinda' ? 'rgba(212, 175, 55, 0.8)' : 'rgba(224, 17, 95, 0.8)'
+        });
+      }
+
+      // Play high chime
+      if (audioCtx && audioCtx.state === 'running') {
+        try {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(660, audioCtx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(1320, audioCtx.currentTime + 0.25);
+          gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.3);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+        } catch(e){}
+      }
+    }
+  });
+
+  let rotation = 0;
+  let rotationSpeed = 0.005;
+
+  function animate() {
+    // Clear
+    ctx.fillStyle = 'rgba(10, 8, 12, 0.2)';
+    ctx.fillRect(0, 0, width, height);
+
+    const cx = width / 2;
+    const cy = height / 2;
+    const activeTextSet = currentStory === 'gitagovinda' ? shlokas : motifs;
+
+    // Smooth speed modulation on hover
+    if (mouse.active) {
+      const dx = mouse.x - cx;
+      const dy = mouse.y - cy;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < 240) {
+        rotationSpeed = 0.02; // spin faster
+      } else {
+        rotationSpeed = 0.005;
+      }
+    } else {
+      rotationSpeed = 0.005;
+    }
+    rotation += rotationSpeed;
+
+    // DRAW SACRED WHEEL (Chakra / Konark Wheel)
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(rotation);
+
+    // Styling colors
+    const primaryColor = currentStory === 'gitagovinda' ? '#d4af37' : '#e0115f';
+    const secondaryColor = currentStory === 'gitagovinda' ? 'rgba(212, 175, 55, 0.4)' : 'rgba(255, 94, 0, 0.4)';
+
+    // Outer rim
+    ctx.strokeStyle = primaryColor;
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.arc(0, 0, 150, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Inner rim
+    ctx.strokeStyle = secondaryColor;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(0, 0, 136, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Small center hub
+    ctx.fillStyle = primaryColor;
+    ctx.beginPath();
+    ctx.arc(0, 0, 28, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Inner center axle details
+    ctx.fillStyle = '#0a080c';
+    ctx.beginPath();
+    ctx.arc(0, 0, 8, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Draw Spokes (8 spokes like Konark Wheel)
+    for (let i = 0; i < 8; i++) {
+      ctx.save();
+      const angle = (i * Math.PI) / 4;
+      ctx.rotate(angle);
+      
+      // Main spoke line
+      ctx.strokeStyle = primaryColor;
+      ctx.lineWidth = 6;
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(0, -136);
+      ctx.stroke();
+
+      // Intricate spoke details (little circles or triangles)
+      ctx.fillStyle = secondaryColor;
+      ctx.beginPath();
+      ctx.arc(0, -70, 8, 0, Math.PI * 2);
+      ctx.fill();
+
+      // spoke thread webbing
+      ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+      ctx.lineWidth = 1;
+      ctx.restore();
+    }
+    ctx.restore();
+
+    // 2. Sundial Shadow Caster
+    if (mouse.active) {
+      const dx = mouse.x - cx;
+      const dy = mouse.y - cy;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      
+      if (dist > 20) {
+        const angle = Math.atan2(dy, dx);
+        const oppAngle = angle + Math.PI;
+        
+        const shadowLength = Math.min(130, dist * 0.5 + 40);
+        const shadowX = cx + Math.cos(oppAngle) * shadowLength;
+        const shadowY = cy + Math.sin(oppAngle) * shadowLength;
+        
+        ctx.save();
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.65)';
+        ctx.lineWidth = 8;
+        ctx.lineCap = 'round';
+        ctx.shadowBlur = 12;
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(shadowX, shadowY);
+        ctx.stroke();
+        ctx.restore();
+
+        const normalizedAngle = (oppAngle + Math.PI * 2) % (Math.PI * 2);
+        const prahara = Math.floor((normalizedAngle / (Math.PI * 2)) * 8) + 1;
+        const danda = Math.floor(((normalizedAngle / (Math.PI * 2)) * 60) % 7.5) + 1;
+
+        ctx.fillStyle = 'rgba(212, 175, 55, 0.85)';
+        ctx.font = "18px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(`Sundial Time: Prahara ${prahara} (ପ୍ରହର) • ${danda} Danda`, cx, cy + 190);
+      }
+    }
+
+    // DRAW CONNECTING SACRED THREADS
+    activeTextSet.forEach((item, index) => {
+      item.x += Math.sin(Date.now() * 0.001 + index) * 0.3;
+      item.y += Math.cos(Date.now() * 0.001 + index * 1.5) * 0.3;
+
+      ctx.font = "600 22px 'Outfit', sans-serif";
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
+      ctx.textAlign = 'center';
+      ctx.fillText(item.text, item.x, item.y);
+
+      let isPlucked = false;
+      let waveAmp = 0;
+      if (mouse.active) {
+        const mx = mouse.x;
+        const my = mouse.y;
+        const midX = (cx + item.x) / 2;
+        const midY = (cy + item.y) / 2;
+        const dist = Math.sqrt((mx - midX)*(mx - midX) + (my - midY)*(my - midY));
+        if (dist < 80) {
+          isPlucked = true;
+          waveAmp = (1 - dist / 80) * 24;
+        }
+      }
+
+      const angleToText = Math.atan2(item.y - cy, item.x - cx);
+      const startX = cx + Math.cos(angleToText) * 150;
+      const startY = cy + Math.sin(angleToText) * 150;
+      
+      ctx.beginPath();
+      ctx.strokeStyle = currentStory === 'gitagovinda' ? 'rgba(212, 175, 55, 0.22)' : 'rgba(224, 17, 95, 0.22)';
+      ctx.lineWidth = isPlucked ? 2.8 : 1.6;
+      
+      ctx.moveTo(startX, startY);
+      const segments = 20;
+      for (let s = 0; s <= segments; s++) {
+        const t = s / segments;
+        let px = startX + (item.x - startX) * t;
+        let py = startY + (item.y - 12 - startY) * t;
+        
+        const wave = Math.sin(t * Math.PI + Date.now() * 0.06) * (waveAmp + Math.sin(Date.now() * 0.002 + index) * 8);
+        const dx = item.x - startX;
+        const dy = item.y - 12 - startY;
+        const len = Math.sqrt(dx*dx + dy*dy) || 0.001;
+        const nx = -dy / len;
+        const ny = dx / len;
+        
+        px += nx * wave;
+        py += ny * wave;
+        ctx.lineTo(px, py);
+      }
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.strokeStyle = currentStory === 'gitagovinda' ? 'rgba(212, 175, 55, 0.45)' : 'rgba(224, 17, 95, 0.45)';
+      ctx.lineWidth = 2;
+      ctx.moveTo(item.x - 60, item.y + 8);
+      ctx.bezierCurveTo(item.x - 30, item.y + 24 + waveAmp * 0.3, item.x + 30, item.y + 24 + waveAmp * 0.3, item.x + 60, item.y + 8);
+      ctx.stroke();
+
+      // Interactive mouse pull
+      if (mouse.active) {
+        const dx = mouse.x - item.x;
+        const dy = mouse.y - item.y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist < 160) {
+          // Draw reactive golden cursor thread
+          ctx.beginPath();
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+          ctx.lineWidth = 1.0;
+          ctx.moveTo(mouse.x, mouse.y);
+          ctx.lineTo(item.x, item.y - 12);
+          ctx.stroke();
+        }
+      }
+    });
+
+    // DRAW FLARES / PARTICLES
+    for (let i = flares.length - 1; i >= 0; i--) {
+      const flare = flares[i];
+      flare.x += flare.vx;
+      flare.y += flare.vy;
+      flare.life -= flare.decay;
+      
+      if (flare.life <= 0) {
+        flares.splice(i, 1);
+        continue;
+      }
+
+      ctx.fillStyle = flare.color;
+      ctx.globalAlpha = flare.life;
+      ctx.beginPath();
+      ctx.arc(flare.x, flare.y, flare.radius, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1.0; // reset
+
+    requestAnimationFrame(animate);
+  }
+
+  // Start loop
+  animate();
+}
+
+function setupHeritageSoulSection() {
+  const tabs = document.querySelectorAll('.heritage-tabs .btn');
+  const panes = document.querySelectorAll('.heritage-pane');
+  let currentHeritage = 'food';
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+
+      const target = tab.getAttribute('data-heritage');
+      currentHeritage = target;
+
+      panes.forEach(pane => {
+        if (pane.id === `heritage-${target}`) {
+          pane.classList.remove('hidden');
+          pane.classList.add('active');
+        } else {
+          pane.classList.add('hidden');
+          pane.classList.remove('active');
+        }
+      });
+
+      // Play a quick synth chord on tab switch
+      if (audioCtx && audioCtx.state === 'running') {
+        try {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(target === 'food' ? 261.63 : target === 'maritime' ? 329.63 : 392.00, audioCtx.currentTime);
+          gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.4);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(); osc.stop(audioCtx.currentTime + 0.4);
+        } catch(e){}
+      }
+    });
+  });
+
+  const canvas = document.getElementById('canvas-heritage-soul');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  // Fixed coordinate system to prevent off-screen collapse and clipping bugs
+  const width = 800;
+  const height = 800;
+  canvas.width = width;
+  canvas.height = height;
+
+  let mouse = { x: width / 2, y: height / 2, active: false };
+  canvas.addEventListener('mousemove', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    if (rect.width > 0 && rect.height > 0) {
+      mouse.x = (e.clientX - rect.left) * (width / rect.width);
+      mouse.y = (e.clientY - rect.top) * (height / rect.height);
+      mouse.active = true;
+    }
+  });
+  canvas.addEventListener('mouseleave', () => {
+    mouse.active = false;
+  });
+
+  // Steam particles for Mahaprasad
+  let steam = [];
+  const dishLabels = ["ଅନ୍ନ (Rice)", "ଡାଲି (Dal)", "ଖେଚୁଡ଼ି", "କାନିକା", "ଖଜା", "ରସଗୋଲା", "ପିଠା"];
+
+  // Floating paper boats for Bali Jatra
+  let boats = [
+    { x: width * 0.2, y: height * 0.72, size: 28, speed: 0.25 },
+    { x: width * 0.5, y: height * 0.76, size: 20, speed: 0.18 },
+    { x: width * 0.8, y: height * 0.74, size: 24, speed: 0.22 }
+  ];
+
+  // Dance sparkles for Odissi
+  let sparkles = [];
+
+  function draw() {
+    ctx.fillStyle = '#09070b';
+    ctx.fillRect(0, 0, width, height);
+
+    const cx = width / 2;
+    const cy = height / 2;
+    const time = Date.now() * 0.001;
+
+    if (currentHeritage === 'food') {
+      // ==========================================
+      // MAHAPRASAD: Stacked Earthen Pots (Kudua) & Steam
+      // ==========================================
+      
+      // 1. Draw single fire glow at base
+      const fireGlow = ctx.createRadialGradient(cx, cy + 260, 20, cx, cy + 260, 160);
+      fireGlow.addColorStop(0, 'rgba(255, 94, 0, 0.25)');
+      fireGlow.addColorStop(1, 'rgba(255, 94, 0, 0)');
+      ctx.fillStyle = fireGlow;
+      ctx.beginPath();
+      ctx.arc(cx, cy + 260, 160, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 2. Render Stacked Pots (3 representative Kudua pots of decreasing size)
+      const potConfigs = [
+        { y: cy + 160, w: 180, h: 96, label: "Bottom Pot" },
+        { y: cy + 30, w: 152, h: 84, label: "Middle Pot" },
+        { y: cy - 90, w: 124, h: 72, label: "Top Pot" }
+      ];
+
+      potConfigs.forEach((pot, index) => {
+        ctx.save();
+        ctx.translate(cx, pot.y);
+        
+        // Shadow/glow
+        ctx.shadowBlur = 24;
+        ctx.shadowColor = 'rgba(128, 64, 16, 0.4)';
+
+        // Clay pot base body
+        const grad = ctx.createLinearGradient(-pot.w/2, 0, pot.w/2, 0);
+        grad.addColorStop(0, '#5c2d18');
+        grad.addColorStop(0.3, '#8b4513');
+        grad.addColorStop(0.7, '#a0522d');
+        grad.addColorStop(1, '#4a2512');
+        ctx.fillStyle = grad;
+        
+        ctx.beginPath();
+        ctx.moveTo(-pot.w / 2, 0);
+        ctx.bezierCurveTo(-pot.w / 2, pot.h, pot.w / 2, pot.h, pot.w / 2, 0);
+        ctx.closePath();
+        ctx.fill();
+
+        // Clay pot rim
+        ctx.fillStyle = '#6e3519';
+        ctx.beginPath();
+        ctx.ellipse(0, -4, pot.w / 2 + 8, 12, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#3d1d0e';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.restore();
+      });
+
+      // 3. Emit Steam particles containing dish names
+      if (Math.random() < 0.04) {
+        const dishText = dishLabels[Math.floor(Math.random() * dishLabels.length)];
+        steam.push({
+          x: cx + (Math.random() - 0.5) * 120,
+          y: cy - 140,
+          text: dishText,
+          vx: (Math.random() - 0.5) * 1.6,
+          vy: -Math.random() * 2.4 - 1.6,
+          alpha: 1.0,
+          size: Math.random() * 4 + 20
+        });
+      }
+
+      // Draw and update steam
+      for (let i = steam.length - 1; i >= 0; i--) {
+        const p = steam[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.alpha -= 0.007;
+
+        // Hover attraction
+        if (mouse.active) {
+          const dx = mouse.x - p.x;
+          const dy = mouse.y - p.y;
+          const dist = Math.sqrt(dx*dx + dy*dy);
+          if (dist < 200) {
+            p.x += dx * 0.05;
+            p.y += dy * 0.05;
+          }
+        }
+
+        if (p.alpha <= 0) {
+          steam.splice(i, 1);
+          continue;
+        }
+
+        ctx.fillStyle = `rgba(212, 175, 55, ${p.alpha * 0.85})`;
+        ctx.font = `${p.size}px sans-serif`;
+        ctx.textAlign = "center";
+        ctx.fillText(p.text, p.x, p.y);
+      }
+
+    } else if (currentHeritage === 'maritime') {
+      // ==========================================
+      // MARITIME: Bali Jatra Sailing Boitas
+      // ==========================================
+
+      // 1. Draw beautiful interactive waves
+      ctx.strokeStyle = 'rgba(0, 119, 182, 0.4)';
+      ctx.lineWidth = 3;
+      const waveY = height * 0.75;
+      
+      // Starry Night Sky Background with Twinkling Constellations
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+      for (let s = 0; s < 30; s++) {
+        const sx = (Math.sin(s * 73.13) * 0.5 + 0.5) * width;
+        const sy = (Math.cos(s * 29.45) * 0.5 + 0.5) * (waveY - 80);
+        const size = Math.abs(Math.sin(time * 2 + s)) * 4;
+        ctx.beginPath();
+        ctx.arc(sx, sy, size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      
+      for (let w = 0; w < 3; w++) {
+        ctx.beginPath();
+        ctx.moveTo(0, waveY + w * 24);
+        
+        for (let x = 0; x <= width; x += 30) {
+          // Wave height modifier based on mouse hover
+          let hoverHeight = 0;
+          if (mouse.active) {
+            const dist = Math.abs(mouse.x - x);
+            if (dist < 240) {
+              hoverHeight = (1 - dist / 240) * (mouse.y - waveY) * 0.35;
+            }
+          }
+          
+          const y = waveY + w * 24 + Math.sin(x * 0.01 + time * 2.5 + w) * 16 + hoverHeight;
+          if (x === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      }
+
+      // 2. Draw the primary stylized Merchant Boita (traditional ship)
+      ctx.save();
+      ctx.translate(cx, waveY - 40 + Math.sin(time * 2.0) * 8);
+      ctx.rotate(Math.sin(time * 1.5) * 0.04);
+
+      // Ship Hull (Earthen wood)
+      ctx.fillStyle = '#8b5a2b';
+      ctx.beginPath();
+      ctx.moveTo(-140, -20);
+      ctx.lineTo(120, -20);
+      ctx.quadraticCurveTo(170, -50, 190, -70); // stern
+      ctx.lineTo(190, -10);
+      ctx.quadraticCurveTo(0, 40, -180, -10); // bow curve
+      ctx.closePath();
+      ctx.fill();
+
+      // Golden lines & details on Hull
+      ctx.strokeStyle = 'rgba(212, 175, 55, 0.8)';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(-160, -14);
+      ctx.quadraticCurveTo(0, 24, 170, -14);
+      ctx.stroke();
+
+      // Main Mast
+      ctx.strokeStyle = '#5c3a21';
+      ctx.lineWidth = 8;
+      ctx.beginPath();
+      ctx.moveTo(0, 10);
+      ctx.lineTo(0, -180);
+      ctx.stroke();
+
+      // Secondary Mast
+      ctx.lineWidth = 6;
+      ctx.beginPath();
+      ctx.moveTo(70, 10);
+      ctx.lineTo(70, -140);
+      ctx.stroke();
+
+      // Traditional sails (Triangular crimson/gold cloth sails)
+      ctx.fillStyle = 'rgba(195, 27, 27, 0.85)';
+      ctx.beginPath();
+      ctx.moveTo(0, -170);
+      ctx.quadraticCurveTo(-50, -100, -80, -30);
+      ctx.lineTo(0, -30);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = 'rgba(212, 175, 55, 0.85)';
+      ctx.beginPath();
+      ctx.moveTo(70, -130);
+      ctx.quadraticCurveTo(30, -80, 10, -30);
+      ctx.lineTo(70, -30);
+      ctx.closePath();
+      ctx.fill();
+
+      // Sacred temple flag flying on top
+      ctx.fillStyle = '#ff5e00';
+      ctx.beginPath();
+      ctx.moveTo(0, -180);
+      ctx.lineTo(-40, -164);
+      ctx.lineTo(0, -148);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.restore();
+
+      // 3. Draw smaller floating paper boats
+      boats.forEach((b) => {
+        b.x -= b.speed;
+        if (b.x < -80) b.x = width + 80;
+
+        ctx.save();
+        ctx.translate(b.x, b.y + Math.sin(time * 3 + b.x * 0.05) * 6);
+        
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.65)';
+        ctx.beginPath();
+        ctx.moveTo(-b.size, 0);
+        ctx.lineTo(b.size, 0);
+        ctx.lineTo(b.size * 0.3, -b.size * 0.4);
+        ctx.lineTo(0, -b.size * 0.8);
+        ctx.lineTo(-b.size * 0.3, -b.size * 0.4);
+        ctx.closePath();
+        ctx.fill();
+        
+        // Floating diya light
+        ctx.fillStyle = 'rgba(255, 165, 0, 0.8)';
+        ctx.beginPath();
+        ctx.arc(0, -b.size * 0.5, 6, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore();
+      });
+
+    } else if (currentHeritage === 'odissi') {
+      // ==========================================
+      // ODISSI: Dancer Silhouette & Mandalas
+      // ==========================================
+
+      // 1. Rotating background mandala halo
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(time * 0.15);
+      ctx.strokeStyle = 'rgba(212, 175, 55, 0.15)';
+      ctx.lineWidth = 2;
+      
+      // Draw circular geometric pattern
+      for (let i = 0; i < 16; i++) {
+        ctx.rotate(Math.PI / 8);
+        ctx.beginPath();
+        ctx.arc(0, 0, 220, 0, Math.PI * 0.25);
+        ctx.stroke();
+        
+        ctx.beginPath();
+        ctx.arc(80, 0, 50, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      // 2. Draw elegant silhouette of an Odissi Dancer in Tribhangi pose
+      ctx.save();
+      ctx.translate(cx, cy + 60);
+      
+      // Tahia (Odissi Crown decoration)
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+      ctx.strokeStyle = '#d4af37';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      for (let a = -Math.PI * 0.65; a <= -Math.PI * 0.35; a += 0.15) {
+        const tx = Math.cos(a) * 176;
+        const ty = -200 + Math.sin(a) * 40;
+        ctx.moveTo(0, -170);
+        ctx.lineTo(tx, ty);
+        ctx.arc(tx, ty, 6, 0, Math.PI*2);
+      }
+      ctx.stroke();
+      ctx.fill();
+
+      // Head & Hair
+      ctx.fillStyle = '#0a0a0a';
+      ctx.beginPath();
+      ctx.arc(0, -140, 30, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Body (Fluid Pose Morphing: Tribhangi -> Chauka -> Abhanga)
+      const cycle = (time * 0.5) % 3;
+      const currentPose = Math.floor(cycle);
+      const blend = cycle - currentPose;
+      
+      let chestX, waistX, hipsX;
+      
+      if (currentPose === 0) {
+        chestX = -10 + (0 - (-10)) * blend;
+        waistX = 15 + (0 - 15) * blend;
+        hipsX = -5 + (0 - (-5)) * blend;
+      } else if (currentPose === 1) {
+        chestX = 0 + (8 - 0) * blend;
+        waistX = 0 + (-8 - 0) * blend;
+        hipsX = 0 + (5 - 0) * blend;
+      } else {
+        chestX = 8 + (-10 - 8) * blend;
+        waistX = -8 + (15 - (-8)) * blend;
+        hipsX = 5 + (-5 - 5) * blend;
+      }
+
+      ctx.fillStyle = 'rgba(224, 17, 95, 0.8)';
+      ctx.beginPath();
+      ctx.moveTo(-8, -110);
+      ctx.lineTo(8, -110);
+      ctx.quadraticCurveTo(30, -80, chestX * 2, -50);
+      ctx.quadraticCurveTo(chestX * 2 - 30, -20, waistX * 2, 20);
+      ctx.quadraticCurveTo(waistX * 2 + 20, 50, hipsX * 2, 100);
+      ctx.lineTo(-40, 100);
+      ctx.lineTo(-40, 112);
+      ctx.lineTo(40, 112);
+      ctx.lineTo(40, 100);
+      ctx.closePath();
+      ctx.fill();
+
+      // Arms doing a mudra
+      ctx.strokeStyle = 'rgba(212, 175, 55, 0.9)';
+      ctx.lineWidth = 8;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      
+      // Left arm curving upward
+      ctx.beginPath();
+      ctx.moveTo(-16, -84);
+      ctx.lineTo(-56, -60);
+      ctx.lineTo(-36, -20);
+      ctx.stroke();
+
+      // Right arm stretching out
+      ctx.beginPath();
+      ctx.moveTo(16, -84);
+      ctx.lineTo(64, -72);
+      ctx.lineTo(90, -40);
+      ctx.stroke();
+
+      // Ghungroo (feet bells) circles
+      ctx.fillStyle = '#ffd700';
+      ctx.beginPath();
+      ctx.arc(-30, 104, 6, 0, Math.PI*2);
+      ctx.arc(-16, 104, 6, 0, Math.PI*2);
+      ctx.arc(16, 104, 6, 0, Math.PI*2);
+      ctx.arc(30, 104, 6, 0, Math.PI*2);
+      ctx.fill();
+
+      ctx.restore();
+
+      // 3. Emit sparkles/flower petals from mudra points
+      if (Math.random() < 0.08) {
+        sparkles.push({
+          x: cx + (Math.random() > 0.5 ? -50 : 90),
+          y: cy + (Math.random() > 0.5 ? -20 : -40),
+          size: Math.random() * 6 + 4,
+          color: 'rgba(212, 175, 55, 0.85)',
+          vy: -Math.random() * 3.0 - 1.0,
+          vx: (Math.random() - 0.5) * 2.4,
+          life: 1.0,
+          decay: 0.02
+        });
+      }
+
+      for (let i = sparkles.length - 1; i >= 0; i--) {
+        const s = sparkles[i];
+        s.y += s.vy;
+        s.x += s.vx;
+        s.life -= s.decay;
+
+        if (s.life <= 0) {
+          sparkles.splice(i, 1);
+          continue;
+        }
+
+        ctx.fillStyle = s.color;
+        ctx.globalAlpha = s.life;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1.0;
+    }
+
+    requestAnimationFrame(draw);
+  }
+
+  // Start loop
+  draw();
 }

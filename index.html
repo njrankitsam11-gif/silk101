@@ -129,6 +129,7 @@
     </script>
   </head>
   <body>
+    <a class="skip-link" href="#genesis">Skip to the story</a>
     <!-- Premium Loading Overlay -->
     <div id="loader" class="loader-overlay">
       <div class="loader-content">
@@ -155,12 +156,28 @@
 
     <!-- Main Container -->
     <main id="viewport">
+      <header class="site-header" aria-label="Primary navigation">
+        <a class="brand-lockup" href="#genesis" aria-label="The Loom of Time home">
+          <span class="brand-wheel" aria-hidden="true">✦</span>
+          <span>
+            <strong>The Loom of Time</strong>
+            <small>Odisha · India</small>
+          </span>
+        </a>
+        <nav class="site-nav" aria-label="Explore the story">
+          <a href="#artisan-pulse">The Weavers</a>
+          <a href="#metamorphosis">Living Culture</a>
+          <a href="#vault">Collection</a>
+        </nav>
+        <a class="header-journal" href="/articles.html">Journal <span aria-hidden="true">↗</span></a>
+      </header>
+
       <!-- Rhythmic Loom Audio & Synth Controller -->
-      <button id="audio-toggle" class="audio-indicator" aria-label="Mute/Unmute Audio">
+      <button id="audio-toggle" class="audio-indicator" aria-label="Turn ambient audio on" aria-pressed="false">
         <div class="sound-bars">
           <span></span><span></span><span></span><span></span>
         </div>
-        <span class="audio-text">AUDIO ON</span>
+        <span class="audio-text">AUDIO OFF</span>
       </button>
 
       <!-- SECTION 1: THE GENESIS (Hero Drop) -->
@@ -173,6 +190,7 @@
             <h2 class="embroidered-text">Woven Heritage.</h2>
             <h2 class="embroidered-text accent">Preserved Forever.</h2>
           </div>
+          <svg class="mudra-icon small" viewBox="0 0 48 48" style="margin-bottom:10px; opacity:0.65;" aria-hidden="true"><path d="M24 40c-2.2 0-4-1.8-4-4 0-4-6-6.5-8-12 3 0 5.5 2 7.5 5.5m4.5 10.5c2.2 0 4-1.8 4-4 0-4 6-6.5 8-12-3 0-5.5 2-7.5 5.5M24 36V16c-1.5 1.5-2.5 4.5-2.5 9M21 25c-3-3-4.5-7.5-4.5-12m11 12c3-3 4.5-7.5 4.5-12" /><circle cx="24" cy="40" r="1.5" fill="var(--color-zari)" /></svg>
           <span class="scroll-hint">SCROLL TO WEAVE</span>
         </div>
       </section>
@@ -186,6 +204,7 @@
             <div class="slide slide-text flex-center">
               <div class="slide-content">
                 <span class="section-label">01 / THE HUMAN CONNECTION</span>
+                <svg class="mudra-icon" style="margin-bottom:15px; display:block;" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 40c-2.5 0-4.5-2-4.5-4.5V25l-4-15c0-1.5 2.5-1.5 2.5 1.5l3-3.5c0-1.5 2.5-1.5 2.5 1.5l3.5-2c0-1.5 2.5-1.5 2.5 1.5L27 24m-3 2c1.5 0 2.5-1 2.5-2s-1.5-2-2.5-1.5c-1 1-1.5 1.5-1.5 2.5s.5 1 1.5 1z" /><circle cx="24" cy="40" r="1.5" fill="var(--color-zari)" /></svg>
                 <h3 class="slide-heading">The Artisan's Pulse</h3>
                 <p class="slide-desc">Every masterpiece begins in the hands of a master weaver in Nuapatna and Maniabandha. Their rhythm is the clock cycle of heritage.</p>
               </div>
@@ -267,6 +286,7 @@
                 <!-- Left: Our Story -->
                 <div class="narrative-col">
                   <span class="section-label">01B / EIGHT CENTURIES OF CRAFT</span>
+                  <svg class="mudra-icon" style="margin-bottom:12px; display:block;" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 40c-4 0-5.5-2-5.5-5V26c0-2.5 2.5-4 5.5-4s5.5 1.5 5.5 4v6c0 4-2.5 8-5.5 8zm0-18V8c0-1.5 2.5-1.5 2.5 1.5v8.5m-8 6.5c1 1.5 3.5 1.5 5 0m-5 4c1 1.5 3.5 1.5 5 0m-5 4c1 1.5 3.5 1.5 5 0" /><circle cx="24" cy="40" r="1.5" fill="var(--color-zari)" /></svg>
                   <h3 class="narrative-heading">Devotion & Struggle</h3>
                   <p class="narrative-text">For eight centuries, the handloom artisans of Nuapatna have woven <strong>Khandua Silk</strong> as a sacred offering for Odisha's Ratha Yatra, dressing the towering temple chariots of Puri. This thread of faith survived the British colonial era, when machine-made cheap imports flooded the markets and policies restricted local silk production. The weavers' unwavering devotion is the soul that kept the loom alive.</p>
                 </div>
@@ -315,6 +335,74 @@
               </div>
             </div>
 
+            <!-- Slide 3.5: Pattachitra Storytelling Scroll -->
+            <div class="slide slide-pattachitra flex-center" style="position: relative; overflow: hidden; background: #0c0806;">
+              <div class="pattachitra-scroll-container" style="width: 80%; display: flex; flex-direction: column; justify-content: center; z-index: 10;">
+                <span class="section-label">01C / VISUAL FOLKLORE</span>
+                <h3 class="slide-heading" style="font-size: 2.8rem; margin-bottom: 12px; color: var(--color-zari);">Pattachitra Scroll</h3>
+                <p class="slide-desc" style="max-width: 600px; margin-bottom: 24px; font-size: 0.95rem; line-height: 1.45;">Traditional Odia Pattachitra art tells sacred tales in natural stone pigment dyes. Scroll horizontally to unravel the scroll, seeing the wildlife and temple spires separate into layered depths.</p>
+                
+                <div class="pattachitra-viewport" style="width: 100%; height: 200px; background: rgba(0,0,0,0.3); border: 1px solid rgba(212,175,55,0.15); border-radius: 6px; position: relative; overflow: hidden;">
+                  <!-- Background landscape (Faint trees) -->
+                  <div class="patta-layer patta-bg" style="position: absolute; top:0; left: 0; width: 200%; height: 100%; background: repeating-linear-gradient(90deg, transparent, transparent 150px, rgba(212, 175, 55, 0.04) 150px, rgba(212, 175, 55, 0.04) 300px); transition: transform 0.1s ease-out;"></div>
+                  
+                  <!-- Midground (Stylized trees & temple pillars) -->
+                  <div class="patta-layer patta-mid" style="position: absolute; top: 20px; left: 0; width: 300%; height: 100%; display: flex; gap: 200px; padding-left: 50px; opacity: 0.45; transition: transform 0.1s ease-out;">
+                    <svg width="60" height="160" viewBox="0 0 60 160" fill="none" stroke="var(--color-zari)" stroke-width="1"><path d="M30,160 L30,60 M30,100 L10,80 M30,80 L50,60 M30,60 C10,40 10,10 30,10 C50,10 50,40 30,60 Z" /></svg>
+                    <svg width="60" height="160" viewBox="0 0 60 160" fill="none" stroke="var(--color-zari)" stroke-width="1"><path d="M30,160 L30,60 M30,100 L10,80 M30,80 L50,60 M30,60 C10,40 10,10 30,10 C50,10 50,40 30,60 Z" /></svg>
+                    <svg width="60" height="160" viewBox="0 0 60 160" fill="none" stroke="var(--color-zari)" stroke-width="1"><path d="M30,160 L30,60 M30,100 L10,80 M30,80 L50,60 M30,60 C10,40 10,10 30,10 C50,10 50,40 30,60 Z" /></svg>
+                    <svg width="60" height="160" viewBox="0 0 60 160" fill="none" stroke="var(--color-zari)" stroke-width="1"><path d="M30,160 L30,60 M30,100 L10,80 M30,80 L50,60 M30,60 C10,40 10,10 30,10 C50,10 50,40 30,60 Z" /></svg>
+                  </div>
+                  
+                  <!-- Foreground (Deers & dancing figures) -->
+                  <div class="patta-layer patta-fore" style="position: absolute; top: 60px; left: 0; width: 400%; height: 100%; display: flex; gap: 150px; padding-left: 100px; opacity: 0.85; transition: transform 0.1s ease-out;">
+                    <svg width="50" height="80" viewBox="0 0 50 80" fill="none" stroke="var(--color-zari)" stroke-width="1.2"><path d="M10,80 L15,50 L40,50 L45,80 M15,50 L20,20 L30,20 L35,50 M25,20 L20,5 L30,5 M40,50 L50,60" /></svg>
+                    <svg width="40" height="80" viewBox="0 0 40 80" fill="none" stroke="var(--color-zari)" stroke-width="1.2"><path d="M20,15 A8,8 0 1,0 20,31 A8,8 0 1,0 20,15 M20,31 L20,55 L10,75 M20,55 L30,75 M20,40 L5,35 M20,40 L35,35" /></svg>
+                    <svg width="50" height="80" viewBox="0 0 50 80" fill="none" stroke="var(--color-zari)" stroke-width="1.2"><path d="M10,80 L15,50 L40,50 L45,80 M15,50 L20,20 L30,20 L35,50 M25,20 L20,5 L30,5 M40,50 L50,60" /></svg>
+                    <svg width="40" height="80" viewBox="0 0 40 80" fill="none" stroke="var(--color-zari)" stroke-width="1.2"><path d="M20,15 A8,8 0 1,0 20,31 A8,8 0 1,0 20,15 M20,31 L20,55 L10,75 M20,55 L30,75 M20,40 L5,35 M20,40 L35,35" /></svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Slide 4: Odia Heritage & Sacred Mythos -->
+            <div class="slide slide-mythos flex-center">
+              <div class="narrative-split">
+                <!-- Left: Mythos Content & Stories -->
+                <div class="narrative-col">
+                  <span class="section-label">01D / THE SACRED MYTHOS</span>
+                  <h3 class="narrative-heading">Divine Threads</h3>
+                  
+                  <div class="mythos-tabs" style="display: flex; gap: 10px; margin-bottom: 20px;">
+                    <button class="btn btn-sm btn-outline active" data-story="gitagovinda">Gita Govinda Ikat</button>
+                    <button class="btn btn-sm btn-outline" data-story="rathayatra">Ratha Yatra Offering</button>
+                  </div>
+                  
+                  <div class="mythos-content-wrap">
+                    <div id="story-gitagovinda" class="mythos-story-pane active">
+                      <h4 style="font-family:'Outfit'; color:var(--color-zari); margin-bottom:10px; font-weight:600;">The Calligraphic Weave</h4>
+                      <p class="narrative-text" style="margin-bottom:12px;">In Khandua Patta, verses from poet Jayadeva's 12th-century Sanskrit epic <em>Gita Govinda</em> are woven directly into the body. This unique calligraphic tie-dye process requires absolute structural memory, as the weaver binds individual threads to form sacred shlokas before weaving them.</p>
+                      <p class="narrative-text">"Kansari senari..." The silk serves as a medium of prayer, representing a marriage of literature, sacred math, and divine devotion.</p>
+                    </div>
+                    <div id="story-rathayatra" class="mythos-story-pane hidden">
+                      <h4 style="font-family:'Outfit'; color:var(--color-zari); margin-bottom:10px; font-weight:600;">The Lord's Daily Attire</h4>
+                      <p class="narrative-text" style="margin-bottom:12px;">Every morning, Lord Jagannath of Puri is adorned with a fresh Khandua silk garment. The colors and motifs change according to the day of the week, aligning with astrological forces.</p>
+                      <p class="narrative-text">Red for Sunday, white for Monday, yellow for Wednesday, and black/purple for other days. This daily ritual connects the weaver's loom in Nuapatna directly to the ancient deity sanctum of Puri.</p>
+                    </div>
+                  </div>
+                </div>
+                <!-- Right: Heritage Animation Canvas -->
+                <div class="narrative-col border-left flex-center" style="position: relative; overflow: hidden; height: 100%;">
+                  <div class="mythos-canvas-wrap" style="position: relative; width: 100%; height: 100%; min-height: 320px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.15); border-radius: 6px; border: 1px solid rgba(255,255,255,0.03);">
+                    <canvas id="canvas-mythos" style="position: absolute; top:0; left:0; width:100%; height:100%; pointer-events: auto;"></canvas>
+                    <div class="mythos-interactive-hint" style="position: absolute; bottom: 10px; font-size: 0.75rem; color: rgba(255,255,255,0.4); pointer-events: none; text-align: center; font-family:'Outfit'; width: 100%;">
+                      Hover near the wheel to weave the threads of shlokas
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </section>
@@ -328,7 +416,54 @@
           <div class="meta-card">
             <span class="section-label">02 / DIGITAL THREAD</span>
             <h3 class="meta-heading">The Metamorphosis</h3>
+            <svg class="mudra-icon" style="margin:10px 0 15px 0; display:block;" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 40c-2.2 0-4-1.8-4-4 0-4-6-6.5-8-12 3 0 5.5 2 7.5 5.5m4.5 10.5c2.2 0 4-1.8 4-4 0-4 6-6.5 8-12-3 0-5.5 2-7.5 5.5M24 36V16c-1.5 1.5-2.5 4.5-2.5 9M21 25c-3-3-4.5-7.5-4.5-12m11 12c3-3 4.5-7.5 4.5-12" /><circle cx="24" cy="40" r="1.5" fill="var(--color-zari)" /></svg>
             <p class="meta-desc">Every handloom masterpiece is preserved in high-fidelity digital detail. As you zoom into the Pallu, experience the mathematical precision of the weave structure, capturing the soul of Nuapatna silk craftsmanship.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 3.5: THE SOUL OF ODISHA -->
+      <section id="heritage-soul" class="scroll-section flex-center" style="background:#09070b; position:relative; min-height: 100vh; padding: 4rem 10%; box-sizing: border-box;">
+        <div class="narrative-split" style="display:flex; width:100%; height:100%; max-width:1200px; gap:4%; align-items:center;">
+          <!-- Left: Narrative & Toggles -->
+          <div class="narrative-col" style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+            <span class="section-label">02B / DEVOTION, FOOD & SEA</span>
+            <svg class="mudra-icon" style="margin-bottom:12px; display:block;" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 40c-2.5 0-4.5-2-4.5-4.5V25l-4-15c0-1.5 2.5-1.5 2.5 1.5l3-3.5c0-1.5 2.5-1.5 2.5 1.5l3.5-2c0-1.5 2.5-1.5 2.5 1.5L27 24m-3 2c1.5 0 2.5-1 2.5-2s-1.5-2-2.5-1.5c-1 1-1.5 1.5-1.5 2.5s.5 1 1.5 1z" /><circle cx="24" cy="40" r="1.5" fill="var(--color-zari)" /></svg>
+            <h3 class="narrative-heading" style="font-size:2.8rem; line-height:1.15; margin-bottom:1.5rem;">The Soul of Odisha</h3>
+            
+            <div class="heritage-tabs" style="display:flex; gap:10px; margin-bottom:24px; flex-wrap:wrap;">
+              <button class="btn btn-sm btn-outline active" data-heritage="food">Mahaprasad Feast</button>
+              <button class="btn btn-sm btn-outline" data-heritage="maritime">Bali Jatra sails</button>
+              <button class="btn btn-sm btn-outline" data-heritage="odissi">Odissi Mudras</button>
+            </div>
+            
+            <div class="heritage-content-wrap">
+              <div id="heritage-food" class="heritage-pane active">
+                <h4 style="font-family:'Outfit'; color:var(--color-zari); margin-bottom:10px; font-weight:600; font-size:1.15rem;">Abhada & Stacked Clay Pots</h4>
+                <p class="narrative-text" style="margin-bottom:12px; font-size:0.95rem; line-height:1.4;">In the sacred temple kitchen of Puri, the Mahaprasad is cooked as a holy offering. In a unique design, 9 clay pots (Kudua) are stacked on top of each other over a single wood fire. Miraculously, the top pot cooks first, then the next, downwards.</p>
+                <p class="narrative-text" style="font-size:0.95rem; line-height:1.4;">This divine culinary physics celebrates simplicity, earthen elements, and centuries of devotion.</p>
+              </div>
+              <div id="heritage-maritime" class="heritage-pane hidden">
+                <h4 style="font-family:'Outfit'; color:var(--color-zari); margin-bottom:10px; font-weight:600; font-size:1.15rem;">Boita Bandana: The Sea Merchant Legacy</h4>
+                <p class="narrative-text" style="margin-bottom:12px; font-size:0.95rem; line-height:1.4;">During Kartik Purnima, the rivers and shores of Odisha glow with thousands of miniature paper and cork boats (Boita) floating with oil lamps, betel leaves, and coins.</p>
+                <p class="narrative-text" style="font-size:0.95rem; line-height:1.4;">This ritual honors the "Sadhabas" (ancient maritime traders) who sailed across oceans to trade spices and silks, leaving an indelible imprint on Indonesian culture.</p>
+              </div>
+              <div id="heritage-odissi" class="heritage-pane hidden">
+                <h4 style="font-family:'Outfit'; color:var(--color-zari); margin-bottom:10px; font-weight:600; font-size:1.15rem;">The Sacred Posture of Tribhangi</h4>
+                <p class="narrative-text" style="margin-bottom:12px; font-size:0.95rem; line-height:1.4;">Odissi is the ancient classical dance form of Odisha, characterized by the <em>Tribhangi</em> (the three-bend stance of the head, chest, and pelvis) and complex hand gestures (Mudras).</p>
+                <p class="narrative-text" style="font-size:0.95rem; line-height:1.4;">Carved in stone across temples like Konark and Mukteswar, these poses translate physical geometry into absolute spiritual surrender.</p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Right: Interactive Canvas Illustration -->
+          <div class="narrative-col border-left flex-center" style="flex:1; position:relative; overflow:hidden; min-height:420px; display:flex; align-items:center; justify-content:center;">
+            <div class="heritage-canvas-wrap" style="position:relative; width:100%; height:100%; min-height:400px; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.15); border-radius:8px; border:1px solid rgba(255,255,255,0.03);">
+              <canvas id="canvas-heritage-soul" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:auto;"></canvas>
+              <div class="heritage-interactive-hint" style="position:absolute; bottom:12px; font-size:0.75rem; color:rgba(255,255,255,0.45); pointer-events:none; font-family:'Outfit'; width:100%; text-align:center;">
+                Interact with the canvas to feel the rhythm of Odisha
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -337,8 +472,11 @@
       <section id="vault" class="scroll-section">
         <div class="vault-heading-wrap">
           <span class="section-label">03 / THE COLLECTION</span>
-          <h3 class="vault-title">The Vault</h3>
-          <p class="vault-subtitle">Scroll to fly through the 3D archive. <strong>Click any card to enter the 3D Window Shopping Showroom!</strong></p>
+          <h3 class="vault-title" style="display:flex; align-items:center; justify-content:center; gap:12px;">
+            <svg class="mudra-icon" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 40c-4 0-5.5-2-5.5-5V26c0-2.5 2.5-4 5.5-4s5.5 1.5 5.5 4v6c0 4-2.5 8-5.5 8zm0-18V8c0-1.5 2.5-1.5 2.5 1.5v8.5m-8 6.5c1 1.5 3.5 1.5 5 0m-5 4c1 1.5 3.5 1.5 5 0m-5 4c1 1.5 3.5 1.5 5 0" /><circle cx="24" cy="40" r="1.5" fill="var(--color-zari)" /></svg>
+            The Vault
+          </h3>
+          <p class="vault-subtitle">A curated archive of living Odisha handloom. <strong>Select a saree to explore its weave, motif and maker.</strong></p>
         </div>
         
         <div class="tunnel-container">
@@ -351,11 +489,12 @@
       <!-- Footer / Outro -->
       <footer class="scroll-section outro-section flex-center">
         <div class="outro-content">
-          <h2 class="outro-logo">ANTIGRAVITI</h2>
-          <p class="outro-tagline">Crafting the Interface of Heritage and Tomorrow.</p>
+          <p class="outro-kicker">From Odisha, with reverence</p>
+          <h2 class="outro-logo">The Loom of Time</h2>
+          <p class="outro-tagline">Handloom stories from Nuapatna, Maniabandha, Sambalpur and beyond.</p>
           <div class="footer-links">
-            <a href="#" class="footer-link">The Collection</a>
-            <a href="#" class="footer-link">Artisan Stories</a>
+            <a href="#vault" class="footer-link">The Collection</a>
+            <a href="#artisan-pulse" class="footer-link">Artisan Stories</a>
             <a href="/articles.html" class="footer-link">Weaving Journal (Articles)</a>
             <a href="/admin.html" class="footer-link">Loom Console</a>
           </div>
@@ -413,6 +552,16 @@
               <div class="avatar-thumb"        data-id="11" style="background-color:#833471;">11</div>
               <div class="avatar-thumb"        data-id="12" style="background-color:#1e272e;">12</div>
             </div>
+            <div class="model-switcher" aria-label="Choose a showroom model">
+              <span class="model-switcher-label">MODEL LOOK</span>
+              <div class="model-options">
+                <button class="model-option active" data-model="1" aria-label="Crimson model look"></button>
+                <button class="model-option" data-model="2" aria-label="Indigo model look"></button>
+                <button class="model-option" data-model="3" aria-label="Emerald model look"></button>
+                <button class="model-option" data-model="4" aria-label="Violet model look"></button>
+                <button class="model-option" data-model="5" aria-label="Tussar gold model look"></button>
+              </div>
+            </div>
           </div>
           
           <div id="pane-customizer" class="sidebar-pane hidden" style="display:none; flex-direction:column; gap:10px; font-family:'Outfit'; font-size:0.8rem;">
@@ -444,6 +593,23 @@
             <button id="btn-generate-certificate" class="acquire-btn" style="margin-top:10px; width:100%; padding:6px; font-size:0.75rem; text-align:center; justify-content:center;">
               <span>Provenance Cert</span>
             </button>
+
+            <!-- Pipili Applique Medallion Exploded View Concept -->
+            <div class="pipili-customizer-medallion" style="margin-top:20px; display:flex; flex-direction:column; align-items:center; border-top:1px solid rgba(255,255,255,0.08); padding-top:15px; position:relative;">
+              <span class="avatar-sidebar-label" style="display:block; font-size:0.7rem; color:rgba(255,255,255,0.4); margin-bottom:10px; font-weight:600; text-align:center;">Pipili Applique Medallion</span>
+              
+              <!-- Hover stage for exploded layers -->
+              <div class="pipili-stage" style="width:120px; height:120px; position:relative; background:rgba(0,0,0,0.15); border-radius:50%; border:1px solid rgba(212,175,55,0.1); cursor:pointer;">
+                <!-- Layer 1: Outer scalloped fabric border (Red) -->
+                <div class="pipili-layer pl-1" style="position:absolute; top:10px; left:10px; width:100px; height:100px; border-radius:50%; border:3px dashed #d32f2f; background:rgba(211,47,47,0.15); transition:all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);"></div>
+                <!-- Layer 2: Middle yellow patch layer -->
+                <div class="pipili-layer pl-2" style="position:absolute; top:22px; left:22px; width:76px; height:76px; border-radius:50%; border:2px solid #ffc72c; background:rgba(255,199,44,0.1); transition:all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);"></div>
+                <!-- Layer 3: Central mirror glass layer -->
+                <div class="pipili-layer pl-3" style="position:absolute; top:38px; left:38px; width:44px; height:44px; border-radius:50%; border:1px solid #fff; background:radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(200,200,200,0.3) 70%, rgba(255,255,255,0.1) 100%); box-shadow:0 0 10px rgba(255,255,255,0.5); transition:all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);"></div>
+              </div>
+              
+              <div style="font-size:0.65rem; color:rgba(255,255,255,0.4); margin-top:8px; text-align:center;">Hover medallion to explode Pipili applique layers</div>
+            </div>
           </div>
         </div>
 
@@ -462,6 +628,14 @@
               <button class="bbar-btn light-btn active" data-light="sunset">Sunset</button>
               <button class="bbar-btn light-btn"        data-light="neon">Neon</button>
               <button class="bbar-btn light-btn"        data-light="zari">Gold</button>
+            </div>
+          </div>
+          <div class="bottom-bar-group">
+            <span class="bbar-label">ROTATE</span>
+            <div class="bbar-btns">
+              <button class="bbar-btn" id="btn-spin-left" aria-label="Rotate model left">↶</button>
+              <button class="bbar-btn" id="btn-spin-reset" aria-label="Reset model rotation">↺</button>
+              <button class="bbar-btn" id="btn-spin-right" aria-label="Rotate model right">↷</button>
             </div>
           </div>
           <div class="bottom-bar-group">

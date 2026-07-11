@@ -1913,3 +1913,19 @@ body.cursor-drag .custom-cursor-ring::after {
     display: none !important;
   }
 }
+
+.control-row input[type="range"] {
+  -webkit-appearance: none;
+  background: rgba(255,255,255,0.08);
+  border-radius: 2px;
+  outline: none;
+}
+.control-row input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--color-zari);
+  cursor: pointer;
+  box-shadow: 0 0 6px var(--color-zari);
+}

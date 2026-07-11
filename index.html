@@ -180,6 +180,11 @@
         <span class="audio-text">AUDIO OFF</span>
       </button>
 
+      <!-- Floating Soundscape Studio Trigger -->
+      <button id="btn-open-soundscape" class="audio-indicator" style="top:75px; left:20px; font-size:0.7rem; letter-spacing:1px; z-index:1001;" aria-label="Open Loom Soundscape Studio">
+        <span>🎧 SOUND STUDIO</span>
+      </button>
+
       <!-- SECTION 1: THE GENESIS (Hero Drop) -->
       <section id="genesis" class="scroll-section">
         <div class="canvas-container">
@@ -810,6 +815,60 @@
             <button type="button" id="btn-close-booking" class="btn btn-secondary btn-sm" style="flex:1; font-size:0.75rem; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.05); color:#fff; border-radius:4px; padding:6px 12px; cursor:pointer;">Cancel</button>
           </div>
         </form>
+      </div>
+    </div>
+
+    <!-- Loom Soundscape Synthesizer Modal -->
+    <div id="soundscape-modal" class="modal-overlay hidden" style="z-index:3000; background:rgba(0,0,0,0.9); display:none; align-items:center; justify-content:center; position:fixed; top:0; left:0; width:100%; height:100%;">
+      <div class="cert-card" style="width:480px; max-width:90%; background:#121217; padding:24px; border:1px solid var(--color-zari); border-radius:12px; font-family:'Outfit'; box-shadow:0 0 40px rgba(212,175,55,0.25); text-align:left;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:12px;">
+          <h4 style="font-family:'Playfair Display'; font-size:1.4rem; color:var(--color-zari); margin:0;">Loom Soundscape Studio</h4>
+          <button id="btn-close-soundscape" style="background:transparent; border:none; color:rgba(255,255,255,0.5); font-size:1.4rem; cursor:pointer;">&times;</button>
+        </div>
+        
+        <p style="font-size:0.75rem; color:rgba(255,255,255,0.6); margin-bottom:15px; line-height:1.4;">
+          Compose the live acoustic ambience of a Maniabandha weaving cottage. Adjust the sliders to synthesize authentic loom sounds and watch the audio threads weave together in real-time.
+        </p>
+
+        <!-- Real-time Thread Visualizer Screen -->
+        <div style="height:120px; background:rgba(0,0,0,0.4); border:1px solid rgba(212,175,55,0.15); border-radius:6px; overflow:hidden; position:relative; margin-bottom:20px;">
+          <canvas id="canvas-soundscape-visualizer" style="width:100%; height:100%; display:block;"></canvas>
+          <div style="position:absolute; top:8px; right:8px; font-size:0.6rem; color:rgba(255,255,255,0.4); text-transform:uppercase; font-weight:600; letter-spacing:1px;">Weave Wave Analyzer</div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:12px;">
+          <div class="control-row" style="display:grid; grid-template-columns:100px 1fr 60px; gap:10px; align-items:center;">
+            <label style="font-size:0.75rem; color:#86868b; font-weight:600;">Warp Drone</label>
+            <input type="range" id="sound-warp-freq" min="50" max="220" value="110" style="width:100%; padding:0; height:4px; cursor:pointer;">
+            <span id="val-warp-freq" style="font-size:0.7rem; color:var(--color-zari); text-align:right;">110Hz</span>
+          </div>
+
+          <div class="control-row" style="display:grid; grid-template-columns:100px 1fr 60px; gap:10px; align-items:center;">
+            <label style="font-size:0.75rem; color:#86868b; font-weight:600;">Shuttle Clack</label>
+            <input type="range" id="sound-clack-tempo" min="1" max="10" value="5" style="width:100%; padding:0; height:4px; cursor:pointer;">
+            <span id="val-clack-tempo" style="font-size:0.7rem; color:var(--color-zari); text-align:right;">5/s</span>
+          </div>
+
+          <div class="control-row" style="display:grid; grid-template-columns:100px 1fr 60px; gap:10px; align-items:center;">
+            <label style="font-size:0.75rem; color:#86868b; font-weight:600;">Pedal Thump</label>
+            <input type="range" id="sound-pedal-vol" min="0" max="100" value="50" style="width:100%; padding:0; height:4px; cursor:pointer;">
+            <span id="val-pedal-vol" style="font-size:0.7rem; color:var(--color-zari); text-align:right;">50%</span>
+          </div>
+
+          <div class="control-row" style="display:grid; grid-template-columns:100px 1fr 60px; gap:10px; align-items:center;">
+            <label style="font-size:0.75rem; color:#86868b; font-weight:600;">Bobbin Whir</label>
+            <input type="range" id="sound-bobbin-vol" min="0" max="100" value="30" style="width:100%; padding:0; height:4px; cursor:pointer;">
+            <span id="val-bobbin-vol" style="font-size:0.7rem; color:var(--color-zari); text-align:right;">30%</span>
+          </div>
+        </div>
+
+        <div style="margin-top:20px; display:flex; justify-content:space-between; align-items:center; border-top:1px solid rgba(255,255,255,0.06); padding-top:15px;">
+          <div style="display:flex; gap:8px;">
+            <button id="preset-cottage" class="btn btn-secondary btn-sm" style="padding:4px 8px; font-size:0.7rem; cursor:pointer; background:rgba(255,255,255,0.05); color:#fff; border:1px solid rgba(255,255,255,0.1); border-radius:4px; font-family:'Outfit';">Cottage Preset</button>
+            <button id="preset-concert" class="btn btn-secondary btn-sm" style="padding:4px 8px; font-size:0.7rem; cursor:pointer; background:rgba(255,255,255,0.05); color:#fff; border:1px solid rgba(255,255,255,0.1); border-radius:4px; font-family:'Outfit';">Sacred Shloka Drone</button>
+          </div>
+          <button id="btn-toggle-soundscape-play" class="btn btn-primary btn-sm" style="font-weight:600; padding:6px 16px; font-size:0.75rem; background:var(--color-zari); color:#000; border:none; border-radius:4px; cursor:pointer;">START SYNTH</button>
+        </div>
       </div>
     </div>
 

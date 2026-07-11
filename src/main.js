@@ -2906,6 +2906,7 @@ window.addEventListener('DOMContentLoaded', () => {
   setupInteractiveExtensions();
   setupMythosAnimation();
   setupHeritageSoulSection();
+  setupSoundscapeStudio();
 });
 
 function setupInteractiveExtensions() {
@@ -4066,4 +4067,260 @@ function setupHeritageSoulSection() {
 
   // Start loop
   draw();
+}
+
+function setupSoundscapeStudio() {
+  const btnOpen = document.getElementById('btn-open-soundscape');
+  const btnClose = document.getElementById('btn-close-soundscape');
+  const modal = document.getElementById('soundscape-modal');
+
+  if (btnOpen && modal) {
+    btnOpen.onclick = () => {
+      modal.style.display = 'flex';
+      modal.classList.remove('hidden');
+    };
+  }
+
+  if (btnClose && modal) {
+    btnClose.onclick = () => {
+      modal.style.display = 'none';
+      modal.classList.add('hidden');
+      stopSoundscape();
+    };
+  }
+
+  let soundscapeCtx = null;
+  let droneOsc = null;
+  let droneGain = null;
+  
+  let clackTimer = null;
+  let pedalTimer = null;
+  
+  let noiseNode = null;
+  let noiseGain = null;
+  
+  let isSoundscapePlaying = false;
+  
+  const togglePlayBtn = document.getElementById('btn-toggle-soundscape-play');
+
+  function initSoundscapeAudio() {
+    if (soundscapeCtx) return;
+    soundscapeCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+
+  function startSoundscape() {
+    initSoundscapeAudio();
+    if (soundscapeCtx.state === 'suspended') soundscapeCtx.resume();
+
+    isSoundscapePlaying = true;
+    togglePlayBtn.textContent = "STOP SYNTH";
+    togglePlayBtn.style.background = "#ffd700";
+
+    const warpFreqVal = parseInt(document.getElementById('sound-warp-freq').value);
+    droneOsc = soundscapeCtx.createOscillator();
+    droneGain = soundscapeCtx.createGain();
+    droneOsc.type = 'sawtooth';
+    droneOsc.frequency.setValueAtTime(warpFreqVal, soundscapeCtx.currentTime);
+    
+    const lp = soundscapeCtx.createBiquadFilter();
+    lp.type = 'lowpass';
+    lp.frequency.setValueAtTime(280, soundscapeCtx.currentTime);
+
+    droneGain.gain.setValueAtTime(0.04, soundscapeCtx.currentTime);
+
+    droneOsc.connect(lp);
+    lp.connect(droneGain);
+    droneGain.connect(soundscapeCtx.destination);
+    droneOsc.start();
+
+    const bobbinVolVal = parseInt(document.getElementById('sound-bobbin-vol').value) / 100;
+    const bufferSize = soundscapeCtx.sampleRate * 2;
+    const noiseBuffer = soundscapeCtx.createBuffer(1, bufferSize, soundscapeCtx.sampleRate);
+    const output = noiseBuffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      output[i] = Math.random() * 2 - 1;
+    }
+    
+    noiseNode = soundscapeCtx.createBufferSource();
+    noiseNode.buffer = noiseBuffer;
+    noiseNode.loop = true;
+
+    const noiseFilter = soundscapeCtx.createBiquadFilter();
+    noiseFilter.type = 'bandpass';
+    noiseFilter.frequency.setValueAtTime(1000, soundscapeCtx.currentTime);
+    noiseFilter.Q.setValueAtTime(4, soundscapeCtx.currentTime);
+
+    noiseGain = soundscapeCtx.createGain();
+    noiseGain.gain.setValueAtTime(bobbinVolVal * 0.05, soundscapeCtx.currentTime);
+
+    noiseNode.connect(noiseFilter);
+    noiseFilter.connect(noiseGain);
+    noiseGain.connect(soundscapeCtx.destination);
+    noiseNode.start();
+
+    triggerSoundscapeClacks();
+    triggerSoundscapePedal();
+  }
+
+  function stopSoundscape() {
+    isSoundscapePlaying = false;
+    if (togglePlayBtn) {
+      togglePlayBtn.textContent = "START SYNTH";
+      togglePlayBtn.style.background = "";
+    }
+
+    if (droneOsc) {
+      try { droneOsc.stop(); } catch(e) {}
+      droneOsc = null;
+    }
+    if (noiseNode) {
+      try { noiseNode.stop(); } catch(e) {}
+      noiseNode = null;
+    }
+    if (clackTimer) {
+      clearTimeout(clackTimer);
+      clackTimer = null;
+    }
+    if (pedalTimer) {
+      clearTimeout(pedalTimer);
+      pedalTimer = null;
+    }
+  }
+
+  function triggerSoundscapeClacks() {
+    if (!isSoundscapePlaying || !soundscapeCtx) return;
+    const tempo = parseInt(document.getElementById('sound-clack-tempo').value);
+    const interval = 1000 / tempo;
+
+    const osc = soundscapeCtx.createOscillator();
+    const gain = soundscapeCtx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(800, soundscapeCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(120, soundscapeCtx.currentTime + 0.04);
+    gain.gain.setValueAtTime(0.08, soundscapeCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, soundscapeCtx.currentTime + 0.04);
+    osc.connect(gain);
+    gain.connect(soundscapeCtx.destination);
+    osc.start(); osc.stop(soundscapeCtx.currentTime + 0.05);
+
+    clackTimer = setTimeout(triggerSoundscapeClacks, interval);
+  }
+
+  function triggerSoundscapePedal() {
+    if (!isSoundscapePlaying || !soundscapeCtx) return;
+    const vol = parseInt(document.getElementById('sound-pedal-vol').value) / 100;
+
+    const osc = soundscapeCtx.createOscillator();
+    const gain = soundscapeCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(55, soundscapeCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(20, soundscapeCtx.currentTime + 0.15);
+    gain.gain.setValueAtTime(vol * 0.18, soundscapeCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, soundscapeCtx.currentTime + 0.15);
+    osc.connect(gain);
+    gain.connect(soundscapeCtx.destination);
+    osc.start(); osc.stop(soundscapeCtx.currentTime + 0.2);
+
+    pedalTimer = setTimeout(triggerSoundscapePedal, 1500);
+  }
+
+  if (togglePlayBtn) {
+    togglePlayBtn.onclick = () => {
+      if (isSoundscapePlaying) {
+        stopSoundscape();
+      } else {
+        startSoundscape();
+      }
+    };
+  }
+
+  const sliderWarp = document.getElementById('sound-warp-freq');
+  const sliderClack = document.getElementById('sound-clack-tempo');
+  const sliderPedal = document.getElementById('sound-pedal-vol');
+  const sliderBobbin = document.getElementById('sound-bobbin-vol');
+
+  function updateParams() {
+    if (sliderWarp) document.getElementById('val-warp-freq').textContent = `${sliderWarp.value}Hz`;
+    if (sliderClack) document.getElementById('val-clack-tempo').textContent = `${sliderClack.value}/s`;
+    if (sliderPedal) document.getElementById('val-pedal-vol').textContent = `${sliderPedal.value}%`;
+    if (sliderBobbin) document.getElementById('val-bobbin-vol').textContent = `${sliderBobbin.value}%`;
+
+    if (isSoundscapePlaying && soundscapeCtx) {
+      if (droneOsc) droneOsc.frequency.setValueAtTime(parseInt(sliderWarp.value), soundscapeCtx.currentTime);
+      if (noiseGain) noiseGain.gain.setValueAtTime((parseInt(sliderBobbin.value) / 100) * 0.05, soundscapeCtx.currentTime);
+    }
+  }
+
+  [sliderWarp, sliderClack, sliderPedal, sliderBobbin].forEach(s => {
+    if (s) s.addEventListener('input', updateParams);
+  });
+
+  const btnCottage = document.getElementById('preset-cottage');
+  const btnConcert = document.getElementById('preset-concert');
+
+  if (btnCottage) {
+    btnCottage.onclick = () => {
+      sliderWarp.value = 110;
+      sliderClack.value = 4;
+      sliderPedal.value = 60;
+      sliderBobbin.value = 40;
+      updateParams();
+    };
+  }
+
+  if (btnConcert) {
+    btnConcert.onclick = () => {
+      sliderWarp.value = 65;
+      sliderClack.value = 2;
+      sliderPedal.value = 30;
+      sliderBobbin.value = 10;
+      updateParams();
+    };
+  }
+
+  const vCanvas = document.getElementById('canvas-soundscape-visualizer');
+  if (!vCanvas) return;
+  const vCtx = vCanvas.getContext('2d');
+
+  function drawVisualizer() {
+    vCanvas.width = vCanvas.parentElement.clientWidth;
+    vCanvas.height = vCanvas.parentElement.clientHeight;
+
+    vCtx.clearRect(0, 0, vCanvas.width, vCanvas.height);
+    vCtx.fillStyle = 'rgba(10, 10, 15, 0.4)';
+    vCtx.fillRect(0, 0, vCanvas.width, vCanvas.height);
+
+    const time = Date.now() * 0.0025;
+    const midY = vCanvas.height / 2;
+
+    const wFreq = sliderWarp ? parseInt(sliderWarp.value) : 110;
+    const cTempo = sliderClack ? parseInt(sliderClack.value) : 5;
+    const pVol = sliderPedal ? parseInt(sliderPedal.value) : 50;
+    const bVol = sliderBobbin ? parseInt(sliderBobbin.value) : 30;
+
+    const threadData = [
+      { color: '#d4af37', amp: wFreq * 0.15, freq: 0.015, speed: 2.0, yOffset: -15 },
+      { color: '#c31b1b', amp: cTempo * 4.5, freq: 0.03, speed: 3.5, yOffset: -5 },
+      { color: '#ff8c00', amp: pVol * 0.35, freq: 0.01, speed: 1.5, yOffset: 10 },
+      { color: '#4169e1', amp: bVol * 0.3, freq: 0.04, speed: 5.0, yOffset: 20 }
+    ];
+
+    threadData.forEach(t => {
+      vCtx.beginPath();
+      vCtx.strokeStyle = t.color;
+      vCtx.lineWidth = isSoundscapePlaying ? 2 : 0.8;
+      
+      for (let x = 0; x <= vCanvas.width; x += 10) {
+        const activeAmp = isSoundscapePlaying ? t.amp : t.amp * 0.15 + 2;
+        const y = midY + t.yOffset + Math.sin(x * t.freq + time * t.speed) * activeAmp;
+        if (x === 0) vCtx.moveTo(x, y);
+        else vCtx.lineTo(x, y);
+      }
+      vCtx.stroke();
+    });
+
+    requestAnimationFrame(drawVisualizer);
+  }
+
+  drawVisualizer();
 }

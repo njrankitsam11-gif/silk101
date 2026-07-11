@@ -41,6 +41,9 @@ button, .btn, canvas, .avatar-thumb {
 }
 .skip-link:focus { transform: translateY(0); }
 
+html {
+  scroll-behavior: smooth;
+}
 html, body {
   background-color: var(--color-bg);
   color: var(--color-text);
@@ -391,7 +394,7 @@ html, body {
 .horizontal-scroll-section {
   display: flex;
   flex-wrap: nowrap;
-  width: 500vw; /* 5 screens wide */
+  width: 600vw; /* 6 screens wide */
   height: 100%;
 }
 
@@ -1871,4 +1874,42 @@ body.cursor-drag .custom-cursor-ring::after {
   0% { transform: scale(1); opacity: 0.8; }
   50% { transform: scale(1.8); opacity: 0; }
   100% { transform: scale(1); opacity: 0; }
+}
+
+@keyframes waveBounce {
+  0% { height: 2px; }
+  100% { height: 14px; }
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #cert-overlay, #cert-overlay * {
+    visibility: visible;
+  }
+  #cert-overlay {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: white !important;
+    color: black !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  .cert-card {
+    border: 2px solid #000 !important;
+    background: white !important;
+    color: black !important;
+    box-shadow: none !important;
+  }
+  .cert-border {
+    border: 1px dashed #000 !important;
+  }
+  #btn-print-cert, #btn-close-cert {
+    display: none !important;
+  }
 }

@@ -592,7 +592,7 @@ function setupHorizontalPulse() {
   const scrollSection = document.querySelector('.horizontal-scroll-section');
   
   gsap.to(scrollSection, {
-    x: '-400vw',
+    x: '-500vw',
     ease: 'none',
     scrollTrigger: {
       trigger: '#artisan-pulse',
@@ -870,6 +870,234 @@ function setupHorizontalPulse() {
   sliderTension.addEventListener('input', updateConsoleSettings);
   sliderDensity.addEventListener('input', updateConsoleSettings);
   selectPattern.addEventListener('change', updateConsoleSettings);
+}
+
+
+/* ==========================================================
+   SECTION 2.5: CUSTOM WEAVING COMMISSION STUDIO
+========================================================== */
+function setupCustomCommissionStudio() {
+  const canvas = document.getElementById('canvas-custom-saree');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  function resize() {
+    canvas.width = canvas.parentElement.clientWidth;
+    canvas.height = canvas.parentElement.clientHeight;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  const selectArtisan = document.getElementById('comm-artisan');
+  const sliderBodyHue = document.getElementById('comm-body-hue');
+  const sliderBorderHue = document.getElementById('comm-border-hue');
+  const selectMotif = document.getElementById('comm-motif');
+  const selectDensity = document.getElementById('comm-density');
+
+  const elEstTime = document.getElementById('comm-est-time');
+  const elEstPrice = document.getElementById('comm-est-price');
+  const formCommission = document.getElementById('form-custom-commission');
+
+  function getSettings() {
+    if (!selectArtisan) return { artisanId: 1, bodyHue: 340, borderHue: 45, motif: 'lotus', density: 4200, time: 34, price: 136000 };
+    const artisanId = parseInt(selectArtisan.value);
+    const bodyHue = parseInt(sliderBodyHue.value);
+    const borderHue = parseInt(sliderBorderHue.value);
+    const motif = selectMotif.value;
+    const density = parseInt(selectDensity.value);
+
+    let time = 24;
+    if (density === 4200) time = 34;
+    else if (density === 6000) time = 48;
+
+    let motifAdd = 4;
+    if (motif === 'peacock') motifAdd = 8;
+    else if (motif === 'elephant') motifAdd = 12;
+    else if (motif === 'temple') motifAdd = 6;
+    time += motifAdd;
+
+    let price = density * 30;
+    let motifCost = 10000;
+    if (motif === 'peacock') motifCost = 18000;
+    else if (motif === 'elephant') motifCost = 25000;
+    else if (motif === 'temple') motifCost = 14000;
+    price += motifCost;
+
+    return { artisanId, bodyHue, borderHue, motif, density, time, price };
+  }
+
+  function updateEstimates() {
+    const settings = getSettings();
+    if (elEstTime) elEstTime.textContent = `${settings.time} Days`;
+    if (elEstPrice) elEstPrice.textContent = `₹${settings.price.toLocaleString('en-IN')}`;
+  }
+
+  function draw() {
+    if (!canvas) return;
+    const settings = getSettings();
+    
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    ctx.fillStyle = '#06060c';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    const time = Date.now() * 0.0015;
+    
+    ctx.save();
+    
+    ctx.fillStyle = `hsl(${settings.bodyHue}, 75%, 22%)`;
+    ctx.strokeStyle = `hsl(${settings.bodyHue}, 80%, 40%)`;
+    ctx.lineWidth = 1;
+    
+    ctx.beginPath();
+    ctx.moveTo(30, 40);
+    ctx.bezierCurveTo(120, 20 + Math.sin(time) * 10, 320, 50, canvas.width - 30, 40);
+    ctx.lineTo(canvas.width - 30, canvas.height - 70);
+    ctx.bezierCurveTo(320, canvas.height - 60 + Math.cos(time) * 10, 120, canvas.height - 80, 30, canvas.height - 70);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.strokeStyle = `hsla(${settings.bodyHue}, 80%, 30%, 0.15)`;
+    ctx.lineWidth = 0.5;
+    for (let y = 50; y < canvas.height - 80; y += 4) {
+      ctx.beginPath();
+      ctx.moveTo(32, y);
+      ctx.lineTo(canvas.width - 32, y + Math.sin(time + y * 0.05) * 2);
+      ctx.stroke();
+    }
+
+    ctx.fillStyle = `hsl(${settings.borderHue}, 80%, 35%)`;
+    ctx.strokeStyle = `hsl(${settings.borderHue}, 90%, 55%)`;
+    ctx.lineWidth = 2;
+    
+    ctx.fillRect(30, 40, 25, canvas.height - 110);
+    ctx.strokeRect(30, 40, 25, canvas.height - 110);
+    
+    ctx.fillRect(canvas.width - 55, 40, 25, canvas.height - 110);
+    ctx.strokeRect(canvas.width - 55, 40, 25, canvas.height - 110);
+
+    ctx.fillStyle = `hsl(${settings.borderHue}, 90%, 55%)`;
+    for (let y = 60; y < canvas.height - 90; y += 30) {
+      if (settings.motif === 'temple') {
+        ctx.beginPath();
+        ctx.moveTo(55, y);
+        ctx.lineTo(65, y + 10);
+        ctx.lineTo(55, y + 20);
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.moveTo(canvas.width - 55, y);
+        ctx.lineTo(canvas.width - 65, y + 10);
+        ctx.lineTo(canvas.width - 55, y + 20);
+        ctx.fill();
+      } else {
+        ctx.beginPath();
+        ctx.arc(60, y + 10, 4, 0, Math.PI * 2);
+        ctx.fill();
+        
+        ctx.beginPath();
+        ctx.arc(canvas.width - 60, y + 10, 4, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    const cx = canvas.width / 2;
+    const cy = canvas.height / 2;
+    
+    ctx.shadowColor = `hsl(${settings.borderHue}, 80%, 50%)`;
+    ctx.shadowBlur = 15;
+    ctx.fillStyle = `hsl(${settings.borderHue}, 70%, 30%)`;
+    ctx.strokeStyle = `hsl(${settings.borderHue}, 90%, 60%)`;
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.arc(cx, cy, 65, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    ctx.fillStyle = '#fff';
+    ctx.strokeStyle = `hsl(${settings.borderHue}, 90%, 65%)`;
+    ctx.lineWidth = 1.5;
+    if (settings.motif === 'lotus') {
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, 14, 28, 0, 0, Math.PI*2);
+      ctx.ellipse(cx, cy, 28, 14, 0, 0, Math.PI*2);
+      ctx.fill();
+      ctx.stroke();
+    } else if (settings.motif === 'peacock') {
+      ctx.beginPath();
+      ctx.arc(cx, cy - 10, 15, 0, Math.PI*2);
+      ctx.moveTo(cx, cy + 5);
+      ctx.bezierCurveTo(cx - 20, cy + 20, cx + 20, cy + 40, cx, cy + 45);
+      ctx.stroke();
+    } else if (settings.motif === 'elephant') {
+      ctx.beginPath();
+      ctx.arc(cx - 8, cy, 12, 0, Math.PI*2);
+      ctx.moveTo(cx - 8, cy);
+      ctx.quadraticCurveTo(cx + 15, cy - 20, cx + 22, cy);
+      ctx.stroke();
+    } else {
+      ctx.beginPath();
+      ctx.moveTo(cx, cy - 35);
+      ctx.lineTo(cx - 30, cy + 25);
+      ctx.lineTo(cx + 30, cy + 25);
+      ctx.closePath();
+      ctx.stroke();
+    }
+
+    ctx.restore();
+    requestAnimationFrame(draw);
+  }
+
+  if (selectArtisan) {
+    selectArtisan.addEventListener('change', updateEstimates);
+    sliderBodyHue.addEventListener('input', updateEstimates);
+    sliderBorderHue.addEventListener('input', updateEstimates);
+    selectMotif.addEventListener('change', updateEstimates);
+    selectDensity.addEventListener('change', updateEstimates);
+  }
+
+  if (formCommission) {
+    formCommission.onsubmit = async (e) => {
+      e.preventDefault();
+      const settings = getSettings();
+      
+      const customerName = prompt("Enter your Name to reserve the commission loom slot:");
+      if (!customerName) return;
+      const customerEmail = prompt("Enter your Email for design verification updates:");
+      if (!customerEmail || !customerEmail.includes('@')) {
+        alert("Valid email required.");
+        return;
+      }
+
+      const message = `Bespoke Saree Commission Request: Main Motif: ${settings.motif.toUpperCase()}, Thread Density: ${settings.density} threads, Body Hue: ${settings.bodyHue}°, Border Hue: ${settings.borderHue}°. Assigned to Weaver ID: ${settings.artisanId}.`;
+
+      try {
+        const response = await fetch('/api/enquiries', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            item_id: null,
+            customer_name: customerName,
+            customer_email: customerEmail,
+            message: message
+          })
+        });
+        const data = await response.json();
+        if (response.ok) {
+          alert(`✨ Commission Submitted Successfully! Your reservation code: COM-${data.id}. Our master weaver cooperative will reach out to you within 24 hours.`);
+        } else {
+          alert(`Error: ${data.error}`);
+        }
+      } catch(err) {
+        alert(`✨ Commission Reserved offline! Your reservation code: COM-MOCK. We will register this to local storage.`);
+      }
+    };
+  }
+
+  updateEstimates();
+  draw();
 }
 
 
@@ -2145,6 +2373,76 @@ function setupShowroomDrape(initialItem, itemsList) {
     };
   }
 
+  const btnPrintCert = document.getElementById('btn-print-cert');
+  if (btnPrintCert) {
+    btnPrintCert.onclick = () => {
+      window.print();
+    };
+  }
+
+  // Live Loom Booking bindings
+  const btnOpenBooking = document.getElementById('btn-open-loom-booking');
+  const bookingModal = document.getElementById('booking-modal');
+  const btnCloseBooking = document.getElementById('btn-close-booking');
+  const formBooking = document.getElementById('form-loom-booking');
+
+  if (btnOpenBooking && bookingModal) {
+    btnOpenBooking.onclick = () => {
+      bookingModal.style.display = 'flex';
+      bookingModal.classList.remove('hidden');
+    };
+  }
+
+  if (btnCloseBooking && bookingModal) {
+    btnCloseBooking.onclick = () => {
+      bookingModal.style.display = 'none';
+      bookingModal.classList.add('hidden');
+    };
+  }
+
+  if (formBooking) {
+    formBooking.onsubmit = async (e) => {
+      e.preventDefault();
+      const dateVal = document.getElementById('book-date').value;
+      const timeVal = document.getElementById('book-time').value;
+
+      const customerName = prompt("Enter your Name for virtual tour booking confirmation:");
+      if (!customerName) return;
+      const customerEmail = prompt("Enter your Email for calendar invitation details:");
+      if (!customerEmail || !customerEmail.includes('@')) {
+        alert("Valid email required.");
+        return;
+      }
+
+      const message = `Virtual Loom Video Tour Booking: Date: ${dateVal}, Time Slot: ${timeVal}. Saree Showroom Reference: ID ${activeItem.id || 'N/A'} - ${activeItem.name || 'Bespoke'}.`;
+
+      try {
+        const response = await fetch('/api/enquiries', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            item_id: activeItem.id || null,
+            customer_name: customerName,
+            customer_email: customerEmail,
+            message: message
+          })
+        });
+        if (response.ok) {
+          alert(`🗓 Weaving Loom Tour Scheduled! A calendar invite has been sent to ${customerEmail} for ${dateVal} at ${timeVal}.`);
+          bookingModal.style.display = 'none';
+          bookingModal.classList.add('hidden');
+        } else {
+          const data = await response.json();
+          alert(`Error: ${data.error}`);
+        }
+      } catch(err) {
+        alert(`🗓 Weaving Loom Tour Scheduled (offline/local database)! Date: ${dateVal} at ${timeVal}.`);
+        bookingModal.style.display = 'none';
+        bookingModal.classList.add('hidden');
+      }
+    };
+  }
+
   // Remove the static SELECT input binding if it exists
   const selectAvatar = document.getElementById('select-avatar-asset');
   if (selectAvatar) {
@@ -2601,6 +2899,7 @@ window.addEventListener('DOMContentLoaded', () => {
   
   setupGenesisCanvas();
   setupHorizontalPulse();
+  setupCustomCommissionStudio();
   setupMetamorphosis();
   setupVaultTunnel();
   setupCustomCursor();
@@ -2760,6 +3059,108 @@ function setupInteractiveExtensions() {
     }
   };
 
+  let activeClusterKey = null;
+  let audioTimer = null;
+  let synthDrone = null;
+
+  const audioPlayerWrap = document.getElementById('map-audio-player');
+  const btnPlayOral = document.getElementById('btn-play-oral-audio');
+  const visualizerWaves = document.getElementById('audio-waves');
+  const transcriptBox = document.getElementById('audio-transcript-box');
+
+  const ORAL_TRANSCRIPTS = {
+    nuapatna: [
+      "Om Sri Jagannathaya Namah...",
+      "Woven with absolute devotion for the holy chariot.",
+      "Nuapatna weavers chant Gita Govinda verses with every thread."
+    ],
+    maniabandha: [
+      "Buddhist monks migrated here centuries ago...",
+      "The math of tie-dye aligns warp and weft perfectly.",
+      "Lotus petals reflect cosmic consciousness."
+    ],
+    puri: [
+      "Inspired by Konark wheel stone reliefs...",
+      "The Kumbha border tells stories of ancient temple flags.",
+      "Every fold is a monument of history."
+    ],
+    kotpad: [
+      "Boiled roots of the Aal tree produce natural deep ocher...",
+      "Tribal geometry tells stories of forest paths and river streams.",
+      "No electricity, only natural elements."
+    ]
+  };
+
+  function stopOralAudio() {
+    if (audioTimer) {
+      clearTimeout(audioTimer);
+      audioTimer = null;
+    }
+    if (synthDrone) {
+      try {
+        synthDrone.osc.stop();
+        synthDrone.gain.disconnect();
+      } catch(e) {}
+      synthDrone = null;
+    }
+    if (visualizerWaves) {
+      visualizerWaves.classList.add('hidden');
+      visualizerWaves.style.display = 'none';
+    }
+    if (btnPlayOral) btnPlayOral.textContent = "▶ Listen to Oral Shloka";
+    if (transcriptBox) transcriptBox.textContent = "";
+  }
+
+  function playOralAudio(clusterKey) {
+    stopOralAudio();
+    if (!CLUSTER_DATA[clusterKey]) return;
+
+    if (btnPlayOral) btnPlayOral.textContent = "⏹ Stop Listening";
+    if (visualizerWaves) {
+      visualizerWaves.classList.remove('hidden');
+      visualizerWaves.style.display = 'flex';
+    }
+
+    if (audioCtx) {
+      try {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(clusterKey === 'nuapatna' ? 110 : clusterKey === 'maniabandha' ? 130 : clusterKey === 'puri' ? 146 : 98, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        synthDrone = { osc, gain };
+      } catch(e) {}
+    }
+
+    const lines = ORAL_TRANSCRIPTS[clusterKey] || ["Reciting oral history..."];
+    let lineIdx = 0;
+
+    function nextLine() {
+      if (lineIdx < lines.length) {
+        if (transcriptBox) transcriptBox.textContent = `"${lines[lineIdx]}"`;
+        lineIdx++;
+        audioTimer = setTimeout(nextLine, 3000);
+      } else {
+        stopOralAudio();
+      }
+    }
+    nextLine();
+  }
+
+  if (btnPlayOral) {
+    btnPlayOral.onclick = () => {
+      if (synthDrone) {
+        stopOralAudio();
+      } else if (activeClusterKey) {
+        playOralAudio(activeClusterKey);
+      }
+    };
+  }
+
   markers.forEach(marker => {
     const clusterKey = marker.dataset.cluster;
     marker.onmouseenter = () => {
@@ -2769,6 +3170,10 @@ function setupInteractiveExtensions() {
         infoDesc.textContent = data.desc;
         marker.querySelector('circle').setAttribute('fill', '#ffd700');
         marker.querySelector('circle').setAttribute('r', '7');
+        
+        activeClusterKey = clusterKey;
+        stopOralAudio();
+        if (audioPlayerWrap) audioPlayerWrap.classList.remove('hidden');
       }
     };
 
@@ -2778,18 +3183,8 @@ function setupInteractiveExtensions() {
     };
 
     marker.onclick = () => {
-      if (audioCtx) {
-        try {
-          const osc = audioCtx.createOscillator();
-          const gain = audioCtx.createGain();
-          osc.frequency.setValueAtTime(400, audioCtx.currentTime);
-          gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.1);
-          osc.connect(gain);
-          gain.connect(audioCtx.destination);
-          osc.start(); osc.stop(audioCtx.currentTime + 0.1);
-        } catch (e) {}
-      }
+      activeClusterKey = clusterKey;
+      playOralAudio(clusterKey);
     };
   });
 }

@@ -28,6 +28,8 @@ const MOCK_INVENTORY = [
     artisan_id: 1,
     artisan_name: 'Smt. Sebati Mohanty',
     artisan_location: 'Nuapatna, Odisha',
+    artisan_exp: 32,
+    artisan_bio: 'Master weaver specializing in sacred Khandua scripture patterns and traditional wooden looms.',
     price_fiat: 150000,
     stock_status: 'available',
     material: '100% Pure Mulberry Silk',
@@ -44,6 +46,8 @@ const MOCK_INVENTORY = [
     artisan_id: 2,
     artisan_name: 'Shri Ranjan Meher',
     artisan_location: 'Maniabandha, Odisha',
+    artisan_exp: 28,
+    artisan_bio: 'Expert in mathematical geometric double-Ikat patterns and complex natural dyes.',
     price_fiat: 135000,
     stock_status: 'available',
     material: 'Mulberry Silk',
@@ -60,6 +64,8 @@ const MOCK_INVENTORY = [
     artisan_id: 1,
     artisan_name: 'Smt. Sebati Mohanty',
     artisan_location: 'Nuapatna, Odisha',
+    artisan_exp: 32,
+    artisan_bio: 'Master weaver specializing in sacred Khandua scripture patterns and traditional wooden looms.',
     price_fiat: 125000,
     stock_status: 'available',
     material: 'Organic Cotton',
@@ -76,6 +82,8 @@ const MOCK_INVENTORY = [
     artisan_id: 2,
     artisan_name: 'Shri Ranjan Meher',
     artisan_location: 'Maniabandha, Odisha',
+    artisan_exp: 28,
+    artisan_bio: 'Expert in mathematical geometric double-Ikat patterns and complex natural dyes.',
     price_fiat: 175000,
     stock_status: 'available',
     material: 'Tussar Silk',
@@ -92,6 +100,8 @@ const MOCK_INVENTORY = [
     artisan_id: 3,
     artisan_name: 'Shri Kailash Meher',
     artisan_location: 'Puri, Odisha',
+    artisan_exp: 40,
+    artisan_bio: 'Renowned for complex mythological and temple architecture drapes and double-layer weaves.',
     price_fiat: 205000,
     stock_status: 'available',
     material: 'Khandua Silk',
@@ -108,6 +118,8 @@ const MOCK_INVENTORY = [
     artisan_id: 3,
     artisan_name: 'Shri Kailash Meher',
     artisan_location: 'Puri, Odisha',
+    artisan_exp: 40,
+    artisan_bio: 'Renowned for complex mythological and temple architecture drapes and double-layer weaves.',
     price_fiat: 185000,
     stock_status: 'available',
     material: 'Fine Silk Blend',
@@ -268,7 +280,31 @@ class MockStatement {
   all(...args) {
     console.log('MockStatement.all:', this.sql, args);
     if (this.sql.includes('inventory')) {
-      return MOCK_INVENTORY;
+      const mockVars = {
+        'Ikat': [
+          { name: "Standard 80-Count Weave", price_delta: 0 },
+          { name: "Premium 120-Count Fine Double-Warp Weave", price_delta: 18000 },
+          { name: "Gilded Silver Zari Border Custom Pallu", price_delta: 35000 }
+        ],
+        'Chanderi': [
+          { name: "Traditional Silk-Cotton Sheer Blend", price_delta: 0 },
+          { name: "Pure Silk-Tissue Warp border variation", price_delta: 12000 },
+          { name: "Heavy Gold-Thread Zari Motif border variation", price_delta: 25000 }
+        ],
+        'Kanjivaram': [
+          { name: "Standard Kanjivaram 2-Ply Silk Weave", price_delta: 0 },
+          { name: "Exquisite 3-Ply Gold Zari Brocade Temple Border", price_delta: 25000 }
+        ],
+        'Tissue Silk': [
+          { name: "Fine Golden Tissue Silk Weave", price_delta: 0 },
+          { name: "Heavily Ornamented Gold-Thread Zari Pallu Relic", price_delta: 30000 }
+        ]
+      };
+      return MOCK_INVENTORY.map(item => {
+        const cat = item.category_name || 'Ikat';
+        const variations = mockVars[cat] || mockVars['Ikat'];
+        return { ...item, variations };
+      });
     }
     if (this.sql.includes('artisans')) {
       return MOCK_ARTISANS;

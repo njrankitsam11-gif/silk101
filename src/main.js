@@ -1,4 +1,5 @@
 import './style.css';
+import './matchmaker.css';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -187,6 +188,14 @@ window.addEventListener('scroll', () => {
   scrollVelocity = Math.abs(currentY - lastScrollY);
   lastScrollY = currentY;
   
+  // Update Premium Scroll Progress Indicator
+  const totalScroll = document.documentElement.scrollHeight - window.innerHeight;
+  if (totalScroll > 0) {
+    const progressPercent = (currentY / totalScroll) * 100;
+    const pBar = document.querySelector('.scroll-progress-fill');
+    if (pBar) pBar.style.width = `${progressPercent}%`;
+  }
+  
   if (audioCtx && synthNode && isAudioPlaying) {
     const pitchFactor = 1 + Math.min(scrollVelocity / 50, 0.4);
     synthNode.osc1.frequency.setValueAtTime(65.41 * pitchFactor, audioCtx.currentTime);
@@ -204,32 +213,30 @@ setInterval(() => {
 }, 50);
 
 // Audio Setup Buttons
-document.getElementById('btn-sound-on').addEventListener('click', () => {
-  initAudio();
-  isAudioPlaying = true;
-  document.getElementById('audio-modal').classList.add('hidden');
-  document.getElementById('audio-toggle').classList.add('playing');
-  document.getElementById('audio-toggle').setAttribute('aria-pressed', 'true');
-  document.getElementById('audio-toggle').setAttribute('aria-label', 'Turn ambient audio off');
-  document.querySelector('#audio-toggle .audio-text').textContent = 'AUDIO ON';
-  gsap.to(entryAnimation, {
-    scale: 1.0,
-    duration: 2.2,
-    ease: 'power4.out'
-  });
-});
+const btnGateOn = document.getElementById('btn-gate-on');
+const btnGateOff = document.getElementById('btn-gate-off');
+const entryGate = document.getElementById('entry-gate');
 
-document.getElementById('btn-sound-off').addEventListener('click', () => {
-  document.getElementById('audio-modal').classList.add('hidden');
-  document.getElementById('audio-toggle').classList.remove('playing');
-  document.getElementById('audio-toggle').setAttribute('aria-pressed', 'false');
-  document.getElementById('audio-toggle').setAttribute('aria-label', 'Turn ambient audio on');
-  gsap.to(entryAnimation, {
-    scale: 1.0,
-    duration: 2.2,
-    ease: 'power4.out'
+if (btnGateOn) {
+  btnGateOn.addEventListener('click', () => {
+    initAudio();
+    isAudioPlaying = true;
+    if (entryGate) entryGate.classList.add('hidden');
+    document.getElementById('audio-toggle').classList.add('playing');
+    document.getElementById('audio-toggle').setAttribute('aria-pressed', 'true');
+    document.getElementById('audio-toggle').setAttribute('aria-label', 'Turn ambient audio off');
+    document.querySelector('#audio-toggle .audio-text').textContent = 'AUDIO ON';
   });
-});
+}
+
+if (btnGateOff) {
+  btnGateOff.addEventListener('click', () => {
+    if (entryGate) entryGate.classList.add('hidden');
+    document.getElementById('audio-toggle').classList.remove('playing');
+    document.getElementById('audio-toggle').setAttribute('aria-pressed', 'false');
+    document.getElementById('audio-toggle').setAttribute('aria-label', 'Turn ambient audio on');
+  });
+}
 
 document.getElementById('audio-toggle').addEventListener('click', () => {
   const toggle = document.getElementById('audio-toggle');
@@ -1456,6 +1463,102 @@ const FALLBACK_INVENTORY = [
     description: 'Classic Maniabandha grid layout. Geometric diamonds and checkerboard squares representing mathematical symmetry in handloom.',
     color_hue: 30,
     color_saturation: 1.1
+  },
+  {
+    id: 7,
+    name: 'Bomkai Jamdani Peacock Saree',
+    category_id: 3,
+    category_name: 'Kanjivaram',
+    artisan_id: 1,
+    artisan_name: 'Smt. Sebati Mohanty',
+    artisan_location: 'Nuapatna, Odisha',
+    price_fiat: 215000,
+    stock_status: 'available',
+    material: 'Pure Bomkai Silk',
+    weaving_time_days: 38,
+    description: 'Deep forest violet with gold peacock feather pallu. The Bomkai style features extra-weft figuring — individual peacock tail motifs hand-woven through each section of the pallu border.',
+    color_hue: 285,
+    color_saturation: 1.3
+  },
+  {
+    id: 8,
+    name: 'Tigiria Double-Ikat Pasapalli Saree',
+    category_id: 1,
+    category_name: 'Ikat',
+    artisan_id: 2,
+    artisan_name: 'Shri Ranjan Meher',
+    artisan_location: 'Maniabandha, Odisha',
+    price_fiat: 160000,
+    stock_status: 'available',
+    material: 'Mulberry Silk',
+    weaving_time_days: 22,
+    description: 'Navy and ivory double-Ikat checkerboard Pasapalli — the signature board-game pattern of Tigiria. The mathematical precision of tie-dye alignment in double-Ikat is considered among the most technically demanding in the world.',
+    color_hue: 220,
+    color_saturation: 1.4
+  },
+  {
+    id: 9,
+    name: 'Nayagarh Kumbha Spire Saree',
+    category_id: 2,
+    category_name: 'Chanderi',
+    artisan_id: 3,
+    artisan_name: 'Shri Kailash Meher',
+    artisan_location: 'Puri, Odisha',
+    price_fiat: 195000,
+    stock_status: 'available',
+    material: 'Tussar Silk',
+    weaving_time_days: 32,
+    description: 'Turquoise body silk with rising silver Kumbha temple spires along both border edges. The Kumbha (sacred pot / spire form) motif is an ancient Odishan symbol representing divine vessels of prosperity.',
+    color_hue: 185,
+    color_saturation: 1.2
+  },
+  {
+    id: 10,
+    name: 'Sonepur Elephant Procession Saree',
+    category_id: 1,
+    category_name: 'Ikat',
+    artisan_id: 2,
+    artisan_name: 'Shri Ranjan Meher',
+    artisan_location: 'Maniabandha, Odisha',
+    price_fiat: 230000,
+    stock_status: 'available',
+    material: '100% Pure Mulberry Silk',
+    weaving_time_days: 44,
+    description: 'Rich amber and saffron ground with a grand procession of nine elephants woven into the pallu using the Bandha technique. Elephants represent the divine chariot vehicles of Jagannath Temple during Rath Yatra.',
+    color_hue: 35,
+    color_saturation: 1.5
+  },
+  {
+    id: 11,
+    name: 'Berhampur Gongdi Silk Saree',
+    category_id: 4,
+    category_name: 'Tissue Silk',
+    artisan_id: 1,
+    artisan_name: 'Smt. Sebati Mohanty',
+    artisan_location: 'Nuapatna, Odisha',
+    price_fiat: 175000,
+    stock_status: 'available',
+    material: 'Gongdi Tissue Silk',
+    weaving_time_days: 26,
+    description: 'Rose-gold gossamer Gongdi tissue silk from Berhampur. Features a peacock fan tail border in silver Zari — the characteristic "Berhampur look" that combines sheer fabric weight with detailed border complexity.',
+    color_hue: 340,
+    color_saturation: 1.1
+  },
+  {
+    id: 12,
+    name: 'Puri Ratha Yatra Patta Silk',
+    category_id: 3,
+    category_name: 'Kanjivaram',
+    artisan_id: 3,
+    artisan_name: 'Shri Kailash Meher',
+    artisan_location: 'Puri, Odisha',
+    price_fiat: 245000,
+    stock_status: 'available',
+    material: 'Khandua Patta Silk',
+    weaving_time_days: 46,
+    description: 'Deep crimson with a Rath Chariot procession — the iconic Nandighosa chariot of Lord Jagannath woven into the full pallu. A once-in-a-generation masterpiece celebrating the sacred Rath Yatra festival of Puri.',
+    color_hue: 5,
+    color_saturation: 1.6
   }
 ];
 
@@ -1891,6 +1994,99 @@ function drawZariPattern(ctx, itemOrId, category_name) {
       else drawLotusPath(ctx);
       ctx.restore();
     }
+  } else if (name.includes('bomkai') || name.includes('peacock') || name.includes('gongdi')) {
+    // Bomkai / Gongdi — Peacock fan tail pattern in violet / rose-gold
+    const isGongdi = name.includes('gongdi');
+    ctx.strokeStyle = isGongdi ? 'rgba(255, 100, 150, 0.95)' : 'rgba(180, 80, 255, 0.9)';
+    ctx.fillStyle   = isGongdi ? 'rgba(255, 215, 0, 0.45)' : 'rgba(212, 175, 55, 0.5)';
+    ctx.lineWidth = 2.5;
+    // Border columns
+    for (let bx of [40, 380]) {
+      for (let y = 60; y < 560; y += 90) {
+        ctx.save(); ctx.translate(bx, y); drawPeacockFan(ctx); ctx.restore();
+      }
+    }
+    // Central pallu peacock
+    ctx.save();
+    ctx.translate(210, 290);
+    ctx.scale(2.0, 2.0);
+    drawPeacockFan(ctx);
+    ctx.restore();
+  } else if (name.includes('pasapalli') || name.includes('tigiria') || name.includes('double-ikat')) {
+    // Tigiria Double-Ikat Pasapalli — navy / ivory checkerboard
+    const cellW = 40, cellH = 48;
+    for (let cx2 = 10; cx2 < 420; cx2 += cellW) {
+      for (let cy2 = 10; cy2 < 580; cy2 += cellH) {
+        const col = Math.floor(cx2 / cellW), row = Math.floor(cy2 / cellH);
+        ctx.fillStyle = (col + row) % 2 === 0 ? 'rgba(25, 40, 120, 0.9)' : 'rgba(235, 225, 210, 0.85)';
+        ctx.fillRect(cx2, cy2, cellW - 2, cellH - 2);
+      }
+    }
+    // Ikat blur edges to simulate tie-dye
+    ctx.strokeStyle = 'rgba(212, 175, 55, 0.6)';
+    ctx.lineWidth = 1;
+    for (let x2 = 10; x2 < 420; x2 += cellW) {
+      ctx.beginPath(); ctx.moveTo(x2, 10); ctx.lineTo(x2, 570); ctx.stroke();
+    }
+  } else if (name.includes('kumbha') || name.includes('nayagarh') || name.includes('spire')) {
+    // Nayagarh Kumbha Spire — turquoise body, silver temple spires on borders
+    ctx.strokeStyle = 'rgba(180, 240, 240, 0.9)';
+    ctx.fillStyle   = 'rgba(80, 200, 220, 0.3)';
+    ctx.lineWidth = 2;
+    for (let ky = 30; ky < 560; ky += 80) {
+      // Left spire
+      ctx.save(); ctx.translate(35, ky); drawKumbhaSpire(ctx); ctx.restore();
+      // Right spire
+      ctx.save(); ctx.translate(385, ky); drawKumbhaSpire(ctx); ctx.restore();
+    }
+    // Central geometric medallion
+    ctx.save();
+    ctx.translate(210, 290);
+    ctx.strokeStyle = 'rgba(180, 240, 255, 0.85)';
+    ctx.lineWidth = 1.5;
+    for (let i = 0; i < 8; i++) {
+      const a = (i * Math.PI) / 4;
+      ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(Math.cos(a)*80, Math.sin(a)*80); ctx.stroke();
+    }
+    ctx.beginPath(); ctx.arc(0,0,80,0,Math.PI*2); ctx.stroke();
+    ctx.beginPath(); ctx.arc(0,0,40,0,Math.PI*2); ctx.stroke();
+    ctx.restore();
+  } else if (name.includes('sonepur') || name.includes('elephant procession')) {
+    // Sonepur Elephant Procession — amber/saffron with elephant parade
+    ctx.strokeStyle = 'rgba(255, 180, 0, 0.9)';
+    ctx.fillStyle   = 'rgba(255, 140, 0, 0.4)';
+    ctx.lineWidth = 2;
+    const elephantX = [80, 175, 270, 355];
+    elephantX.forEach((ex, i) => {
+      ctx.save(); ctx.translate(ex, 80 + i * 10); drawElephantSilhouette(ctx, 0.6); ctx.restore();
+      ctx.save(); ctx.translate(ex, 480 - i * 8); ctx.scale(1, -0.5); drawElephantSilhouette(ctx, 0.6); ctx.restore();
+    });
+    // Saffron center medallion
+    ctx.save();
+    ctx.translate(210, 290);
+    ctx.strokeStyle = 'rgba(255, 200, 50, 0.8)';
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(0,0,65,0,Math.PI*2); ctx.stroke();
+    for (let i = 0; i < 16; i++) {
+      const a = (i * Math.PI) / 8;
+      ctx.beginPath(); ctx.moveTo(Math.cos(a)*50,Math.sin(a)*50); ctx.lineTo(Math.cos(a)*65,Math.sin(a)*65); ctx.stroke();
+    }
+    ctx.restore();
+  } else if (name.includes('ratha') || name.includes('chariot') || name.includes('yatra')) {
+    // Puri Ratha Yatra — crimson pallu with Nandighosa chariot
+    ctx.strokeStyle = 'rgba(255, 215, 0, 0.9)';
+    ctx.fillStyle   = 'rgba(255, 215, 0, 0.2)';
+    ctx.lineWidth = 2;
+    // Chariot wheels on each border row
+    for (let wy = 60; wy < 560; wy += 120) {
+      ctx.save(); ctx.translate(55, wy); drawRathaWheel(ctx, 35); ctx.restore();
+      ctx.save(); ctx.translate(365, wy); drawRathaWheel(ctx, 35); ctx.restore();
+    }
+    // Large central chariot
+    ctx.save();
+    ctx.translate(210, 290);
+    drawRathaChariot(ctx);
+    ctx.restore();
   } else if (name.includes('temple') || name.includes('border') || cat.includes('chanderi')) {
     // Kotpad Temple Border pattern
     ctx.strokeStyle = 'rgba(244, 208, 63, 0.95)';
@@ -2058,6 +2254,111 @@ function drawZariPattern(ctx, itemOrId, category_name) {
   }
 }
 
+/* --  New Zari Drawing Helpers  -- */
+
+function drawPeacockFan(ctx) {
+  // Fan tail feathers radiating from center
+  const FEATHERS = 7;
+  for (let i = 0; i < FEATHERS; i++) {
+    const angle = -Math.PI * 0.6 + (i * Math.PI * 1.2) / (FEATHERS - 1);
+    const fx = Math.cos(angle) * 28, fy = Math.sin(angle) * 28;
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.quadraticCurveTo(fx * 0.5, fy * 0.5 - 8, fx, fy);
+    ctx.stroke();
+    // Eye spot
+    ctx.beginPath();
+    ctx.arc(fx, fy, 4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+  }
+  // Body
+  ctx.beginPath();
+  ctx.ellipse(0, 8, 5, 9, 0, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function drawKumbhaSpire(ctx) {
+  // Sacred Kumbha (pot / spire) motif
+  ctx.beginPath();
+  ctx.moveTo(0, -22);
+  ctx.lineTo(-12, -10);
+  ctx.bezierCurveTo(-14, -2, -14, 4, -10, 8);
+  ctx.bezierCurveTo(-6, 12, 6, 12, 10, 8);
+  ctx.bezierCurveTo(14, 4, 14, -2, 12, -10);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+  // Finial dot
+  ctx.beginPath(); ctx.arc(0, -25, 3, 0, Math.PI * 2); ctx.fill();
+}
+
+function drawElephantSilhouette(ctx, scale = 1) {
+  ctx.save();
+  ctx.scale(scale, scale);
+  ctx.beginPath();
+  // Body
+  ctx.ellipse(0, 0, 30, 20, 0, 0, Math.PI * 2);
+  ctx.fill(); ctx.stroke();
+  // Head
+  ctx.beginPath(); ctx.arc(-28, -8, 14, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+  // Trunk
+  ctx.beginPath();
+  ctx.moveTo(-38, -4);
+  ctx.bezierCurveTo(-50, 4, -52, 14, -44, 18);
+  ctx.stroke();
+  // Legs
+  for (let lx of [-15, -5, 5, 15]) {
+    ctx.beginPath(); ctx.moveTo(lx, 18); ctx.lineTo(lx, 32); ctx.stroke();
+  }
+  // Tusk
+  ctx.beginPath(); ctx.moveTo(-40, -10); ctx.lineTo(-50, -18); ctx.stroke();
+  ctx.restore();
+}
+
+function drawRathaWheel(ctx, r) {
+  ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.stroke();
+  ctx.beginPath(); ctx.arc(0, 0, r * 0.65, 0, Math.PI * 2); ctx.stroke();
+  ctx.beginPath(); ctx.arc(0, 0, r * 0.2, 0, Math.PI * 2); ctx.fill();
+  for (let i = 0; i < 12; i++) {
+    const a = (i * Math.PI) / 6;
+    ctx.beginPath();
+    ctx.moveTo(Math.cos(a) * r * 0.2, Math.sin(a) * r * 0.2);
+    ctx.lineTo(Math.cos(a) * r * 0.65, Math.sin(a) * r * 0.65);
+    ctx.stroke();
+  }
+  for (let i = 0; i < 24; i++) {
+    const a = (i * Math.PI) / 12;
+    ctx.beginPath();
+    ctx.moveTo(Math.cos(a)*r*0.65, Math.sin(a)*r*0.65);
+    ctx.lineTo(Math.cos(a)*r, Math.sin(a)*r);
+    ctx.stroke();
+  }
+}
+
+function drawRathaChariot(ctx) {
+  ctx.strokeStyle = 'rgba(255, 215, 0, 0.9)';
+  ctx.fillStyle = 'rgba(255, 215, 0, 0.15)';
+  ctx.lineWidth = 2;
+  // Platform
+  ctx.fillRect(-90, -20, 180, 50); ctx.strokeRect(-90, -20, 180, 50);
+  // Canopy pyramid
+  ctx.beginPath(); ctx.moveTo(-80, -20); ctx.lineTo(0, -100); ctx.lineTo(80, -20); ctx.closePath(); ctx.fill(); ctx.stroke();
+  // Spire
+  ctx.beginPath(); ctx.moveTo(0, -100); ctx.lineTo(0, -130); ctx.stroke();
+  ctx.beginPath(); ctx.arc(0, -133, 5, 0, Math.PI * 2); ctx.fill();
+  // Wheels
+  ctx.lineWidth = 1.5;
+  ctx.save(); ctx.translate(-60, 30); drawRathaWheel(ctx, 25); ctx.restore();
+  ctx.save(); ctx.translate(60, 30); drawRathaWheel(ctx, 25); ctx.restore();
+  // Decorative flags on top
+  ctx.strokeStyle = 'rgba(255, 94, 0, 0.8)';
+  for (let fx of [-40, 0, 40]) {
+    const base = -20 - Math.abs(fx) * 0.8;
+    ctx.beginPath(); ctx.moveTo(fx, base); ctx.lineTo(fx + 12, base - 15); ctx.lineTo(fx, base - 10); ctx.closePath(); ctx.fill();
+  }
+}
+
 function drawLotusPath(ctx) {
   ctx.beginPath();
   ctx.moveTo(0, -35);
@@ -2072,6 +2373,9 @@ function drawLotusPath(ctx) {
   ctx.fill();
   ctx.stroke();
 }
+
+
+
 
 function drawTemplePath(ctx) {
   ctx.beginPath();
@@ -2111,6 +2415,7 @@ function setupShowroomDrape(initialItem, itemsList) {
   let lightTheme = 'sunset'; 
   let viewAngle = 'front';
   let selectedModel = 1;
+  let customLightEnv = 'dawn';
 
   function loadImg(src) { const i = new Image(); i.src = src; return i; }
 
@@ -2120,7 +2425,10 @@ function setupShowroomDrape(initialItem, itemsList) {
     2: { frames: [loadImg('/avatars/navy_front.png'), loadImg('/avatars/navy_front.png'), loadImg('/avatars/navy_side.png'), loadImg('/avatars/navy_side.png')] },
     3: { frames: [loadImg('/avatars/green_front.png'), loadImg('/avatars/green_front.png'), loadImg('/avatars/green_side.png'), loadImg('/avatars/green_side.png')] },
     4: { frames: [loadImg('/avatars/purple_front.png'), loadImg('/avatars/purple_front.png'), loadImg('/avatars/purple_side.png'), loadImg('/avatars/purple_side.png')] },
-    5: { frames: [loadImg('/avatars/golden_front.png'), loadImg('/avatars/golden_front.png'), loadImg('/avatars/golden_side.png'), loadImg('/avatars/golden_side.png')] }
+    5: { frames: [loadImg('/avatars/golden_front.png'), loadImg('/avatars/golden_front.png'), loadImg('/avatars/golden_side.png'), loadImg('/avatars/golden_side.png')] },
+    6: { frames: [loadImg('/avatars/model6_front.png'), loadImg('/avatars/model6_front.png'), loadImg('/avatars/model6_side.png'), loadImg('/avatars/model6_back.png')] },
+    7: { frames: [loadImg('/avatars/model7_front.png'), loadImg('/avatars/model7_front.png'), loadImg('/avatars/model7_side.png'), loadImg('/avatars/model7_back.png')] },
+    8: { frames: [loadImg('/avatars/model8_front.png'), loadImg('/avatars/model8_front.png'), loadImg('/avatars/model8_side.png'), loadImg('/avatars/model8_back.png')] }
   };
 
   const baseFrames = [
@@ -2232,10 +2540,57 @@ function setupShowroomDrape(initialItem, itemsList) {
     // Set artisan and location details dynamically
     const artisanName = selectedItem.artisan_name || 'Master Weaver';
     const loc = selectedItem.artisan_location || 'Odisha, India';
-    document.getElementById('showroom-artisan-name').innerHTML = `${artisanName} &nbsp;·&nbsp; ${loc}`;
+    document.getElementById('showroom-artisan-name').innerHTML = `${artisanName} &nbsp;·&nbsp; ${loc} &nbsp;<span style="text-decoration:underline; opacity:0.8;">[VIEW BIO]</span>`;
     
     // Update price dynamically with global currency converter
     document.getElementById('showroom-price-fiat').textContent = formatSareePrice(selectedItem.price_fiat);
+
+    // Populate variations selector
+    const varSelector = document.getElementById('select-saree-variation');
+    if (varSelector && selectedItem.variations) {
+      varSelector.innerHTML = selectedItem.variations.map((v, idx) => {
+        const deltaText = v.price_delta > 0 ? ` (+${formatSareePrice(v.price_delta)})` : '';
+        return `<option value="${idx}">${v.name}${deltaText}</option>`;
+      }).join('');
+      
+      // Update selected price on change
+      varSelector.onchange = () => {
+        const selectedIndex = parseInt(varSelector.value);
+        const variation = selectedItem.variations[selectedIndex];
+        const finalPrice = selectedItem.price_fiat + (variation ? variation.price_delta : 0);
+        document.getElementById('showroom-price-fiat').textContent = formatSareePrice(finalPrice);
+      };
+    }
+
+    // Localized Shipping and Delivery text estimator on load
+    const shipText = document.getElementById('shipping-estimator-text');
+    if (shipText) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const lang = urlParams.get('lang') || 'en-IN';
+      const shippingDetails = {
+        'en-US': "🇺🇸 Free Insured Express Shipping to USA via DHL. Estimated delivery to New York/California: 3-5 business days.",
+        'en-GB': "🇬🇧 Free Insured Express Shipping to UK via FedEx. Estimated delivery to London/Leicester: 4-6 business days.",
+        'en-CA': "🇨🇦 Free Insured Express Shipping to Canada. Estimated delivery to Toronto/Vancouver: 4-6 business days.",
+        'en-AU': "🇦🇺 Free Insured Express Shipping to Australia. Estimated delivery to Sydney/Melbourne: 5-7 business days.",
+        'en-AE': "🇦🇪 Free Insured Express Shipping to UAE via Aramex. Estimated delivery to Dubai/Abu Dhabi: 2-4 business days.",
+        'en-SG': "🇸🇬 Free Insured Express Shipping to Singapore. Estimated delivery: 3-5 business days.",
+        'en-IN': "🇮🇳 Free Insured Domestic Shipping via BlueDart. Estimated delivery: 2-3 business days.",
+        'hi-IN': "🇮🇳 Free Insured Domestic Shipping via BlueDart. Estimated delivery: 2-3 business days."
+      };
+      shipText.textContent = shippingDetails[lang] || shippingDetails['en-IN'];
+    }
+
+    // Dynamic Loom Reservation Queue Scarcity text
+    const scarcityText = document.getElementById('weaver-scarcity-status');
+    if (scarcityText) {
+      const aid = selectedItem.artisan_id || 1;
+      const statusMap = {
+        1: `Loom occupied by Smt. Sebati Mohanty weaving a custom scriptural Khandua order. Next reservation slot opens in 5 days.`,
+        2: `Loom occupied by Shri Ranjan Meher spinning mathematical geometric double-Ikat wefts. Next reservation slot opens in 9 days.`,
+        3: `Loom currently open. Shri Kailash Meher is available to accept a new custom mythological/temple commission. Loom setup time: 48h.`
+      };
+      scarcityText.textContent = statusMap[aid] || `Loom active. Currently occupied with custom orders. Next slot opens in 4 days.`;
+    }
     
     // Reset purchase success messages
     document.getElementById('btn-acquire-now').classList.remove('hidden');
@@ -2343,6 +2698,14 @@ function setupShowroomDrape(initialItem, itemsList) {
     };
   }
 
+  const lightEnvSelect = document.getElementById('select-light-env');
+  if (lightEnvSelect) {
+    lightEnvSelect.onchange = (e) => {
+      customLightEnv = e.target.value;
+      playShowroomSound(640, 0.04, 0.08);
+    };
+  }
+
   // Certificate generation binding
   const btnGenerateCertificate = document.getElementById('btn-generate-certificate');
   const certOverlay = document.getElementById('cert-overlay');
@@ -2361,6 +2724,22 @@ function setupShowroomDrape(initialItem, itemsList) {
       const uniqueId = `LOM-2026-${Math.floor(1000 + Math.random() * 9000)}`;
       document.getElementById('cert-display-id').textContent = `CERTIFICATE #${uniqueId}`;
 
+      // Dynamic Date backdating based on weaving time
+      const weaveDays = isCustomMode ? 30 : (activeItem.weaving_time_days || 28);
+      const today = new Date();
+      
+      const formatDate = (d) => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      
+      const dateSign = today;
+      const dateWeave = new Date(today.getTime() - 2 * 24 * 60 * 60 * 1000); // 2 days before signing
+      const dateWarp = new Date(today.getTime() - Math.floor(weaveDays * 0.7) * 24 * 60 * 60 * 1000);
+      const dateDyeing = new Date(today.getTime() - weaveDays * 24 * 60 * 60 * 1000);
+
+      document.getElementById('ledger-date-dyeing').textContent = formatDate(dateDyeing);
+      document.getElementById('ledger-date-warp').textContent = formatDate(dateWarp);
+      document.getElementById('ledger-date-weave').textContent = formatDate(dateWeave);
+      document.getElementById('ledger-date-sign').textContent = formatDate(dateSign);
+
       certOverlay.classList.remove('hidden');
       playShowroomSound(980, 0.08, 0.2);
     };
@@ -2377,6 +2756,32 @@ function setupShowroomDrape(initialItem, itemsList) {
   if (btnPrintCert) {
     btnPrintCert.onclick = () => {
       window.print();
+    };
+  }
+
+  // Artisan Modal bindings
+  const btnCloseArtisan = document.getElementById('btn-close-artisan');
+  const artisanModal = document.getElementById('artisan-modal');
+  const showroomArtisanName = document.getElementById('showroom-artisan-name');
+
+  if (showroomArtisanName && artisanModal) {
+    showroomArtisanName.onclick = () => {
+      document.getElementById('artisan-modal-name').textContent = activeItem.artisan_name || 'Master Weaver';
+      document.getElementById('artisan-modal-loc').textContent = activeItem.artisan_location || 'Odisha, India';
+      document.getElementById('artisan-modal-exp').textContent = `${activeItem.artisan_exp || 30} Years`;
+      document.getElementById('artisan-modal-bio').textContent = activeItem.artisan_bio || 'Master weaver specializing in complex heritage styles.';
+      
+      artisanModal.style.display = 'flex';
+      artisanModal.classList.remove('hidden');
+      playShowroomSound(600, 0.05, 0.08);
+    };
+  }
+
+  if (btnCloseArtisan && artisanModal) {
+    btnCloseArtisan.onclick = () => {
+      artisanModal.style.display = 'none';
+      artisanModal.classList.add('hidden');
+      playShowroomSound(440, 0.04, 0.05);
     };
   }
 
@@ -2688,14 +3093,25 @@ function setupShowroomDrape(initialItem, itemsList) {
     const cw = canvas.width;
     const ch = canvas.height;
 
+    // ── Breathing parallax: model rises/falls like a live model ──
+    const breatheOffset = Math.sin(Date.now() * 0.0012) * 6;
+
     ctx.filter = 'none';
 
     ctx.fillStyle = '#030303';
     ctx.fillRect(0, 0, cw, ch);
 
+    // Background parallax gradient that moves opposite to rotation
+    const bgX = cw / 2 + Math.cos(normRot * -0.5) * 22;
+    const bgGrad = ctx.createRadialGradient(bgX, ch * 0.35, 0, bgX, ch * 0.35, ch * 0.8);
+    bgGrad.addColorStop(0, `hsla(${(activeItem.color_hue || 30)}, 40%, 8%, 0.9)`);
+    bgGrad.addColorStop(1, 'rgba(3,3,3,1)');
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, cw, ch);
+
     const vignette = ctx.createRadialGradient(cw/2, ch/2, ch*0.2, cw/2, ch/2, ch*0.82);
     vignette.addColorStop(0, 'rgba(0,0,0,0)');
-    vignette.addColorStop(1, 'rgba(0,0,0,0.7)');
+    vignette.addColorStop(1, 'rgba(0,0,0,0.75)');
     ctx.fillStyle = vignette;
     ctx.fillRect(0, 0, cw, ch);
 
@@ -2707,7 +3123,10 @@ function setupShowroomDrape(initialItem, itemsList) {
       const dw = imgW * scale;
       const dh = imgH * scale;
       const dx = (cw - dw) / 2;
-      const dy = (ch - dh) / 2 + ch * 0.01;
+      const dy = (ch - dh) / 2 + ch * 0.01 + breatheOffset;
+      
+      const activeFilter = (avatarCollections[selectedModel] && avatarCollections[selectedModel].filter) || 'none';
+      ctx.filter = activeFilter;
 
       ctx.globalAlpha = 1 - blendT;
       ctx.drawImage(currentFrame, dx, dy, dw, dh);
@@ -2718,6 +3137,20 @@ function setupShowroomDrape(initialItem, itemsList) {
       }
       ctx.globalAlpha = 1;
       ctx.filter = 'none';
+
+      // ── Specular Silk Sheen Ray ──────────────────────────────────
+      // A sweep of gold light that follows the rotation angle across the figure
+      const sheenAngle = normRot % Math.PI;
+      const sheenX = dx + dw * (sheenAngle / Math.PI);
+      const sheenW = dw * 0.18;
+      if (sheenX > dx - sheenW && sheenX < dx + dw + sheenW) {
+        const sheen = ctx.createLinearGradient(sheenX - sheenW, 0, sheenX + sheenW, 0);
+        sheen.addColorStop(0, 'rgba(255, 235, 170, 0)');
+        sheen.addColorStop(0.5, 'rgba(255, 240, 180, 0.18)');
+        sheen.addColorStop(1, 'rgba(255, 235, 170, 0)');
+        ctx.fillStyle = sheen;
+        ctx.fillRect(dx, dy, dw, dh);
+      }
 
       if (lightTheme === 'neon') {
         const neonGrad = ctx.createLinearGradient(0, 0, cw, 0);
@@ -2731,14 +3164,49 @@ function setupShowroomDrape(initialItem, itemsList) {
         ctx.fillRect(0, 0, cw, ch);
       }
 
+      // Apply Custom Light Environment "Silk Sheen" filters
+      if (customLightEnv === 'dawn') {
+        const dawnGrad = ctx.createLinearGradient(0, 0, 0, ch);
+        dawnGrad.addColorStop(0, 'rgba(255, 215, 0, 0.09)');
+        dawnGrad.addColorStop(0.5, 'rgba(255, 140, 0, 0.02)');
+        dawnGrad.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = dawnGrad;
+        ctx.fillRect(0, 0, cw, ch);
+      } else if (customLightEnv === 'candle') {
+        const pulse = 1 + Math.sin(Date.now() * 0.002) * 0.05;
+        const candleGrad = ctx.createRadialGradient(cw / 2, ch * 0.45, 10, cw / 2, ch * 0.45, ch * 0.7 * pulse);
+        candleGrad.addColorStop(0, 'rgba(255, 120, 0, 0.22)');
+        candleGrad.addColorStop(0.4, 'rgba(255, 60, 0, 0.06)');
+        candleGrad.addColorStop(1, 'rgba(0,0,0,0.5)');
+        ctx.fillStyle = candleGrad;
+        ctx.fillRect(0, 0, cw, ch);
+      } else if (customLightEnv === 'spotlight') {
+        const spotGrad = ctx.createRadialGradient(cw / 2, 0, 10, cw / 2, 0, ch * 0.95);
+        spotGrad.addColorStop(0, 'rgba(255, 255, 255, 0.22)');
+        spotGrad.addColorStop(0.4, 'rgba(255, 255, 255, 0.05)');
+        spotGrad.addColorStop(1, 'rgba(0, 0, 0, 0.35)');
+        ctx.fillStyle = spotGrad;
+        ctx.fillRect(0, 0, cw, ch);
+      }
+
+      // ── Floor shadow / depth ──────────────────────────────────────
+      const shadowY = dy + dh - 4;
+      const shadowGrad = ctx.createRadialGradient(cw/2, shadowY, 5, cw/2, shadowY, dw * 0.4);
+      shadowGrad.addColorStop(0, `rgba(0,0,0,${0.35 + Math.abs(velocity) * 0.5})`);
+      shadowGrad.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = shadowGrad;
+      ctx.fillRect(cw/2 - dw*0.4, shadowY - 8, dw*0.8, 22);
+
+      // ── Silk reflection strip ─────────────────────────────────────
       const reflectHeight = dh * 0.18;
       ctx.save();
-      ctx.globalAlpha = 0.22 * (1 - blendT);
+      ctx.filter = activeFilter;
+      ctx.globalAlpha = 0.18 * (1 - blendT);
       ctx.translate(dx, dy + dh);
       ctx.scale(1, -1);
       ctx.drawImage(currentFrame, 0, dh - reflectHeight, dw, reflectHeight, 0, 0, dw, reflectHeight);
       if (nextFrame && nextFrame.complete) {
-        ctx.globalAlpha = 0.22 * blendT;
+        ctx.globalAlpha = 0.18 * blendT;
         ctx.drawImage(nextFrame, 0, dh - reflectHeight, dw, reflectHeight, 0, 0, dw, reflectHeight);
       }
       ctx.restore();
@@ -2759,42 +3227,67 @@ function setupShowroomDrape(initialItem, itemsList) {
       ctx.fillText('LOADING AVATAR MODEL...', cw / 2, ch / 2);
     }
 
-    ctx.strokeStyle = 'rgba(255, 215, 0, 0.012)';
-    ctx.lineWidth = 1;
-    for (let x = 0; x < cw; x += 50) {
-      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, ch); ctx.stroke();
-    }
-    for (let y = 0; y < ch; y += 50) {
-      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(cw, y); ctx.stroke();
+    // ── Konark Wheel Rotation Arc Indicator ─────────────────────────
+    {
+      const arcR = 30;
+      const arcX = cw - 52, arcY = ch - 52;
+      ctx.save();
+      ctx.globalAlpha = 0.7;
+      ctx.strokeStyle = 'rgba(212, 175, 55, 0.25)';
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.arc(arcX, arcY, arcR, 0, Math.PI * 2); ctx.stroke();
+      ctx.strokeStyle = 'rgba(212, 175, 55, 0.8)';
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(arcX, arcY, arcR, -Math.PI/2, -Math.PI/2 + normRot); ctx.stroke();
+      // Hub
+      ctx.fillStyle = 'rgba(212, 175, 55, 0.9)';
+      ctx.beginPath(); ctx.arc(arcX, arcY, 4, 0, Math.PI * 2); ctx.fill();
+      // 8 mini spokes
+      for (let s = 0; s < 8; s++) {
+        const sa = normRot + (s * Math.PI) / 4;
+        ctx.strokeStyle = 'rgba(212, 175, 55, 0.2)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(arcX + Math.cos(sa) * 4, arcY + Math.sin(sa) * 4);
+        ctx.lineTo(arcX + Math.cos(sa) * arcR, arcY + Math.sin(sa) * arcR);
+        ctx.stroke();
+      }
+      // Degree label
+      ctx.fillStyle = 'rgba(212, 175, 55, 0.75)';
+      ctx.font = '600 8px "Outfit", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(`${(normRot * 180 / Math.PI).toFixed(0)}°`, arcX, arcY + arcR + 12);
+      ctx.restore();
     }
 
+    // ── Elegant HUD (replaces raw monospace debug text) ─────────────
+    ctx.globalAlpha = 1;
+    {
+      const hudH = 28;
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
+      ctx.beginPath();
+      ctx.roundRect(12, ch - hudH - 12, cw - 24, hudH, 6);
+      ctx.fill();
+      ctx.fillStyle = 'rgba(212, 175, 55, 0.7)';
+      ctx.font = '500 9px "Outfit", sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText(`${['FRONT','¾ LEFT','SIDE','BACK'][frameIndex]}  ·  ${(zoomLevel).toFixed(2)}×  ·  ${inspectMode.toUpperCase()}`, 22, ch - 24);
+      ctx.textAlign = 'right';
+      ctx.fillText(`${activeItem.name || 'SAREE'}  ·  ${activeItem.category_name || ''}`, cw - 22, ch - 24);
+      ctx.textAlign = 'center';
+      ctx.fillStyle = 'rgba(255,255,255,0.2)';
+      ctx.fillText('↔ DRAG TO ROTATE · SCROLL TO ZOOM · TOUCH SUPPORTED', cw / 2, ch - 24);
+    }
+
+    // ── Gold thread drag particles ────────────────────────────────
     const zoomDisp = document.getElementById('zoom-display');
     if (zoomDisp) zoomDisp.textContent = `${zoomLevel.toFixed(2)}×`;
-
-    ctx.fillStyle = 'rgba(255, 215, 0, 0.45)';
-    ctx.font = 'bold 9px monospace';
-    ctx.textAlign = 'left';
-    ctx.fillText(`SYS: NEXUS_ODISHI_v2.2`, 20, 35);
-    ctx.fillText(`ROT: ${(normRot * (180 / Math.PI)).toFixed(1)}°`, 20, 50);
-    ctx.fillText(`SPN: ${Math.abs(velocity * 60).toFixed(2)} rad/s`, 20, 65);
-    ctx.fillText(`FRM: ${frameIndex + 1}/4 [${['FRONT','3Q-L','SIDE','BACK'][frameIndex]}]`, 20, 80);
-    ctx.fillText(`ZOOM: ${zoomLevel.toFixed(2)}×`, 20, 95);
-
-    ctx.textAlign = 'right';
-    ctx.fillText(`LENS: ${inspectMode.toUpperCase()}`, cw - 20, 35);
-    ctx.fillText(`MODEL: NXS-${String(activeItem.id).padStart(3,'0')}-PATA`, cw - 20, 50);
-    ctx.fillText(`LIGHT: ${lightTheme.toUpperCase()}`, cw - 20, 65);
-    ctx.fillText(`STYLE: ${activeItem.category_name || 'SAREE'}`, cw - 20, 80);
-
-    ctx.textAlign = 'center';
-    ctx.fillStyle = 'rgba(255, 215, 0, 0.25)';
-    ctx.fillText('↔ CLICK & DRAG TO ROTATE · TOUCH SUPPORTED', cw / 2, ch - 18);
 
     for (let i = particles.length - 1; i >= 0; i--) {
       const p = particles[i];
       p.angle += p.speedR;
       p.y += p.speedY;
-      p.alpha -= 0.012;
+      p.alpha -= 0.010;
       const swirlX = cw / 2 + Math.cos(p.angle) * p.radius;
       if (p.alpha <= 0) {
         particles.splice(i, 1);
@@ -2803,7 +3296,7 @@ function setupShowroomDrape(initialItem, itemsList) {
         ctx.globalAlpha = p.alpha;
         ctx.fillStyle = `rgba(255, 215, 0, ${p.alpha})`;
         ctx.shadowColor = '#ffd700';
-        ctx.shadowBlur = 4;
+        ctx.shadowBlur = 6;
         ctx.beginPath();
         ctx.arc(swirlX, p.y, p.size, 0, Math.PI * 2);
         ctx.fill();
@@ -2834,6 +3327,11 @@ function setupShowroomDrape(initialItem, itemsList) {
         ctx.strokeStyle = '#ffd700';
         ctx.lineWidth = 3;
         ctx.beginPath(); ctx.arc(mx, my, 80, 0, Math.PI * 2); ctx.stroke();
+        // Loupe crosshair
+        ctx.strokeStyle = 'rgba(255,215,0,0.3)';
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(mx - 80, my); ctx.lineTo(mx + 80, my); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(mx, my - 80); ctx.lineTo(mx, my + 80); ctx.stroke();
       }
     }
 
@@ -2843,6 +3341,7 @@ function setupShowroomDrape(initialItem, itemsList) {
   if (drapeAnimationId) cancelAnimationFrame(drapeAnimationId);
   drawDrape();
 }
+
 
 function openUnweaveModal(item, itemsList) {
   if (!item) return;
@@ -2890,13 +3389,57 @@ window.addEventListener('keydown', (e) => {
 window.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => {
     const loader = document.getElementById('loader');
-    loader.classList.add('fade-out');
+    if (loader) loader.classList.add('fade-out');
+    
+    // Auto-zoom the wheel down to 1.0 immediately when the loader fades out
+    gsap.to(entryAnimation, {
+      scale: 1.0,
+      duration: 2.5,
+      ease: 'power4.out'
+    });
     
     setTimeout(() => {
-      document.getElementById('audio-modal').classList.remove('hidden');
+      const gate = document.getElementById('entry-gate');
+      if (gate) gate.classList.remove('hidden');
     }, 1200);
   }, 1800);
   
+  // Localized Dynamic SEO Meta Tags injection for global NRI markets
+  const urlParams = new URLSearchParams(window.location.search);
+  const lang = urlParams.get('lang') || 'en-IN';
+  const localizedSEOMeta = {
+    'en-US': {
+      title: "The Loom of Time | Buy Handloom Odisha Patta & Khandua Silk Sarees Online (USA)",
+      desc: "Premium, authentic Odisha Patta Silk, Khandua Ikat, and Sambalpuri sarees handcrafted by master weavers. Free insured express shipping to the USA (New York, California, Texas, Chicago) with zero-electricity handloom verification."
+    },
+    'en-GB': {
+      title: "The Loom of Time | Handloom Odisha Silk & Wedding Sarees Online (UK)",
+      desc: "Museum-grade Khandua Ikat & Patta Silk sarees. Woven on traditional wooden looms in Odisha, India. Insured express delivery to the United Kingdom (London, Leicester, Birmingham)."
+    },
+    'en-CA': {
+      title: "The Loom of Time | Authentic Odisha Handloom Sarees Online (Canada)",
+      desc: "Shop pure Khandua Ikat & Patta Silk from Odisha. Verified provenance, zero carbon footprint. Insured delivery to Canada (Toronto, Vancouver, Montreal)."
+    },
+    'en-AU': {
+      title: "The Loom of Time | Pure Odisha Patta Silk & Ikat Sarees (Australia)",
+      desc: "Authentic Sambalpuri Ikat & Khandua Silk sarees handcrafted by award-winning weavers. Express delivery to Australia (Sydney, Melbourne, Brisbane)."
+    },
+    'en-AE': {
+      title: "The Loom of Time | Luxury Odisha Handloom Silk Sarees (UAE & Dubai)",
+      desc: "Buy exclusive Khandua Silk & Patta Silk sarees online. Verified provenance, zero carbon footprint. Fast delivery to Dubai, Abu Dhabi, Sharjah."
+    },
+    'en-SG': {
+      title: "The Loom of Time | Buy Handloom Odisha Silk Sarees Online (Singapore)",
+      desc: "Pure Khandua Ikat & Patta Silk sarees. Woven on traditional zero-electricity looms. Insured express shipping to Singapore."
+    }
+  };
+
+  if (localizedSEOMeta[lang]) {
+    document.title = localizedSEOMeta[lang].title;
+    const metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc) metaDesc.setAttribute('content', localizedSEOMeta[lang].desc);
+  }
+
   setupGenesisCanvas();
   setupHorizontalPulse();
   setupCustomCommissionStudio();
@@ -2906,7 +3449,33 @@ window.addEventListener('DOMContentLoaded', () => {
   setupInteractiveExtensions();
   setupMythosAnimation();
   setupHeritageSoulSection();
-  setupSoundscapeStudio();
+  setupHeritageMatchmaker();
+  setupCuratorConcierge();
+  setupSilkConstellation();
+  setupCuratorWhisper();
+
+
+  // Weaving & Provenance FAQ Accordion Script
+  document.querySelectorAll('.faq-trigger').forEach(trigger => {
+    trigger.onclick = () => {
+      const parent = trigger.parentElement;
+      const content = parent.querySelector('.faq-content');
+      const icon = trigger.querySelector('.faq-icon');
+      const isOpen = parent.classList.contains('active');
+      
+      document.querySelectorAll('.faq-item').forEach(item => {
+        item.classList.remove('active');
+        item.querySelector('.faq-content').style.maxHeight = '0';
+        item.querySelector('.faq-icon').textContent = '+';
+      });
+      
+      if (!isOpen) {
+        parent.classList.add('active');
+        content.style.maxHeight = `${content.scrollHeight}px`;
+        icon.textContent = '−';
+      }
+    };
+  });
 });
 
 function setupInteractiveExtensions() {
@@ -2984,6 +3553,45 @@ function setupInteractiveExtensions() {
     if (weftProgress === 100) {
       if (successMsg) successMsg.classList.remove('hidden');
       playSuccessFanfare();
+      
+      // Visual container shake
+      if (manualLoomPanel) {
+        gsap.to(manualLoomPanel, {
+          x: '+=8',
+          yoyo: true,
+          repeat: 5,
+          duration: 0.04,
+          onComplete: () => gsap.set(manualLoomPanel, { x: 0 })
+        });
+        
+        // Spawn golden thread particles
+        for (let i = 0; i < 35; i++) {
+          const p = document.createElement('div');
+          p.style.position = 'absolute';
+          p.style.left = '50%';
+          p.style.top = '50%';
+          p.style.width = `${Math.random() * 5 + 3}px`;
+          p.style.height = `${Math.random() * 5 + 3}px`;
+          p.style.background = 'linear-gradient(135deg, #ffd700, #ff8c00)';
+          p.style.borderRadius = '50%';
+          p.style.pointerEvents = 'none';
+          p.style.zIndex = '99';
+          manualLoomPanel.appendChild(p);
+          
+          const angle = Math.random() * Math.PI * 2;
+          const velocity = Math.random() * 140 + 70;
+          
+          gsap.to(p, {
+            x: Math.cos(angle) * velocity,
+            y: Math.sin(angle) * velocity,
+            opacity: 0,
+            scale: 0.2,
+            duration: 1.2,
+            ease: 'power2.out',
+            onComplete: () => p.remove()
+          });
+        }
+      }
       
       // Seed a secret master design in localStorage!
       try {
@@ -3216,6 +3824,54 @@ function setupCustomCursor() {
     requestAnimationFrame(updateRing);
   }
   updateRing();
+
+  // Premium Magnetic Buttons Interaction
+  const magneticEls = document.querySelectorAll('.btn-magnetic');
+  magneticEls.forEach(el => {
+    el.addEventListener('mousemove', (e) => {
+      const bound = el.getBoundingClientRect();
+      const elX = bound.left + bound.width / 2;
+      const elY = bound.top + bound.height / 2;
+      
+      const mX = e.clientX;
+      const mY = e.clientY;
+      
+      // Calculate elastic pull offset
+      const pullX = (mX - elX) * 0.35;
+      const pullY = (mY - elY) * 0.35;
+      
+      gsap.to(el, {
+        x: pullX,
+        y: pullY,
+        duration: 0.3,
+        ease: 'power2.out'
+      });
+      
+      // Expand and box the cursor ring to warp the button
+      gsap.to(ring, {
+        width: bound.width + 16,
+        height: bound.height + 16,
+        borderRadius: '30px',
+        duration: 0.3
+      });
+    });
+    
+    el.addEventListener('mouseleave', () => {
+      gsap.to(el, {
+        x: 0,
+        y: 0,
+        duration: 0.6,
+        ease: 'elastic.out(1.1, 0.4)'
+      });
+      
+      gsap.to(ring, {
+        width: 32,
+        height: 32,
+        borderRadius: '50%',
+        duration: 0.3
+      });
+    });
+  });
 
   // Hover states on interactive elements
   const hoverSelectors = 'a, button, select, input, .avatar-thumb, .card-interactive, .view-btn, .close-modal, .modal-close-btn';
@@ -4069,258 +4725,745 @@ function setupHeritageSoulSection() {
   draw();
 }
 
-function setupSoundscapeStudio() {
-  const btnOpen = document.getElementById('btn-open-soundscape');
-  const btnClose = document.getElementById('btn-close-soundscape');
-  const modal = document.getElementById('soundscape-modal');
+function setupHeritageMatchmaker() {
+  const drawer = document.getElementById('matchmaker-drawer');
+  const btnOpen = document.getElementById('btn-open-matchmaker');
+  const btnClose = document.getElementById('btn-close-matchmaker');
 
-  if (btnOpen && modal) {
-    btnOpen.onclick = () => {
-      modal.style.display = 'flex';
-      modal.classList.remove('hidden');
+  if (!drawer || !btnOpen || !btnClose) return;
+
+  // Open/Close Toggles
+  btnOpen.onclick = () => {
+    drawer.classList.add('active');
+    gsap.fromTo(drawer, { right: -420 }, { right: 0, duration: 0.6, ease: 'power3.out' });
+  };
+
+  btnClose.onclick = () => {
+    gsap.to(drawer, {
+      right: -420,
+      duration: 0.5,
+      ease: 'power3.in',
+      onComplete: () => drawer.classList.remove('active')
+    });
+  };
+
+  // Step Navigations
+  let currentStep = 1;
+  const totalSteps = 3;
+  const btnPrev = document.getElementById('btn-matchmaker-prev');
+  const btnNext = document.getElementById('btn-matchmaker-next');
+
+  // Answers State
+  const answers = {
+    occasion: null,
+    color: null,
+    complexity: null
+  };
+
+  // Select Option bindings
+  const stepsData = {
+    1: 'occasion',
+    2: 'color',
+    3: 'complexity'
+  };
+
+  document.querySelectorAll('.matchmaker-step-panel').forEach((panel, pIdx) => {
+    const step = pIdx + 1;
+    const cards = panel.querySelectorAll('.option-card');
+    cards.forEach(card => {
+      card.onclick = () => {
+        cards.forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        answers[stepsData[step]] = card.dataset.key;
+        playShowroomSound(700, 0.04, 0.05);
+      };
+    });
+  });
+
+  function updateStepUI() {
+    // Show/Hide Step panels
+    document.querySelectorAll('.matchmaker-step-panel').forEach(panel => {
+      const step = parseInt(panel.dataset.step);
+      panel.classList.toggle('active', step === currentStep);
+    });
+
+    // Update Dots
+    document.querySelectorAll('.step-dot').forEach(dot => {
+      const step = parseInt(dot.dataset.step);
+      dot.classList.toggle('active', step === currentStep);
+    });
+
+    // Update Nav Buttons
+    if (btnPrev) btnPrev.style.display = currentStep > 1 ? 'block' : 'none';
+    if (btnNext) {
+      if (currentStep === totalSteps) {
+        btnNext.textContent = "Reveal My Match";
+      } else {
+        btnNext.textContent = "Next Step";
+      }
+    }
+  }
+
+  if (btnPrev) {
+    btnPrev.onclick = () => {
+      if (currentStep > 1) {
+        currentStep--;
+        updateStepUI();
+        playShowroomSound(440, 0.03, 0.05);
+      }
     };
   }
 
-  if (btnClose && modal) {
-    btnClose.onclick = () => {
-      modal.style.display = 'none';
-      modal.classList.add('hidden');
-      stopSoundscape();
+  if (btnNext) {
+    btnNext.onclick = () => {
+      // Validate option is selected for current step
+      const currentKey = stepsData[currentStep];
+      if (!answers[currentKey]) {
+        // Simple shake animation on current active step
+        const activePanel = document.querySelector(`.matchmaker-step-panel[data-step="${currentStep}"]`);
+        if (activePanel) {
+          gsap.to(activePanel, { x: '+=6', yoyo: true, repeat: 5, duration: 0.04, onComplete: () => gsap.set(activePanel, { x: 0 }) });
+        }
+        playShowroomSound(220, 0.08, 0.1);
+        return;
+      }
+
+      if (currentStep < totalSteps) {
+        currentStep++;
+        updateStepUI();
+        playShowroomSound(550, 0.04, 0.06);
+      } else {
+        // Calculate match and select!
+        revealSareeMatch();
+      }
     };
   }
 
-  let soundscapeCtx = null;
-  let droneOsc = null;
-  let droneGain = null;
-  
-  let clackTimer = null;
-  let pedalTimer = null;
-  
-  let noiseNode = null;
-  let noiseGain = null;
-  
-  let isSoundscapePlaying = false;
-  
-  const togglePlayBtn = document.getElementById('btn-toggle-soundscape-play');
+  function revealSareeMatch() {
+    // Math matching mapping
+    let matchedId = 2; // Default Lotus
 
-  function initSoundscapeAudio() {
-    if (soundscapeCtx) return;
-    soundscapeCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (answers.occasion === 'wedding') {
+      if (answers.color === 'crimson') matchedId = 5; // Jagannath
+      else if (answers.color === 'gold') matchedId = 4; // Konark Sundial
+    } else if (answers.occasion === 'offering') {
+      if (answers.color === 'crimson') matchedId = 1; // Nuapatana Khandua
+      else matchedId = 6; // Maniabandha Grid
+    } else if (answers.occasion === 'gala') {
+      if (answers.color === 'earth') matchedId = 3; // Kotpad Temple
+    }
+
+    // Dynamic navigate and select item
+    const showroomDrapeStage = document.getElementById('showroom-modal');
+    if (showroomDrapeStage) {
+      // Open showroom modal if closed
+      const modal = document.getElementById('showroom-modal');
+      if (modal && modal.classList.contains('hidden')) {
+        modal.style.display = 'flex';
+        modal.classList.remove('hidden');
+      }
+
+      // Find the matched item from collection
+      // Look up global inventory
+      const matchedItem = sareeCollection.find(i => i.id === matchedId);
+      if (matchedItem) {
+        // Fetch update active item logic
+        // Wait, setupShowroomDrape returns the updateActiveItem, but wait! How do we call it?
+        // We can just query the avatar thumbnail inside the showroom and dispatch a click event!
+        // This is incredibly clean, simple, and avoids having to export internal variables!
+        const matchThumb = document.querySelector(`.avatar-thumb[data-id="${matchedId}"]`);
+        if (matchThumb) {
+          matchThumb.click();
+          
+          // Flash a gorgeous recommendation banner
+          const titleStrip = document.querySelector('.showroom-title-left');
+          const recBadge = document.createElement('div');
+          recBadge.id = 'matchmaker-aura-badge';
+          recBadge.innerHTML = `✨ Matched to your Custom Aura Quiz`;
+          recBadge.style.cssText = "font-size:0.65rem; color:#ffd700; font-weight:bold; text-transform:uppercase; letter-spacing:1px; margin-bottom:4px; animation:pulse 1.5s infinite;";
+          
+          // Remove existing badge if any
+          const oldBadge = document.getElementById('matchmaker-aura-badge');
+          if (oldBadge) oldBadge.remove();
+          
+          if (titleStrip) titleStrip.prepend(recBadge);
+        }
+      }
+    }
+
+    // Close Matchmaker Drawer with transition
+    btnClose.click();
+
+    // Success Fanfare sound
+    if (audioCtx) {
+      const notes = [330, 440, 550, 660];
+      notes.forEach((freq, idx) => {
+        setTimeout(() => {
+          playShowroomSound(freq, 0.05, 0.12);
+        }, idx * 100);
+      });
+    }
   }
+}
 
-  function startSoundscape() {
-    initSoundscapeAudio();
-    if (soundscapeCtx.state === 'suspended') soundscapeCtx.resume();
+function setupCuratorConcierge() {
+  const panel = document.getElementById('concierge-panel');
+  const btnOpen = document.getElementById('btn-open-concierge');
+  const btnClose = document.getElementById('btn-close-concierge');
+  const btnAcquireShowroom = document.getElementById('btn-acquire-now');
 
-    isSoundscapePlaying = true;
-    togglePlayBtn.textContent = "STOP SYNTH";
-    togglePlayBtn.style.background = "#ffd700";
+  if (!panel || !btnOpen || !btnClose) return;
 
-    const warpFreqVal = parseInt(document.getElementById('sound-warp-freq').value);
-    droneOsc = soundscapeCtx.createOscillator();
-    droneGain = soundscapeCtx.createGain();
-    droneOsc.type = 'sawtooth';
-    droneOsc.frequency.setValueAtTime(warpFreqVal, soundscapeCtx.currentTime);
+  function openConcierge() {
+    panel.style.display = 'flex';
+    panel.classList.remove('hidden');
     
-    const lp = soundscapeCtx.createBiquadFilter();
-    lp.type = 'lowpass';
-    lp.frequency.setValueAtTime(280, soundscapeCtx.currentTime);
+    // Auto-build WhatsApp link query parameters
+    const linkWa = document.getElementById('link-wa-concierge');
+    if (linkWa) {
+      const activeTitle = document.getElementById('showroom-title').textContent || 'Mulberry Handloom Saree';
+      const textParam = encodeURIComponent(`Namaste Priyadarshini, I am requesting a private consultation for the "${activeTitle}". Let's arrange a callback.`);
+      linkWa.href = `https://wa.me/919999999999?text=${textParam}`;
+    }
 
-    droneGain.gain.setValueAtTime(0.04, soundscapeCtx.currentTime);
+    // Animate panel scale/fade
+    const card = panel.querySelector('.cert-card');
+    if (card) {
+      gsap.fromTo(card, { scale: 0.9, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.4, ease: 'back.out(1.7)' });
+    }
+    
+    playShowroomSound(660, 0.05, 0.1);
+  }
 
-    droneOsc.connect(lp);
-    lp.connect(droneGain);
-    droneGain.connect(soundscapeCtx.destination);
-    droneOsc.start();
+  function closeConcierge() {
+    const card = panel.querySelector('.cert-card');
+    if (card) {
+      gsap.to(card, {
+        scale: 0.9,
+        opacity: 0,
+        duration: 0.3,
+        ease: 'power3.in',
+        onComplete: () => {
+          panel.style.display = 'none';
+          panel.classList.add('hidden');
+          // Reset success state
+          const succText = document.getElementById('sample-success-text');
+          if (succText) succText.style.display = 'none';
+        }
+      });
+    } else {
+      panel.style.display = 'none';
+      panel.classList.add('hidden');
+    }
+    playShowroomSound(440, 0.04, 0.05);
+  }
 
-    const bobbinVolVal = parseInt(document.getElementById('sound-bobbin-vol').value) / 100;
-    const bufferSize = soundscapeCtx.sampleRate * 2;
-    const noiseBuffer = soundscapeCtx.createBuffer(1, bufferSize, soundscapeCtx.sampleRate);
+  btnOpen.onclick = openConcierge;
+  btnClose.onclick = closeConcierge;
+
+  // Bottom Bar Retract Toggle
+  const btnToggleControls = document.getElementById('btn-toggle-controls');
+  const showroomBottomBar = document.getElementById('showroom-bottom-bar');
+  if (btnToggleControls && showroomBottomBar) {
+    btnToggleControls.onclick = () => {
+      const isRetracted = showroomBottomBar.classList.toggle('retracted');
+      btnToggleControls.textContent = isRetracted ? "▼ SHOW CONTROLS" : "▲ HIDE CONTROLS";
+      playShowroomSound(isRetracted ? 440 : 880, 0.04, 0.08);
+    };
+  }
+
+  // --- WEAVING LOOM AMBIENT SYNTHESIZER ---
+  let audioCtx = null;
+  let ambientSynthInterval = null;
+  let isAmbientAudioPlaying = false;
+
+  function createNoiseBuffer() {
+    const bufferSize = 2 * (audioCtx ? audioCtx.sampleRate : 44100);
+    const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
     const output = noiseBuffer.getChannelData(0);
     for (let i = 0; i < bufferSize; i++) {
       output[i] = Math.random() * 2 - 1;
     }
+    return noiseBuffer;
+  }
+
+  function playShuttleSound(time) {
+    if (!audioCtx) return;
     
-    noiseNode = soundscapeCtx.createBufferSource();
-    noiseNode.buffer = noiseBuffer;
-    noiseNode.loop = true;
+    // Rhythmic Click Node (wood clicking)
+    const clickOsc = audioCtx.createOscillator();
+    const clickGain = audioCtx.createGain();
+    clickOsc.type = 'triangle';
+    clickOsc.frequency.setValueAtTime(80, time);
+    clickOsc.frequency.exponentialRampToValueAtTime(10, time + 0.05);
+    
+    clickGain.gain.setValueAtTime(0.04, time);
+    clickGain.gain.exponentialRampToValueAtTime(0.001, time + 0.05);
+    
+    clickOsc.connect(clickGain);
+    clickGain.connect(audioCtx.destination);
+    
+    clickOsc.start(time);
+    clickOsc.stop(time + 0.06);
 
-    const noiseFilter = soundscapeCtx.createBiquadFilter();
+    // Sliding Shuttle Woosh (white noise sliding reed)
+    const noiseSource = audioCtx.createBufferSource();
+    noiseSource.buffer = createNoiseBuffer();
+    
+    const noiseFilter = audioCtx.createBiquadFilter();
     noiseFilter.type = 'bandpass';
-    noiseFilter.frequency.setValueAtTime(1000, soundscapeCtx.currentTime);
-    noiseFilter.Q.setValueAtTime(4, soundscapeCtx.currentTime);
-
-    noiseGain = soundscapeCtx.createGain();
-    noiseGain.gain.setValueAtTime(bobbinVolVal * 0.05, soundscapeCtx.currentTime);
-
-    noiseNode.connect(noiseFilter);
+    noiseFilter.frequency.setValueAtTime(600, time + 0.05);
+    noiseFilter.frequency.exponentialRampToValueAtTime(300, time + 0.35);
+    noiseFilter.Q.setValueAtTime(3.0, time);
+    
+    const noiseGain = audioCtx.createGain();
+    noiseGain.gain.setValueAtTime(0.0, time);
+    noiseGain.gain.linearRampToValueAtTime(0.02, time + 0.1);
+    noiseGain.gain.exponentialRampToValueAtTime(0.001, time + 0.38);
+    
+    noiseSource.connect(noiseFilter);
     noiseFilter.connect(noiseGain);
-    noiseGain.connect(soundscapeCtx.destination);
-    noiseNode.start();
-
-    triggerSoundscapeClacks();
-    triggerSoundscapePedal();
+    noiseGain.connect(audioCtx.destination);
+    
+    noiseSource.start(time);
+    noiseSource.stop(time + 0.4);
   }
 
-  function stopSoundscape() {
-    isSoundscapePlaying = false;
-    if (togglePlayBtn) {
-      togglePlayBtn.textContent = "START SYNTH";
-      togglePlayBtn.style.background = "";
+  function startAmbientLoomAudio() {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     }
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+    isAmbientAudioPlaying = true;
+    
+    // Play rhythmic weave sounds (click-clack slide pattern every 0.8 seconds)
+    let nextPlayTime = audioCtx.currentTime;
+    ambientSynthInterval = setInterval(() => {
+      const now = audioCtx.currentTime;
+      if (nextPlayTime < now + 0.1) {
+        playShuttleSound(nextPlayTime);
+        // Play another accent wood click shortly after for double-shuttle rhythm
+        playShuttleSound(nextPlayTime + 0.35);
+        nextPlayTime += 0.8;
+      }
+    }, 200);
+  }
 
-    if (droneOsc) {
-      try { droneOsc.stop(); } catch(e) {}
-      droneOsc = null;
-    }
-    if (noiseNode) {
-      try { noiseNode.stop(); } catch(e) {}
-      noiseNode = null;
-    }
-    if (clackTimer) {
-      clearTimeout(clackTimer);
-      clackTimer = null;
-    }
-    if (pedalTimer) {
-      clearTimeout(pedalTimer);
-      pedalTimer = null;
+  function stopAmbientLoomAudio() {
+    isAmbientAudioPlaying = false;
+    if (ambientSynthInterval) {
+      clearInterval(ambientSynthInterval);
+      ambientSynthInterval = null;
     }
   }
 
-  function triggerSoundscapeClacks() {
-    if (!isSoundscapePlaying || !soundscapeCtx) return;
-    const tempo = parseInt(document.getElementById('sound-clack-tempo').value);
-    const interval = 1000 / tempo;
-
-    const osc = soundscapeCtx.createOscillator();
-    const gain = soundscapeCtx.createGain();
-    osc.type = 'triangle';
-    osc.frequency.setValueAtTime(800, soundscapeCtx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(120, soundscapeCtx.currentTime + 0.04);
-    gain.gain.setValueAtTime(0.08, soundscapeCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.0001, soundscapeCtx.currentTime + 0.04);
-    osc.connect(gain);
-    gain.connect(soundscapeCtx.destination);
-    osc.start(); osc.stop(soundscapeCtx.currentTime + 0.05);
-
-    clackTimer = setTimeout(triggerSoundscapeClacks, interval);
-  }
-
-  function triggerSoundscapePedal() {
-    if (!isSoundscapePlaying || !soundscapeCtx) return;
-    const vol = parseInt(document.getElementById('sound-pedal-vol').value) / 100;
-
-    const osc = soundscapeCtx.createOscillator();
-    const gain = soundscapeCtx.createGain();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(55, soundscapeCtx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(20, soundscapeCtx.currentTime + 0.15);
-    gain.gain.setValueAtTime(vol * 0.18, soundscapeCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.0001, soundscapeCtx.currentTime + 0.15);
-    osc.connect(gain);
-    gain.connect(soundscapeCtx.destination);
-    osc.start(); osc.stop(soundscapeCtx.currentTime + 0.2);
-
-    pedalTimer = setTimeout(triggerSoundscapePedal, 1500);
-  }
-
-  if (togglePlayBtn) {
-    togglePlayBtn.onclick = () => {
-      if (isSoundscapePlaying) {
-        stopSoundscape();
+  const btnToggleAmbientAudio = document.getElementById('btn-toggle-ambient-audio');
+  if (btnToggleAmbientAudio) {
+    btnToggleAmbientAudio.onclick = () => {
+      if (isAmbientAudioPlaying) {
+        stopAmbientLoomAudio();
+        btnToggleAmbientAudio.textContent = "🔊 Loom Sound: Off";
+        btnToggleAmbientAudio.style.color = "var(--color-zari)";
       } else {
-        startSoundscape();
+        startAmbientLoomAudio();
+        btnToggleAmbientAudio.textContent = "🔊 Loom Sound: On";
+        btnToggleAmbientAudio.style.color = "#2ecc71";
       }
     };
   }
 
-  const sliderWarp = document.getElementById('sound-warp-freq');
-  const sliderClack = document.getElementById('sound-clack-tempo');
-  const sliderPedal = document.getElementById('sound-pedal-vol');
-  const sliderBobbin = document.getElementById('sound-bobbin-vol');
+  // --- LIVE LOOM STREAM MODAL ---
+  const btnOpenLoomBooking = document.getElementById('btn-open-loom-booking');
+  const liveLoomModal = document.getElementById('live-loom-modal');
+  const btnCloseLoomModal = document.getElementById('btn-close-loom-modal');
+  let loomStatsInterval = null;
 
-  function updateParams() {
-    if (sliderWarp) document.getElementById('val-warp-freq').textContent = `${sliderWarp.value}Hz`;
-    if (sliderClack) document.getElementById('val-clack-tempo').textContent = `${sliderClack.value}/s`;
-    if (sliderPedal) document.getElementById('val-pedal-vol').textContent = `${sliderPedal.value}%`;
-    if (sliderBobbin) document.getElementById('val-bobbin-vol').textContent = `${sliderBobbin.value}%`;
-
-    if (isSoundscapePlaying && soundscapeCtx) {
-      if (droneOsc) droneOsc.frequency.setValueAtTime(parseInt(sliderWarp.value), soundscapeCtx.currentTime);
-      if (noiseGain) noiseGain.gain.setValueAtTime((parseInt(sliderBobbin.value) / 100) * 0.05, soundscapeCtx.currentTime);
-    }
-  }
-
-  [sliderWarp, sliderClack, sliderPedal, sliderBobbin].forEach(s => {
-    if (s) s.addEventListener('input', updateParams);
-  });
-
-  const btnCottage = document.getElementById('preset-cottage');
-  const btnConcert = document.getElementById('preset-concert');
-
-  if (btnCottage) {
-    btnCottage.onclick = () => {
-      sliderWarp.value = 110;
-      sliderClack.value = 4;
-      sliderPedal.value = 60;
-      sliderBobbin.value = 40;
-      updateParams();
-    };
-  }
-
-  if (btnConcert) {
-    btnConcert.onclick = () => {
-      sliderWarp.value = 65;
-      sliderClack.value = 2;
-      sliderPedal.value = 30;
-      sliderBobbin.value = 10;
-      updateParams();
-    };
-  }
-
-  const vCanvas = document.getElementById('canvas-soundscape-visualizer');
-  if (!vCanvas) return;
-  const vCtx = vCanvas.getContext('2d');
-
-  function drawVisualizer() {
-    vCanvas.width = vCanvas.parentElement.clientWidth;
-    vCanvas.height = vCanvas.parentElement.clientHeight;
-
-    vCtx.clearRect(0, 0, vCanvas.width, vCanvas.height);
-    vCtx.fillStyle = 'rgba(10, 10, 15, 0.4)';
-    vCtx.fillRect(0, 0, vCanvas.width, vCanvas.height);
-
-    const time = Date.now() * 0.0025;
-    const midY = vCanvas.height / 2;
-
-    const wFreq = sliderWarp ? parseInt(sliderWarp.value) : 110;
-    const cTempo = sliderClack ? parseInt(sliderClack.value) : 5;
-    const pVol = sliderPedal ? parseInt(sliderPedal.value) : 50;
-    const bVol = sliderBobbin ? parseInt(sliderBobbin.value) : 30;
-
-    const threadData = [
-      { color: '#d4af37', amp: wFreq * 0.15, freq: 0.015, speed: 2.0, yOffset: -15 },
-      { color: '#c31b1b', amp: cTempo * 4.5, freq: 0.03, speed: 3.5, yOffset: -5 },
-      { color: '#ff8c00', amp: pVol * 0.35, freq: 0.01, speed: 1.5, yOffset: 10 },
-      { color: '#4169e1', amp: bVol * 0.3, freq: 0.04, speed: 5.0, yOffset: 20 }
-    ];
-
-    threadData.forEach(t => {
-      vCtx.beginPath();
-      vCtx.strokeStyle = t.color;
-      vCtx.lineWidth = isSoundscapePlaying ? 2 : 0.8;
+  if (btnOpenLoomBooking && liveLoomModal) {
+    btnOpenLoomBooking.onclick = () => {
+      liveLoomModal.style.display = 'flex';
+      playShowroomSound(580, 0.05, 0.1);
       
-      for (let x = 0; x <= vCanvas.width; x += 10) {
-        const activeAmp = isSoundscapePlaying ? t.amp : t.amp * 0.15 + 2;
-        const y = midY + t.yOffset + Math.sin(x * t.freq + time * t.speed) * activeAmp;
-        if (x === 0) vCtx.moveTo(x, y);
-        else vCtx.lineTo(x, y);
+      loomStatsInterval = setInterval(() => {
+        const tension = (7.8 + Math.random() * 1.2).toFixed(2);
+        const velocity = Math.floor(220 + Math.random() * 40);
+        document.getElementById('loom-stat-tension').textContent = `${tension} N`;
+        document.getElementById('loom-stat-velocity').textContent = `${velocity} picks/min`;
+      }, 1000);
+    };
+  }
+
+  if (btnCloseLoomModal && liveLoomModal) {
+    btnCloseLoomModal.onclick = () => {
+      liveLoomModal.style.display = 'none';
+      if (loomStatsInterval) {
+        clearInterval(loomStatsInterval);
+        loomStatsInterval = null;
       }
-      vCtx.stroke();
+      playShowroomSound(440, 0.05, 0.1);
+    };
+  }
+
+  // Intercept the main showroom CTA to drive high-touch curated matching
+  if (btnAcquireShowroom) {
+    btnAcquireShowroom.onclick = (e) => {
+      e.preventDefault();
+      openConcierge();
+    };
+  }
+
+  // Bind custom actions
+  const btnSamples = document.getElementById('btn-request-samples');
+  const btnSchedule = document.getElementById('btn-concierge-schedule');
+  const successText = document.getElementById('sample-success-text');
+
+  if (btnSamples) {
+    btnSamples.onclick = () => {
+      if (successText) {
+        successText.textContent = "✓ Custom Thread Chest requested. Priyadarshini will contact you to verify details.";
+        successText.style.display = 'block';
+        gsap.from(successText, { y: 10, opacity: 0, duration: 0.3 });
+      }
+      playShowroomSound(880, 0.08, 0.15);
+    };
+  }
+
+  if (btnSchedule) {
+    btnSchedule.onclick = () => {
+      if (successText) {
+        successText.textContent = "✓ Callback request received. A stylist will reach you within 2 hours.";
+        successText.style.display = 'block';
+        gsap.from(successText, { y: 10, opacity: 0, duration: 0.3 });
+      }
+      playShowroomSound(880, 0.08, 0.15);
+    };
+  }
+
+  // Interactive Concierge Chat Bot
+  const chatForm = document.getElementById('form-concierge-chat');
+  const chatInput = document.getElementById('concierge-chat-input');
+  const chatHistory = document.getElementById('concierge-chat-history');
+  const typingIndicator = document.getElementById('concierge-typing-indicator');
+
+  if (chatForm && chatInput && chatHistory) {
+    chatForm.onsubmit = (e) => {
+      e.preventDefault();
+      const rawMsg = chatInput.value.trim();
+      if (!rawMsg) return;
+
+      chatInput.value = '';
+
+      // 1. Append User Message
+      const userBubble = document.createElement('div');
+      userBubble.style.cssText = "align-self:flex-end; background:rgba(255,255,255,0.06); padding:8px 12px; border-radius:12px 12px 0 12px; border:1px solid rgba(255,255,255,0.1); max-width:85%; color:#fff;";
+      userBubble.textContent = rawMsg;
+      chatHistory.appendChild(userBubble);
+      chatHistory.scrollTop = chatHistory.scrollHeight;
+
+      playShowroomSound(480, 0.03, 0.05);
+
+      // 2. Show Typing Status
+      if (typingIndicator) typingIndicator.style.visibility = 'visible';
+
+      // 3. Process Keyword Match Response
+      const lower = rawMsg.toLowerCase();
+      let reply = "";
+
+      if (lower.includes('ship') || lower.includes('delivery') || lower.includes('time') || lower.includes('day')) {
+        reply = "We offer insured global express shipping via DHL and FedEx. Delivery to the USA, UK, and Canada takes 3-6 business days, packed in customized wooden chests.";
+      } else if (lower.includes('blue') || lower.includes('navy') || lower.includes('indigo') || lower.includes('bomkai')) {
+        reply = "I recommend our classic Indigo weave. Click here to <span class='chat-deep-link' data-action='model' data-value='7' style='color:var(--color-zari); cursor:pointer; text-decoration:underline; font-weight:bold;'>[Load Bomkai Classic Model Look]</span>.";
+      } else if (lower.includes('green') || lower.includes('emerald') || lower.includes('khandua')) {
+        reply = "Our green and gold weaves are breathtaking. You can preview it here: <span class='chat-deep-link' data-action='model' data-value='8' style='color:var(--color-zari); cursor:pointer; text-decoration:underline; font-weight:bold;'>[Load Khandua Signature Model Look]</span>.";
+      } else if (lower.includes('crimson') || lower.includes('red') || lower.includes('sambalpuri')) {
+        reply = "Preview our Sambalpuri Crimson look here: <span class='chat-deep-link' data-action='model' data-value='6' style='color:var(--color-zari); cursor:pointer; text-decoration:underline; font-weight:bold;'>[Load Sambalpuri Relic Model Look]</span>.";
+      } else if (lower.includes('custom') || lower.includes('color') || lower.includes('dye') || lower.includes('motif')) {
+        reply = "Yes! You can configure custom body pigments, Saturation levels, and border motifs. Click here to <span class='chat-deep-link' data-action='tab' data-value='designer' style='color:var(--color-zari); cursor:pointer; text-decoration:underline; font-weight:bold;'>[Open Designer Panel]</span>.";
+      } else if (lower.includes('size') || lower.includes('length') || lower.includes('long') || lower.includes('blouse')) {
+        reply = "Our sarees adhere to the traditional length of 5.5 meters, accompanied by an additional 80cm matching blouse piece. Contact us on WhatsApp for custom sizing.";
+      } else if (lower.includes('authent') || lower.includes('origin') || lower.includes('provenance') || lower.includes('loom') || lower.includes('burn')) {
+        reply = "All products are woven on traditional zero-electricity wooden handlooms. To see the weaver ledger and transit map, click here: <span class='chat-deep-link' data-action='cert' style='color:var(--color-zari); cursor:pointer; text-decoration:underline; font-weight:bold;'>[Open Provenance Certificate]</span>.";
+      } else if (lower.includes('price') || lower.includes('cost') || lower.includes('rupee') || lower.includes('fiat')) {
+        reply = "Prices for our premium heritage silks begin at ₹1,25,000. Select a variation to recalculate the specific weave cost.";
+      } else {
+        reply = "That is a beautiful enquiry. Let me escalate this to our master cooperative. Click 'Continue on WhatsApp' below to speak to our lead styling consultant directly.";
+      }
+
+      // Simulate typing latency
+      setTimeout(() => {
+        if (typingIndicator) typingIndicator.style.visibility = 'hidden';
+
+        const replyBubble = document.createElement('div');
+        replyBubble.style.cssText = "align-self:flex-start; background:rgba(212,175,55,0.08); padding:8px 12px; border-radius:12px 12px 12px 0; border:1px solid rgba(212,175,55,0.2); max-width:85%; color:rgba(255,255,255,0.95);";
+        replyBubble.innerHTML = reply;
+
+        chatHistory.appendChild(replyBubble);
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+
+        playShowroomSound(660, 0.04, 0.08);
+      }, 1200);
+    };
+  }
+
+  // Click delegation for chat history deep-links
+  if (chatHistory) {
+    chatHistory.addEventListener('click', (e) => {
+      const link = e.target.closest('.chat-deep-link');
+      if (!link) return;
+      const action = link.getAttribute('data-action');
+      const val = link.getAttribute('data-value');
+
+      if (action === 'model') {
+        const btn = document.querySelector(`.model-option[data-model="${val}"]`);
+        if (btn) btn.click();
+      } else if (action === 'tab') {
+        const btn = document.getElementById('tab-customizer');
+        if (btn) btn.click();
+      } else if (action === 'cert') {
+        const btn = document.getElementById('btn-generate-certificate');
+        if (btn) btn.click();
+      }
+      playShowroomSound(780, 0.05, 0.08);
+    });
+  }
+}
+
+
+/* ==========================================================
+   SURPRISE FEATURE: SILK CONSTELLATION AMBIENT CANVAS
+   Golden node-thread network on the Genesis hero section
+   that breathes and reacts to mouse — like a glowing silk web
+========================================================== */
+function setupSilkConstellation() {
+  const genesis = document.getElementById('genesis');
+  if (!genesis) return;
+
+  const canvas = document.createElement('canvas');
+  canvas.id = 'canvas-silk-constellation';
+  canvas.style.cssText = `
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 1; opacity: 0.55;
+  `;
+  genesis.appendChild(canvas);
+
+  let mouse = { x: -9999, y: -9999 };
+  genesis.addEventListener('mousemove', (e) => {
+    const rect = genesis.getBoundingClientRect();
+    mouse.x = e.clientX - rect.left;
+    mouse.y = e.clientY - rect.top;
+  });
+  genesis.addEventListener('mouseleave', () => { mouse.x = -9999; mouse.y = -9999; });
+
+  const NODE_COUNT = 42;
+  const CONNECTION_DIST = 160;
+  const MOUSE_REPEL = 110;
+
+  function makeNode(w, h) {
+    return {
+      x: Math.random() * w,
+      y: Math.random() * h,
+      vx: (Math.random() - 0.5) * 0.28,
+      vy: (Math.random() - 0.5) * 0.28,
+      r: 1.2 + Math.random() * 2.2,
+      hue: 40 + Math.random() * 30
+    };
+  }
+
+  let nodes = [];
+  let animId = null;
+
+  function resize() {
+    canvas.width = genesis.offsetWidth;
+    canvas.height = genesis.offsetHeight;
+    nodes = Array.from({ length: NODE_COUNT }, () => makeNode(canvas.width, canvas.height));
+  }
+
+  resize();
+  window.addEventListener('resize', resize);
+
+  const ctx = canvas.getContext('2d');
+
+  function drawConstellation() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const t = Date.now() * 0.0008;
+    const cw = canvas.width, ch = canvas.height;
+
+    // Update node positions
+    nodes.forEach((n, i) => {
+      // Gentle sine drift
+      n.x += n.vx + Math.sin(t + i * 0.7) * 0.08;
+      n.y += n.vy + Math.cos(t + i * 0.5) * 0.08;
+
+      // Mouse repel
+      const dx = n.x - mouse.x;
+      const dy = n.y - mouse.y;
+      const dist = Math.hypot(dx, dy);
+      if (dist < MOUSE_REPEL && dist > 0) {
+        const force = (MOUSE_REPEL - dist) / MOUSE_REPEL * 1.2;
+        n.x += (dx / dist) * force;
+        n.y += (dy / dist) * force;
+      }
+
+      // Wrap at edges
+      if (n.x < 0) n.x = cw;
+      if (n.x > cw) n.x = 0;
+      if (n.y < 0) n.y = ch;
+      if (n.y > ch) n.y = 0;
     });
 
-    requestAnimationFrame(drawVisualizer);
+    // Draw connections
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i + 1; j < nodes.length; j++) {
+        const a = nodes[i], b = nodes[j];
+        const dx = b.x - a.x, dy = b.y - a.y;
+        const d = Math.hypot(dx, dy);
+        if (d < CONNECTION_DIST) {
+          const alpha = (1 - d / CONNECTION_DIST) * 0.4;
+          ctx.save();
+          ctx.globalAlpha = alpha;
+          ctx.strokeStyle = `hsl(${(a.hue + b.hue) / 2}, 80%, 72%)`;
+          ctx.lineWidth = alpha * 2.2;
+          ctx.shadowColor = 'rgba(255, 215, 0, 0.6)';
+          ctx.shadowBlur = 3;
+          ctx.beginPath();
+          ctx.moveTo(a.x, a.y);
+          ctx.lineTo(b.x, b.y);
+          ctx.stroke();
+          ctx.restore();
+        }
+      }
+    }
+
+    // Draw nodes
+    nodes.forEach(n => {
+      const pulse = 1 + Math.sin(t * 2.1 + n.hue) * 0.3;
+      ctx.save();
+      ctx.globalAlpha = 0.75;
+      ctx.fillStyle = `hsl(${n.hue}, 90%, 75%)`;
+      ctx.shadowColor = `hsl(${n.hue}, 100%, 65%)`;
+      ctx.shadowBlur = 8;
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, n.r * pulse, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    });
+
+    animId = requestAnimationFrame(drawConstellation);
   }
 
-  drawVisualizer();
+  drawConstellation();
 }
+
+
+/* ==========================================================
+   SURPRISE FEATURE: CURATOR WHISPER EASTER EGG
+   Hold the brand logo for 3 seconds to hear a sacred shloka
+   typed across the screen, then gracefully fade away
+========================================================== */
+function setupCuratorWhisper() {
+  const brand = document.querySelector('.brand-lockup');
+  if (!brand) return;
+
+  const SHLOKAS = [
+    "ଓ ଜଗନ୍ନାଥ ସ୍ୱାମୀ ନୟନ ପଥ ଗାମୀ ଭବତୁ ମେ",
+    "ललित लवङ्ग लता परिशीलन कोमल मलयसमीरे",
+    "ସୂତ ବୁଣୁ ସୂତ — ଧାଗା ପ୍ରତ୍ୟେକ ଇତିହାସ",
+    "Every thread is a prayer. Every loom a temple."
+  ];
+
+  let holdTimer = null;
+  let overlay = null;
+  let typeIdx = 0;
+  let typeTimer = null;
+
+  function clearWhisper() {
+    if (overlay) {
+      overlay.style.opacity = '0';
+      setTimeout(() => { if (overlay) { overlay.remove(); overlay = null; } }, 700);
+    }
+    if (typeTimer) { clearInterval(typeTimer); typeTimer = null; }
+  }
+
+  function triggerWhisper() {
+    const shloka = SHLOKAS[Math.floor(Math.random() * SHLOKAS.length)];
+    clearWhisper();
+
+    overlay = document.createElement('div');
+    overlay.id = 'curator-whisper-overlay';
+    overlay.style.cssText = `
+      position: fixed; inset: 0; z-index: 9998; display: flex;
+      align-items: center; justify-content: center;
+      pointer-events: none; background: rgba(0,0,0,0.01);
+      transition: opacity 0.7s ease;
+      opacity: 0;
+    `;
+
+    const txt = document.createElement('div');
+    txt.style.cssText = `
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.1rem, 3vw, 2.2rem);
+      font-style: italic;
+      color: rgba(212, 175, 55, 0.92);
+      text-align: center;
+      max-width: 70vw;
+      letter-spacing: 0.06em;
+      line-height: 1.6;
+      text-shadow: 0 0 40px rgba(212, 175, 55, 0.4), 0 0 80px rgba(212, 175, 55, 0.15);
+      border-bottom: 1px solid rgba(212, 175, 55, 0.25);
+      padding-bottom: 0.5em;
+    `;
+    overlay.appendChild(txt);
+    document.body.appendChild(overlay);
+
+    requestAnimationFrame(() => { overlay.style.opacity = '1'; });
+
+    // Play gentle chime
+    if (audioCtx && audioCtx.state === 'running') {
+      try {
+        [330, 440, 550].forEach((freq, i) => {
+          setTimeout(() => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 1.2);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + 1.2);
+          }, i * 220);
+        });
+      } catch(e) {}
+    }
+
+    // Typewriter effect
+    typeIdx = 0;
+    txt.textContent = '';
+    typeTimer = setInterval(() => {
+      if (typeIdx < shloka.length) {
+        txt.textContent += shloka[typeIdx];
+        typeIdx++;
+      } else {
+        clearInterval(typeTimer);
+        typeTimer = null;
+        // Auto-dismiss after 4s
+        setTimeout(clearWhisper, 4200);
+      }
+    }, 48);
+  }
+
+  brand.addEventListener('mousedown', () => {
+    holdTimer = setTimeout(() => { triggerWhisper(); holdTimer = null; }, 3000);
+  });
+
+  brand.addEventListener('mouseup', () => {
+    if (holdTimer) { clearTimeout(holdTimer); holdTimer = null; }
+  });
+
+  brand.addEventListener('mouseleave', () => {
+    if (holdTimer) { clearTimeout(holdTimer); holdTimer = null; }
+  });
+
+  brand.setAttribute('title', 'Hold for 3 seconds...');
+}
+

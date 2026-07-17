@@ -127,8 +127,8 @@ html, body {
   text-transform: uppercase;
 }
 
-/* Audio Modal */
-.audio-prompt-overlay {
+/* Entry Gate Modal */
+.entry-gate-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -143,12 +143,12 @@ html, body {
   opacity: 1;
   transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.audio-prompt-overlay.hidden {
+.entry-gate-overlay.hidden {
   opacity: 0;
   pointer-events: none;
   visibility: hidden;
 }
-.audio-prompt-card {
+.entry-gate-card {
   max-width: 480px;
   background: rgba(15, 15, 15, 0.6);
   border: 1px solid rgba(212, 175, 55, 0.25);
@@ -157,20 +157,20 @@ html, body {
   text-align: center;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(212, 175, 55, 0.05);
 }
-.audio-prompt-title {
+.entry-gate-title {
   font-family: var(--font-serif);
   font-size: 2.2rem;
   font-weight: 300;
   margin-bottom: 1.5rem;
   color: var(--color-accent);
 }
-.audio-prompt-desc {
+.entry-gate-desc {
   color: var(--color-text-muted);
   font-size: 0.95rem;
   line-height: 1.6;
   margin-bottom: 2.5rem;
 }
-.audio-prompt-buttons {
+.entry-gate-buttons {
   display: flex;
   gap: 1rem;
   justify-content: center;
@@ -846,13 +846,19 @@ html, body {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(2, 2, 2, 0.97);
-  backdrop-filter: blur(20px);
   z-index: 2000;
   display: flex;
   flex-direction: column;
   opacity: 1;
   transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(2, 2, 2, 0.97);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  z-index: 1;
 }
 .modal-overlay.hidden {
   opacity: 0;
@@ -868,6 +874,7 @@ html, body {
   left: 50%;
   transform: translate(-50%, -50%);
   pointer-events: none;
+  z-index: 2;
 }
 .modal-close-btn {
   position: absolute;
@@ -1336,6 +1343,7 @@ html, body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  z-index: 2;
 }
 
 /* Canvas fills entire modal */
@@ -1400,7 +1408,7 @@ html, body {
 }
 #showroom-title {
   font-family: var(--font-serif);
-  font-size: clamp(1.4rem, 3vw, 2.4rem);
+  font-size: clamp(1.2rem, 2.2vw, 1.7rem);
   font-weight: 300;
   color: #fff;
   margin: 0;
@@ -1415,6 +1423,7 @@ html, body {
   flex-direction: column;
   align-items: flex-end;
   gap: 0.15rem;
+  margin-right: 3rem;
 }
 .price-label-top {
   font-size: 0.6rem;
@@ -1498,7 +1507,7 @@ html, body {
   font-weight: 700;
   letter-spacing: .16em;
 }
-.model-options { display: flex; gap: .35rem; }
+.model-options { display: flex; gap: .35rem; flex-wrap: wrap; }
 .model-option {
   width: 22px;
   height: 22px;
@@ -1520,23 +1529,31 @@ html, body {
 /* ── Floating Bottom Control Bar ────────────────────────────────────────── */
 .showroom-bottom-bar {
   position: absolute;
-  bottom: 0; left: 0; right: 0;
+  bottom: 1.5rem;
+  left: calc(50% + 70px);
+  transform: translateX(-50%);
   z-index: 20;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 1rem 2rem 1.4rem;
-  background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 100%);
-  backdrop-filter: blur(0px);
-  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 0.6rem 1.2rem;
+  background: rgba(18, 18, 23, 0.85);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 40px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  flex-wrap: nowrap;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), bottom 0.4s ease;
+}
+.showroom-bottom-bar.retracted {
+  transform: translateX(-50%) translateY(calc(100% - 15px));
 }
 .bottom-bar-group {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0 0.75rem;
+  gap: 0.3rem;
+  padding: 0 0.5rem;
   border-right: 1px solid rgba(255,255,255,0.07);
 }
 .bottom-bar-group:last-child { border-right: none; }
@@ -1626,12 +1643,29 @@ html, body {
   70%  { transform: scale(1);    box-shadow: 0 0 0 5px rgba(46, 204, 113, 0); }
   100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
 }
+@keyframes dash {
+  to {
+    stroke-dashoffset: -40;
+  }
+}
 
 @media (max-width: 768px) {
   .avatar-sidebar { display: none; }
   .showroom-title-strip { padding: 1rem; }
   #showroom-title { font-size: 1.2rem; }
-  .showroom-bottom-bar { gap: 0.3rem; padding: 0.8rem 1rem 1rem; }
+  .showroom-bottom-bar { 
+    left: 0; 
+    right: 0; 
+    bottom: 0; 
+    border-radius: 0; 
+    border: none;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    background: rgba(18, 18, 23, 0.95);
+    gap: 0.3rem; 
+    padding: 0.8rem 1rem 1rem; 
+    flex-wrap: wrap; 
+    justify-content: center;
+  }
   .bottom-bar-group { padding: 0 0.4rem; }
 }
 
@@ -1928,4 +1962,289 @@ body.cursor-drag .custom-cursor-ring::after {
   background: var(--color-zari);
   cursor: pointer;
   box-shadow: 0 0 6px var(--color-zari);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   LUXURY UI UPGRADE LAYER  ·  The Loom of Time  v3.0
+   All rules below are ADDITIVE — zero interference with existing
+═══════════════════════════════════════════════════════════════ */
+
+/* ── Animated Zari-thread Loader bar ────────────────────────── */
+@keyframes zari-march {
+  from { background-position: 0% 0%; }
+  to   { background-position: 200% 0%; }
+}
+.loader-bar {
+  background: linear-gradient(
+    90deg,
+    var(--color-accent) 0%,
+    #fff8c0 35%,
+    var(--color-accent) 50%,
+    #b8860b 65%,
+    var(--color-accent) 100%
+  );
+  background-size: 200% 100%;
+  animation: zari-march 1.8s linear infinite;
+  height: 2px;
+}
+.loader-bar-wrap {
+  height: 2px;
+  border-radius: 2px;
+  overflow: hidden;
+}
+.loader-title {
+  background: linear-gradient(135deg, #d4af37 0%, #fff8c0 45%, #d4af37 60%, #b8860b 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 200% 100%;
+  animation: zari-march 4s linear infinite;
+}
+
+/* ── Entry Gate — Premium Glassmorphism ─────────────────────── */
+.entry-gate-card {
+  background: rgba(8, 6, 4, 0.72) !important;
+  backdrop-filter: blur(32px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(160%) !important;
+  border: 1px solid rgba(212, 175, 55, 0.35) !important;
+  box-shadow:
+    0 0 0 1px rgba(212, 175, 55, 0.08) inset,
+    0 30px 80px rgba(0, 0, 0, 0.9),
+    0 0 60px rgba(212, 175, 55, 0.07) !important;
+}
+.entry-gate-title {
+  background: linear-gradient(135deg, #f4cf61 0%, #d4af37 45%, #fff8c0 65%, #b8860b 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 200% 100%;
+  animation: zari-march 5s linear infinite;
+}
+
+/* ── Vault Saree Cards — Foil Shimmer ───────────────────────── */
+@keyframes foil-sweep {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.saree-card {
+  isolation: isolate;
+}
+.saree-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  background: linear-gradient(
+    120deg,
+    transparent 0%,
+    rgba(255, 240, 160, 0.12) 30%,
+    rgba(255, 255, 255, 0.22) 50%,
+    rgba(255, 240, 160, 0.12) 70%,
+    transparent 100%
+  );
+  background-size: 300% 100%;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+  z-index: 5;
+}
+.saree-card:hover::after {
+  opacity: 1;
+  animation: foil-sweep 1.6s linear infinite;
+}
+.saree-card:hover .saree-layer.layer-silk {
+  box-shadow: 0 16px 60px rgba(0,0,0,0.7), 0 0 30px rgba(212, 175, 55, 0.2);
+}
+
+/* ── CTAs — Zari Border Glow on Hover ─────────────────────── */
+.btn-primary {
+  position: relative;
+  overflow: hidden;
+}
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: conic-gradient(
+    from var(--angle, 0deg),
+    transparent 0%, #d4af37 20%, #fff8c0 40%, #d4af37 60%, transparent 80%
+  );
+  border-radius: 6px;
+  opacity: 0;
+  transition: opacity 0.4s;
+  z-index: -1;
+  animation: spin-border 3s linear infinite;
+}
+.btn-primary:hover::before {
+  opacity: 1;
+}
+@keyframes spin-border {
+  to { --angle: 360deg; }
+}
+@property --angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+/* ── Vault Scarcity Chip ─────────────────────────────────────── */
+.vault-scarcity {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #000;
+  background: linear-gradient(90deg, #d4af37, #fff8c0, #d4af37);
+  background-size: 200% 100%;
+  animation: zari-march 2.5s linear infinite;
+  padding: 0.2em 0.8em;
+  border-radius: 100px;
+  margin-bottom: 0.5rem;
+  width: fit-content;
+}
+
+/* ── Section Silk-Curtain Reveal (Progressive enhancement) ────── */
+@keyframes silk-reveal {
+  from { clip-path: inset(0 0 100% 0); opacity: 0; transform: translateY(8px); }
+  to   { clip-path: inset(0 0 0% 0);   opacity: 1; transform: translateY(0px); }
+}
+.section-reveal {
+  animation: silk-reveal 1.1s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.section-reveal:nth-child(2) { animation-delay: 0.12s; }
+.section-reveal:nth-child(3) { animation-delay: 0.22s; }
+.section-reveal:nth-child(4) { animation-delay: 0.32s; }
+
+/* ── Model Selector — Avatar Pulse Glow ────────────────────── */
+.model-option {
+  position: relative;
+  overflow: visible !important;
+}
+.model-option[data-selected="true"],
+.model-option.active,
+.model-option:focus {
+  box-shadow:
+    0 0 0 2px rgba(212, 175, 55, 0.6),
+    0 0 14px rgba(212, 175, 55, 0.35),
+    0 0 30px rgba(212, 175, 55, 0.12) !important;
+  outline: none;
+}
+
+/* ── Live Scarcity Ticker ───────────────────────────────────── */
+.loom-queue-ticker {
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: rgba(212, 175, 55, 0.7);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.loom-queue-ticker::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #d4af37;
+  box-shadow: 0 0 6px #d4af37;
+  animation: pulse-dot 2s infinite;
+  flex-shrink: 0;
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.4; transform: scale(0.7); }
+}
+
+/* ── Unweave Modal — Luxury Frame ────────────────────────────── */
+#unweave-modal {
+  background: rgba(3, 3, 3, 0.96) !important;
+}
+#unweave-modal .showroom-panel {
+  border: 1px solid rgba(212, 175, 55, 0.25) !important;
+  background: rgba(10, 8, 6, 0.7) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(212, 175, 55, 0.06),
+    0 40px 100px rgba(0, 0, 0, 0.9),
+    0 0 80px rgba(212, 175, 55, 0.05) !important;
+}
+
+/* ── Canvas Drape — Corner Brand Mark ────────────────────────── */
+#canvas-drape {
+  cursor: grab;
+  border-radius: 8px;
+}
+#canvas-drape:active {
+  cursor: grabbing;
+}
+
+/* ── Showroom Section Headers — Gold Underline Slide ─────────── */
+@keyframes line-grow {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+.section-headline-accent {
+  position: relative;
+  display: inline-block;
+}
+.section-headline-accent::after {
+  content: '';
+  position: absolute;
+  bottom: -6px; left: 0;
+  width: 100%; height: 1px;
+  background: linear-gradient(90deg, var(--color-accent), transparent);
+  transform-origin: left center;
+  transform: scaleX(0);
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.section-headline-accent.in-view::after {
+  animation: line-grow 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ── Ambient Noise Grain ─────────────────────────────────────── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 9000;
+  opacity: 0.028;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 200px 200px;
+}
+
+/* ── Silk Constellation Canvas ───────────────────────────────── */
+#canvas-silk-constellation {
+  mix-blend-mode: screen;
+}
+
+/* ── Curator Whisper Overlay ─────────────────────────────────── */
+#curator-whisper-overlay {
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+
+/* ── Mobile Touch Optimisations ─────────────────────────────── */
+@media (max-width: 768px) {
+  .saree-card {
+    width: 300px;
+    height: 420px;
+  }
+  .entry-gate-card {
+    padding: 2rem 1.5rem !important;
+  }
+  .entry-gate-buttons {
+    flex-direction: column;
+  }
+  .btn-primary::before {
+    display: none; /* skip conic-gradient on mobile for perf */
+  }
+  body::before {
+    opacity: 0.018; /* lighter grain on mobile */
+  }
 }

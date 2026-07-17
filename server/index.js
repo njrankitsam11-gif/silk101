@@ -19,18 +19,44 @@ app.use((req, res, next) => {
 
 // ── INVENTORY API ──────────────────────────────────────────────────────────
 
+const ITEM_VARIATIONS = {
+  'Ikat': [
+    { name: "Standard 80-Count Weave", price_delta: 0 },
+    { name: "Premium 120-Count Fine Double-Warp Weave", price_delta: 18000 },
+    { name: "Gilded Silver Zari Border Custom Pallu", price_delta: 35000 }
+  ],
+  'Chanderi': [
+    { name: "Traditional Silk-Cotton Sheer Blend", price_delta: 0 },
+    { name: "Pure Silk-Tissue Warp border variation", price_delta: 12000 },
+    { name: "Heavy Gold-Thread Zari Motif border variation", price_delta: 25000 }
+  ],
+  'Kanjivaram': [
+    { name: "Standard Kanjivaram 2-Ply Silk Weave", price_delta: 0 },
+    { name: "Exquisite 3-Ply Gold Zari Brocade Temple Border", price_delta: 25000 }
+  ],
+  'Tissue Silk': [
+    { name: "Fine Golden Tissue Silk Weave", price_delta: 0 },
+    { name: "Heavily Ornamented Gold-Thread Zari Pallu Relic", price_delta: 30000 }
+  ]
+};
+
 // GET all inventory
 app.get('/api/inventory', (req, res) => {
   try {
     const stmt = db.prepare(`
-      SELECT i.*, a.name AS artisan_name, a.location AS artisan_location, c.name AS category_name
+      SELECT i.*, a.name AS artisan_name, a.location AS artisan_location, a.experience_years AS artisan_exp, a.bio AS artisan_bio, c.name AS category_name
       FROM inventory i
       LEFT JOIN artisans a ON i.artisan_id = a.id
       LEFT JOIN categories c ON i.category_id = c.id
       ORDER BY i.id DESC
     `);
     const items = stmt.all();
-    res.json(items);
+    const itemsWithVars = items.map(item => {
+      const cat = item.category_name || 'Ikat';
+      const variations = ITEM_VARIATIONS[cat] || ITEM_VARIATIONS['Ikat'];
+      return { ...item, variations };
+    });
+    res.json(itemsWithVars);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

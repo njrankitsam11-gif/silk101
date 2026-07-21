@@ -3945,6 +3945,10 @@ function setupInteractiveExtensions() {
       visualizerWaves.style.display = 'flex';
     }
 
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+
     if (audioCtx) {
       try {
         if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -3987,6 +3991,7 @@ function setupInteractiveExtensions() {
         osc.connect(filter);
         osc2.connect(filter);
         filter.connect(delay);
+        delay.connect(gain);
         filter.connect(gain);
         gain.connect(audioCtx.destination);
         

@@ -43,7 +43,7 @@
     <!-- Fonts prefetching -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Outfit:wght@200;300;400;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
 
     <!-- Structured Data: Organization & LocalBusiness -->
     <script type="application/ld+json">
@@ -129,22 +129,116 @@
     </script>
   </head>
   <body>
+    <!-- Custom Silk Thread Cursor -->
+    <div id="cursor-dot"></div>
+    <div id="cursor-ring"></div>
+
     <a class="skip-link" href="#genesis">Skip to the story</a>
-    <!-- Premium Loading Overlay -->
+
+    <!-- Konark Chakra Loading Overlay -->
     <div id="loader" class="loader-overlay">
       <div class="loader-content">
-        <span class="loader-tagline">ANTIGRAVITI PRESENTS</span>
+        <span class="loader-tagline">Antigraviti Presents</span>
+        <!-- 24-spoked Konark Sun Temple Chakra -->
+        <svg class="konark-chakra" viewBox="0 0 100 100" aria-hidden="true">
+          <circle cx="50" cy="50" r="46" stroke="rgba(201,162,39,0.15)" stroke-width="1" fill="none"/>
+          <circle cx="50" cy="50" r="6" fill="rgba(201,162,39,0.4)" />
+          <!-- 24 spokes -->
+          <line class="chakra-spoke" style="--i:0"  x1="50" y1="44" x2="50" y2="8"  transform="rotate(0   50 50)"/>
+          <line class="chakra-spoke" style="--i:1"  x1="50" y1="44" x2="50" y2="8"  transform="rotate(15  50 50)"/>
+          <line class="chakra-spoke" style="--i:2"  x1="50" y1="44" x2="50" y2="8"  transform="rotate(30  50 50)"/>
+          <line class="chakra-spoke" style="--i:3"  x1="50" y1="44" x2="50" y2="8"  transform="rotate(45  50 50)"/>
+          <line class="chakra-spoke" style="--i:4"  x1="50" y1="44" x2="50" y2="8"  transform="rotate(60  50 50)"/>
+          <line class="chakra-spoke" style="--i:5"  x1="50" y1="44" x2="50" y2="8"  transform="rotate(75  50 50)"/>
+          <line class="chakra-spoke" style="--i:6"  x1="50" y1="44" x2="50" y2="8"  transform="rotate(90  50 50)"/>
+          <line class="chakra-spoke" style="--i:7"  x1="50" y1="44" x2="50" y2="8"  transform="rotate(105 50 50)"/>
+          <line class="chakra-spoke" style="--i:8"  x1="50" y1="44" x2="50" y2="8"  transform="rotate(120 50 50)"/>
+          <line class="chakra-spoke" style="--i:9"  x1="50" y1="44" x2="50" y2="8"  transform="rotate(135 50 50)"/>
+          <line class="chakra-spoke" style="--i:10" x1="50" y1="44" x2="50" y2="8"  transform="rotate(150 50 50)"/>
+          <line class="chakra-spoke" style="--i:11" x1="50" y1="44" x2="50" y2="8"  transform="rotate(165 50 50)"/>
+          <line class="chakra-spoke" style="--i:12" x1="50" y1="44" x2="50" y2="8"  transform="rotate(180 50 50)"/>
+          <line class="chakra-spoke" style="--i:13" x1="50" y1="44" x2="50" y2="8"  transform="rotate(195 50 50)"/>
+          <line class="chakra-spoke" style="--i:14" x1="50" y1="44" x2="50" y2="8"  transform="rotate(210 50 50)"/>
+          <line class="chakra-spoke" style="--i:15" x1="50" y1="44" x2="50" y2="8"  transform="rotate(225 50 50)"/>
+          <line class="chakra-spoke" style="--i:16" x1="50" y1="44" x2="50" y2="8"  transform="rotate(240 50 50)"/>
+          <line class="chakra-spoke" style="--i:17" x1="50" y1="44" x2="50" y2="8"  transform="rotate(255 50 50)"/>
+          <line class="chakra-spoke" style="--i:18" x1="50" y1="44" x2="50" y2="8"  transform="rotate(270 50 50)"/>
+          <line class="chakra-spoke" style="--i:19" x1="50" y1="44" x2="50" y2="8"  transform="rotate(285 50 50)"/>
+          <line class="chakra-spoke" style="--i:20" x1="50" y1="44" x2="50" y2="8"  transform="rotate(300 50 50)"/>
+          <line class="chakra-spoke" style="--i:21" x1="50" y1="44" x2="50" y2="8"  transform="rotate(315 50 50)"/>
+          <line class="chakra-spoke" style="--i:22" x1="50" y1="44" x2="50" y2="8"  transform="rotate(330 50 50)"/>
+          <line class="chakra-spoke" style="--i:23" x1="50" y1="44" x2="50" y2="8"  transform="rotate(345 50 50)"/>
+          <!-- Outer rim -->
+          <circle cx="50" cy="50" r="46" stroke="rgba(201,162,39,0.3)" stroke-width="1.5" fill="none" stroke-dasharray="4 3"/>
+        </svg>
         <h1 class="loader-title">The Loom of Time</h1>
         <div class="loader-bar-wrap">
           <div class="loader-bar"></div>
         </div>
-        <span class="loader-status">Preparing digital threads...</span>
+        <span class="loader-status" id="loader-status-text">Preparing digital threads...</span>
       </div>
     </div>
 
     <!-- Premium Scroll Progress Indicator -->
     <div class="scroll-progress-container" style="position:fixed; top:0; left:0; width:100%; height:3px; z-index:9999; pointer-events:none;">
-      <div class="scroll-progress-fill" style="width:0%; height:100%; background:linear-gradient(90deg, #dfba55 0%, #fff8c0 50%, #dfba55 100%); transition:width 0.1s ease-out;"></div>
+      <div class="scroll-progress-fill" style="width:0%; height:100%; background:linear-gradient(90deg, #7a5c0a 0%, #c9a227 30%, #f7d76d 50%, #c9a227 70%, #7a5c0a 100%); background-size:200%; animation:liquid-gold 2s linear infinite; transition:width 0.1s ease-out;"></div>
+    </div>
+
+    <!-- Live Weaving Session Countdown Ribbon -->
+    <div id="weaving-countdown-ribbon">
+      <div class="ribbon-dot"></div>
+      <span>Next Loom Session Opens In:</span>
+      <span class="clock" id="ribbon-countdown">--:--:--</span>
+      <span style="opacity:0.4">·</span>
+      <span id="ribbon-queue-text">3 weavers active now</span>
+    </div>
+
+    <!-- Silk Oracle Floating Button -->
+    <button id="btn-open-oracle" aria-label="Consult the Silk Oracle" title="Consult the Silk Oracle">🔮</button>
+
+    <!-- Silk Oracle Concierge Panel -->
+    <div id="oracle-panel" role="dialog" aria-label="Silk Oracle" aria-modal="true">
+      <div class="oracle-header">
+        <div class="oracle-avatar">🕯</div>
+        <div>
+          <div class="oracle-name">The Silk Oracle</div>
+          <div class="oracle-status" id="oracle-status-text">✦ Awakening from the weave...</div>
+        </div>
+        <button class="oracle-close" id="btn-close-oracle" aria-label="Close Oracle">×</button>
+      </div>
+      <div class="oracle-chat-area" id="oracle-chat-area"></div>
+      <form class="oracle-input-row" id="oracle-chat-form" autocomplete="off">
+        <input class="oracle-input" id="oracle-input" type="text"
+               placeholder="Ask the Oracle anything about silk..."
+               aria-label="Your message to the Oracle" />
+        <button type="submit" class="oracle-send" aria-label="Send">↑</button>
+      </form>
+    </div>
+
+    <!-- Glyph Hunt Counter Badge -->
+    <div id="glyph-counter" aria-live="polite">
+      <div id="glyph-counter-dots">
+        <div class="glyph-dot" data-index="0"></div>
+        <div class="glyph-dot" data-index="1"></div>
+        <div class="glyph-dot" data-index="2"></div>
+        <div class="glyph-dot" data-index="3"></div>
+        <div class="glyph-dot" data-index="4"></div>
+      </div>
+      <span id="glyph-counter-label">0 of 5 Glyphs</span>
+    </div>
+
+    <!-- Secret Vault Panel -->
+    <div id="secret-vault-panel" role="dialog" aria-modal="true" aria-label="Secret Royal Vault">
+      <div class="secret-vault-card">
+        <div style="font-size:2.5rem; margin-bottom:1rem;">🏺</div>
+        <h2>The Royal Pattachitra</h2>
+        <p style="font-family:'Cormorant Garamond', serif; font-size:1.05rem; font-style:italic; color:rgba(247,215,109,0.85); margin-bottom:0.5rem;">
+          "ଶ୍ରୀ ଜଗନ୍ନାଥ ଦ୍ଵାଦଶ ନାମ" — The Twelve Sacred Names
+        </p>
+        <p>A singular Khandua Patta commissioned for the 2024 Ratha Yatra and never offered to the public. Woven over 60 days by Smt. Sebati Mohanty of Nuapatna, this saree carries verses from the Gita Govinda in calligraphic warp-ikat that only a living master weaver can achieve.</p>
+        <p style="font-size:0.8rem; color:rgba(201,162,39,0.7); letter-spacing:0.1em;">NEXT CEREMONIAL RELEASE · RATHA YATRA 2026 · BY INVITATION ONLY</p>
+        <button class="btn-close-secret" id="btn-close-secret">Close the Vault ×</button>
+      </div>
     </div>
 
     <!-- Spatial Audio Start Screen -->
@@ -197,11 +291,15 @@
           </h1>
           <svg class="mudra-icon small" viewBox="0 0 48 48" style="margin-bottom:10px; opacity:0.65;" aria-hidden="true"><path d="M24 40c-2.2 0-4-1.8-4-4 0-4-6-6.5-8-12 3 0 5.5 2 7.5 5.5m4.5 10.5c2.2 0 4-1.8 4-4 0-4 6-6.5 8-12-3 0-5.5 2-7.5 5.5M24 36V16c-1.5 1.5-2.5 4.5-2.5 9M21 25c-3-3-4.5-7.5-4.5-12m11 12c3-3 4.5-7.5 4.5-12" /><circle cx="24" cy="40" r="1.5" fill="var(--color-zari)" /></svg>
           <span class="scroll-hint">SCROLL TO WEAVE</span>
+          <!-- Hidden Glyph 1 (Genesis) -->
+          <span class="hidden-glyph" data-glyph="0" title="" style="top:15%; left:8%;" aria-hidden="true">ଓ</span>
         </div>
       </section>
 
       <!-- SECTION 2: THE ARTISAN'S PULSE -->
-      <section id="artisan-pulse" class="scroll-section horizontal-trigger">
+      <section id="artisan-pulse" class="scroll-section horizontal-trigger" style="position:relative;">
+        <!-- Hidden Glyph 2 (Artisan) -->
+        <span class="hidden-glyph" data-glyph="1" style="top:18%; right:6%; font-size:2rem;" aria-hidden="true">ଙ</span>
         <div class="horizontal-wrapper">
           <div class="horizontal-scroll-section flex-row">
             
@@ -497,8 +595,27 @@
         </div>
       </section>
 
+      <!-- Holographic Warp Thread Divider -->
+      <div class="warp-divider" data-warp="1">
+        <svg viewBox="0 0 1440 80" preserveAspectRatio="none" aria-hidden="true">
+          <defs>
+            <linearGradient id="gold-thread-grad" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="rgba(201,162,39,0)"/>
+              <stop offset="30%" stop-color="rgba(247,215,109,0.8)"/>
+              <stop offset="70%" stop-color="rgba(201,162,39,0.9)"/>
+              <stop offset="100%" stop-color="rgba(201,162,39,0)"/>
+            </linearGradient>
+          </defs>
+          <path class="warp-thread-line" d="M0,40 Q360,10 720,40 Q1080,70 1440,40" fill="none"/>
+          <path class="warp-thread-line" d="M0,45 Q360,15 720,45 Q1080,75 1440,45" fill="none"/>
+          <path class="warp-thread-line" d="M0,35 Q360,8 720,35 Q1080,65 1440,35" fill="none"/>
+        </svg>
+      </div>
+
       <!-- SECTION 3: THE METAMORPHOSIS (Physical to Digital Showcase) -->
-      <section id="metamorphosis" class="scroll-section">
+      <section id="metamorphosis" class="scroll-section" style="position:relative;">
+        <!-- Hidden Glyph 3 (Metamorphosis) -->
+        <span class="hidden-glyph" data-glyph="2" style="bottom:20%; right:8%; font-size:2.2rem;" aria-hidden="true">ଚ</span>
         <div class="canvas-container">
           <canvas id="canvas-meta"></canvas>
         </div>
@@ -512,8 +629,18 @@
         </div>
       </section>
 
+      <!-- Holographic Warp Thread Divider -->
+      <div class="warp-divider" data-warp="2">
+        <svg viewBox="0 0 1440 80" preserveAspectRatio="none" aria-hidden="true">
+          <path class="warp-thread-line" d="M0,20 Q480,60 960,20 Q1200,5 1440,30" fill="none" stroke="url(#gold-thread-grad)"/>
+          <path class="warp-thread-line" d="M0,25 Q480,65 960,25 Q1200,10 1440,35" fill="none" stroke="url(#gold-thread-grad)"/>
+        </svg>
+      </div>
+
       <!-- SECTION 3.5: THE SOUL OF ODISHA -->
       <section id="heritage-soul" class="scroll-section flex-center" style="background:#09070b; position:relative; min-height: 100vh; padding: 4rem 10%; box-sizing: border-box;">
+        <!-- Hidden Glyph 4 (Heritage Soul) -->
+        <span class="hidden-glyph" data-glyph="3" style="top:12%; left:50%; font-size:2rem;" aria-hidden="true">ଣ</span>
         <div class="narrative-split" style="display:flex; width:100%; height:100%; max-width:1200px; gap:4%; align-items:center;">
           <!-- Left: Narrative & Toggles -->
           <div class="narrative-col" style="flex:1; display:flex; flex-direction:column; justify-content:center;">
@@ -558,8 +685,19 @@
         </div>
       </section>
 
+      <!-- Holographic Warp Thread Divider -->
+      <div class="warp-divider" data-warp="3">
+        <svg viewBox="0 0 1440 80" preserveAspectRatio="none" aria-hidden="true">
+          <path class="warp-thread-line" d="M0,60 C360,20 720,70 1080,25 C1260,5 1380,40 1440,30" fill="none" stroke="url(#gold-thread-grad)"/>
+          <path class="warp-thread-line" d="M0,55 C360,15 720,65 1080,20 C1260,0 1380,35 1440,25" fill="none" stroke="url(#gold-thread-grad)"/>
+          <path class="warp-thread-line" d="M0,65 C360,25 720,75 1080,30 C1260,10 1380,45 1440,35" fill="none" stroke="url(#gold-thread-grad)"/>
+        </svg>
+      </div>
+
       <!-- SECTION 4: THE VAULT (1-of-1 Collection Gallery) -->
-      <section id="vault" class="scroll-section">
+      <section id="vault" class="scroll-section" style="position:relative;">
+        <!-- Hidden Glyph 5 (Vault) -->
+        <span class="hidden-glyph" data-glyph="4" style="top:50%; left:5%; font-size:2.2rem;" aria-hidden="true">ଟ</span>
         <div class="vault-heading-wrap">
           <span class="section-label">03 / THE COLLECTION</span>
           <h3 class="vault-title" style="display:flex; align-items:center; justify-content:center; gap:12px;">

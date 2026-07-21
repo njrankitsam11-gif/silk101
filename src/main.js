@@ -5620,3 +5620,447 @@ function setupCuratorWhisper() {
   brand.setAttribute('title', 'Hold for 3 seconds...');
 }
 
+// ═══════════════════════════════════════════════════════════════
+//   TOP-OF-THE-WORLD SURPRISE FEATURES  —  v4.0 ULTIMATE EDITION
+// ═══════════════════════════════════════════════════════════════
+
+// ── 1. CUSTOM SILK THREAD CURSOR TRAIL ──────────────────────────
+function initSilkCursorTrail() {
+  const dot  = document.getElementById('cursor-dot');
+  const ring = document.getElementById('cursor-ring');
+  if (!dot || !ring) return;
+
+  let cursorX = -200, cursorY = -200;
+  let ringX = -200, ringY = -200;
+  let lastTrailTime = 0;
+  const TRAIL_INTERVAL = 30; // ms between trail particles
+
+  document.addEventListener('mousemove', (e) => {
+    cursorX = e.clientX;
+    cursorY = e.clientY;
+
+    dot.style.left  = cursorX + 'px';
+    dot.style.top   = cursorY + 'px';
+
+    // Emit silk thread trail particle
+    const now = Date.now();
+    if (now - lastTrailTime > TRAIL_INTERVAL) {
+      lastTrailTime = now;
+      spawnCursorTrail(cursorX, cursorY);
+    }
+  });
+
+  // Smooth ring lag
+  function animateRing() {
+    ringX += (cursorX - ringX) * 0.12;
+    ringY += (cursorY - ringY) * 0.12;
+    ring.style.left = ringX + 'px';
+    ring.style.top  = ringY + 'px';
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+
+  // Cursor scale on interactive element hover
+  document.addEventListener('mouseenter', (e) => {
+    if (e.target.matches('a,button,.btn,.saree-card,[role="button"],.hidden-glyph')) {
+      dot.style.width  = '16px';
+      dot.style.height = '16px';
+    }
+  }, true);
+  document.addEventListener('mouseleave', (e) => {
+    if (e.target.matches('a,button,.btn,.saree-card,[role="button"],.hidden-glyph')) {
+      dot.style.width  = '8px';
+      dot.style.height = '8px';
+    }
+  }, true);
+}
+
+function spawnCursorTrail(x, y) {
+  const el = document.createElement('div');
+  el.className = 'cursor-trail-particle';
+  const size = 2 + Math.random() * 5;
+  el.style.cssText = `
+    left: ${x}px; top: ${y}px;
+    width: ${size}px; height: ${size}px;
+    animation-duration: ${0.5 + Math.random() * 0.4}s;
+  `;
+  document.body.appendChild(el);
+  el.addEventListener('animationend', () => el.remove());
+}
+
+// ── 2. SILK ORACLE MYSTICAL CONCIERGE ───────────────────────────
+const ORACLE_PERSONA = {
+  greetings: [
+    "🕯 *The weave stirs...* I am the Silk Oracle — the spirit woven into every thread by master hands in Nuapatna. <em>What whispers do you bring to the loom?</em>",
+    "✦ \"ଯସ୍ୟ ସ୍ମୃତ୍ୟା ଚ ନାମୋକ୍ତ୍ୟା...\" — I awaken. The threads of eight centuries pulse beneath us. Ask, and the weave shall answer.",
+    "🔮 The shuttle has crossed. The pattern holds. <em>Speak your question into the weave, and I shall reveal what the silk knows.</em>"
+  ],
+  responses: {
+    ship: ["✈ The sacred cloth travels swiftly — insured express via DHL and FedEx, arriving in USA, UK & UAE within 3–6 days, packed in ceremonial wooden chests lined with muslin."],
+    delivery: ["✈ The sacred cloth travels swiftly — insured express via DHL and FedEx, arriving in USA, UK & UAE within 3–6 days, packed in ceremonial wooden chests lined with muslin."],
+    price: ["💫 *The Oracle cannot assign gold to devotion.* Yet — our curated pieces begin at ₹1,85,000 for a ceremonial Khandua Patta and ₹85,000 for a Sambalpuri weave. Request a consultation for an exact estimation."],
+    cost: ["💫 *The Oracle cannot assign gold to devotion.* Yet — our curated pieces begin at ₹1,85,000 for a ceremonial Khandua Patta and ₹85,000 for a Sambalpuri weave. Request a consultation for an exact estimation."],
+    authentic: ["⚗ Every saree is woven on zero-electricity wooden handlooms, with Silk Mark India certification. Each thread carries a provenance hash — try our <em>Unweave</em> feature to see its molecular DNA."],
+    real: ["⚗ Every saree is woven on zero-electricity wooden handlooms, with Silk Mark India certification. Each thread carries a provenance hash — try our <em>Unweave</em> feature to see its molecular DNA."],
+    handloom: ["⚗ Every saree is woven on zero-electricity wooden handlooms, with Silk Mark India certification. Each thread carries a provenance hash — try our <em>Unweave</em> feature to see its molecular DNA."],
+    weave: ["🌀 \"ତନ୍ତୁ ବ ସ୍ନ...\" — The weavers of Nuapatna and Maniabandha have mastered the tie-dye Ikat technique across generations. Each motif — peacock, lotus, Konark wheel — takes 30–45 days to materialize."],
+    khandua: ["🌀 The Khandua Patta is the most sacred of our silks. Woven specifically to adorn Lord Jagannath at Puri each morning. The calligraphic warp-ikat carries Sanskrit shlokas visible only in direct sunlight."],
+    jagannath: ["🙏 The Khandua Silk has clothed Lord Jagannath of Puri for 800 years. Our weavers continue that sacred lineage — each piece offered to our patrons carries that divine thread of connection."],
+    custom: ["✍ A commission is a sacred agreement between patron and weaver. We offer fully bespoke weaves — choose your master artisan, body color, motif system, and thread count. Begin with our <em>Commission Studio</em> above."],
+    secret: ["🗝 *The Oracle feels your curiosity about hidden things...* Look carefully at the corners of each section — there are 5 ancient Odia glyphs hidden in plain sight. Find them all, and the vault opens."],
+    glyph: ["🗝 *The Oracle feels your curiosity about hidden things...* Look carefully at the corners of each section — there are 5 ancient Odia glyphs hidden in plain sight. Find them all, and the vault opens."],
+    ratha: ["🎪 Ratha Yatra — the grand Chariot Festival of Puri — is the most sacred occasion in Odia life. The Lord's chariot is festooned with our Khandua silk. The next ceremonial release coincides with Ratha Yatra 2026."],
+    odissi: ["💃 Odissi, the classical dance of Odisha, mirrors the Tribhangi posture carved in stone at Konark. Our Sambalpuri sarees are designed for the sweeping movements of Odissi performance — wide borders, deep pleats."],
+    default: [
+      "✦ *The silk whispers...* Your question reaches me across threads. May I suggest consulting our human curators at Priyadarshini Silk House? They hold the answers that live beyond the weave.",
+      "🌿 The Oracle contemplates your words. Each answer is woven slowly, like silk — with care. Try asking about our collections, authentication, weaving time, or our secret vault.",
+      "🕯 \"ଯଥା ଶ୍ରୀ ଜଗନ୍ନାଥ...\" — The weave contemplates your question. Ask about specific sarees, shipping, or the hidden secrets of this loom."
+    ]
+  }
+};
+
+function initSilkOracle() {
+  const btnOpen   = document.getElementById('btn-open-oracle');
+  const panel     = document.getElementById('oracle-panel');
+  const btnClose  = document.getElementById('btn-close-oracle');
+  const chatArea  = document.getElementById('oracle-chat-area');
+  const form      = document.getElementById('oracle-chat-form');
+  const input     = document.getElementById('oracle-input');
+  const statusTxt = document.getElementById('oracle-status-text');
+
+  if (!btnOpen || !panel || !chatArea) return;
+
+  function openOracle() {
+    panel.classList.add('open');
+    btnOpen.classList.add('oracle-open');
+    input.focus();
+
+    // Awaken sequence
+    if (chatArea.children.length === 0) {
+      setTimeout(() => {
+        if (statusTxt) {
+          statusTxt.textContent = '✦ The Oracle speaks...';
+        }
+        const greeting = ORACLE_PERSONA.greetings[Math.floor(Math.random() * ORACLE_PERSONA.greetings.length)];
+        showTypingThenMessage(greeting, 1200);
+      }, 600);
+    }
+    if (isAudioPlaying) playTempleChimeSound();
+  }
+
+  function closeOracle() {
+    panel.classList.remove('open');
+    btnOpen.classList.remove('oracle-open');
+  }
+
+  btnOpen.addEventListener('click', openOracle);
+  btnClose.addEventListener('click', closeOracle);
+
+  // Close on outside click
+  document.addEventListener('click', (e) => {
+    if (panel.classList.contains('open') &&
+        !panel.contains(e.target) &&
+        e.target !== btnOpen) {
+      closeOracle();
+    }
+  });
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const msg = input.value.trim();
+    if (!msg) return;
+    input.value = '';
+
+    // User bubble
+    addBubble(msg, 'user');
+
+    // Show typing
+    const typing = addTypingIndicator();
+    const lower = msg.toLowerCase();
+
+    // Find matching response
+    let reply = null;
+    for (const [keyword, replies] of Object.entries(ORACLE_PERSONA.responses)) {
+      if (keyword !== 'default' && lower.includes(keyword)) {
+        reply = replies[Math.floor(Math.random() * replies.length)];
+        break;
+      }
+    }
+    if (!reply) {
+      const defaults = ORACLE_PERSONA.responses.default;
+      reply = defaults[Math.floor(Math.random() * defaults.length)];
+    }
+
+    const delay = 900 + Math.random() * 600;
+    setTimeout(() => {
+      typing.remove();
+      addBubble(reply, 'oracle');
+      if (isAudioPlaying) playShowroomSound(440, 0.03, 0.08);
+    }, delay);
+  });
+
+  function addBubble(html, type) {
+    const bubble = document.createElement('div');
+    bubble.className = `oracle-bubble ${type}`;
+    bubble.innerHTML = html;
+    chatArea.appendChild(bubble);
+    chatArea.scrollTop = chatArea.scrollHeight;
+    return bubble;
+  }
+
+  function addTypingIndicator() {
+    const el = document.createElement('div');
+    el.className = 'oracle-typing';
+    el.innerHTML = `<div class="oracle-typing-dot"></div><div class="oracle-typing-dot"></div><div class="oracle-typing-dot"></div>`;
+    chatArea.appendChild(el);
+    chatArea.scrollTop = chatArea.scrollHeight;
+    return el;
+  }
+
+  function showTypingThenMessage(html, delay) {
+    const typing = addTypingIndicator();
+    setTimeout(() => {
+      typing.remove();
+      addBubble(html, 'oracle');
+      if (statusTxt) statusTxt.textContent = '✦ Listening...';
+    }, delay);
+  }
+}
+
+// ── 3. ODIA GLYPH EASTER EGG TREASURE HUNT ──────────────────────
+function initGlyphHunt() {
+  const glyphs = Array.from(document.querySelectorAll('.hidden-glyph'));
+  const counter = document.getElementById('glyph-counter');
+  const counterLabel = document.getElementById('glyph-counter-label');
+  const dots = Array.from(document.querySelectorAll('.glyph-dot'));
+  const secretVault = document.getElementById('secret-vault-panel');
+  const btnCloseSecret = document.getElementById('btn-close-secret');
+  const foundSet = new Set();
+
+  if (!glyphs.length) return;
+
+  // Show counter when first glyph is hovered
+  glyphs.forEach(glyph => {
+    glyph.addEventListener('mouseenter', () => {
+      if (counter) counter.classList.add('visible');
+    });
+  });
+
+  glyphs.forEach(glyph => {
+    glyph.addEventListener('click', () => {
+      const idx = parseInt(glyph.dataset.glyph);
+      if (foundSet.has(idx)) return;
+
+      foundSet.add(idx);
+      glyph.classList.add('found');
+
+      // Update dots
+      if (dots[idx]) dots[idx].classList.add('found');
+      if (counterLabel) counterLabel.textContent = `${foundSet.size} of 5 Glyphs`;
+      if (counter) counter.classList.add('visible');
+
+      // Chime
+      if (isAudioPlaying) playTempleChimeSound();
+
+      // Spawn mini silk particle burst from glyph
+      const rect = glyph.getBoundingClientRect();
+      spawnSilkParticleBurst(rect.left + rect.width / 2, rect.top + rect.height / 2, 12);
+
+      // All 5 found — unlock secret vault
+      if (foundSet.size === 5) {
+        setTimeout(() => {
+          if (secretVault) {
+            secretVault.classList.add('active');
+            if (isAudioPlaying) {
+              playTempleChimeSound();
+              setTimeout(playTempleChimeSound, 400);
+              setTimeout(playTempleChimeSound, 800);
+            }
+            // Grand burst
+            spawnSilkParticleBurst(window.innerWidth / 2, window.innerHeight / 2, 80);
+          }
+        }, 600);
+      }
+    });
+  });
+
+  if (btnCloseSecret) {
+    btnCloseSecret.addEventListener('click', () => {
+      if (secretVault) secretVault.classList.remove('active');
+    });
+  }
+}
+
+// ── 4. SILK PARTICLE BURST (CTA CLICK) ──────────────────────────
+function spawnSilkParticleBurst(x, y, count = 60) {
+  for (let i = 0; i < count; i++) {
+    const el = document.createElement('div');
+    const isThread = Math.random() < 0.4;
+    el.className = isThread ? 'silk-thread-particle' : 'silk-particle';
+    const angle = (Math.PI * 2 * i) / count + Math.random() * 0.5;
+    const dist = 60 + Math.random() * 160;
+    const dx = Math.cos(angle) * dist;
+    const dy = Math.sin(angle) * dist;
+    const size = 3 + Math.random() * 7;
+    const len = 12 + Math.random() * 24;
+    const rot = Math.random() * 360;
+    const duration = 0.8 + Math.random() * 0.6;
+    el.style.cssText = `
+      left: ${x}px;
+      top: ${y}px;
+      --size: ${size}px;
+      --len: ${len}px;
+      --dx: ${dx}px;
+      --dy: ${dy}px;
+      --rot: ${rot}deg;
+      animation-duration: ${duration}s;
+      animation-delay: ${Math.random() * 0.1}s;
+    `;
+    document.body.appendChild(el);
+    el.addEventListener('animationend', () => el.remove());
+  }
+}
+
+function initCTAParticleBurst() {
+  // Hook onto the "Request Curator Consultation" button and other CTAs
+  const ctaSelectors = ['#btn-open-concierge', '#btn-acquire-now', '#btn-open-oracle', '[id^="btn-request"]'];
+  ctaSelectors.forEach(sel => {
+    const el = document.querySelector(sel);
+    if (!el) return;
+    el.addEventListener('click', (e) => {
+      spawnSilkParticleBurst(e.clientX, e.clientY, 55);
+      if (isAudioPlaying) {
+        playTempleChimeSound();
+        setTimeout(playTempleChimeSound, 250);
+      }
+    });
+  });
+
+  // Also hook all btn-primary clicks globally with a smaller burst
+  document.addEventListener('click', (e) => {
+    if (e.target.matches('.btn-primary, .btn-acquire')) {
+      spawnSilkParticleBurst(e.clientX, e.clientY, 30);
+    }
+  });
+}
+
+// ── 5. LIVE WEAVING SESSION COUNTDOWN ───────────────────────────
+function initWeavingCountdown() {
+  const el = document.getElementById('ribbon-countdown');
+  const queueEl = document.getElementById('ribbon-queue-text');
+  if (!el) return;
+
+  // Target: next midnight IST (Odisha time) as the "next loom session"
+  function getNextSession() {
+    const now = new Date();
+    // Next 6:00 AM IST (UTC+5:30) as the loom opening time
+    const target = new Date();
+    target.setUTCHours(0, 30, 0, 0); // 6:00 AM IST = 00:30 UTC
+    if (target <= now) target.setDate(target.getDate() + 1);
+    return target;
+  }
+
+  const weaverQueues = ['2 weavers active', '3 weavers active', '4 weavers active', '2 weavers active', '5 weavers active'];
+  let queueIdx = 0;
+
+  function tick() {
+    const now = new Date();
+    const diff = getNextSession() - now;
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    el.textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  }
+
+  // Update queue text every 60s
+  setInterval(() => {
+    queueIdx = (queueIdx + 1) % weaverQueues.length;
+    if (queueEl) queueEl.textContent = weaverQueues[queueIdx] + ' now';
+  }, 60000);
+
+  tick();
+  setInterval(tick, 1000);
+}
+
+// ── 6. ACTIVE NAV SECTION INDICATOR ─────────────────────────────
+function initNavActiveState() {
+  const sections = ['genesis','artisan-pulse','metamorphosis','heritage-soul','vault'];
+  const navLinks = document.querySelectorAll('.site-nav a');
+
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        navLinks.forEach(a => {
+          const href = a.getAttribute('href');
+          if (href === `#${id}`) {
+            a.classList.add('active');
+          } else {
+            a.classList.remove('active');
+          }
+        });
+      }
+    });
+  }, { threshold: 0.4 });
+
+  sections.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) obs.observe(el);
+  });
+}
+
+// ── 7. HOLOGRAPHIC WARP DIVIDER SCROLL REVEAL ────────────────────
+function initWarpDividers() {
+  const dividers = document.querySelectorAll('.warp-divider');
+  if (!dividers.length) return;
+
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in-view');
+        obs.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  dividers.forEach(d => obs.observe(d));
+}
+
+// ── 8. ANIMATED LOADER STATUS MESSAGES ───────────────────────────
+function initAnimatedLoaderMessages() {
+  const statusEl = document.getElementById('loader-status-text');
+  if (!statusEl) return;
+  const messages = [
+    'Preparing digital threads...',
+    'Calibrating warp tension...',
+    'Summoning master weavers...',
+    'Loading sacred motifs...',
+    'Aligning Konark chakra...',
+    'Entering the Loom of Time...',
+  ];
+  let idx = 0;
+  const interval = setInterval(() => {
+    idx = (idx + 1) % messages.length;
+    statusEl.style.opacity = '0';
+    setTimeout(() => {
+      statusEl.textContent = messages[idx];
+      statusEl.style.opacity = '1';
+      statusEl.style.transition = 'opacity 0.4s';
+    }, 200);
+  }, 900);
+
+  // Stop after page load
+  window.addEventListener('load', () => clearInterval(interval));
+}
+
+// ── INITIALIZE ALL SURPRISE FEATURES ────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  initSilkCursorTrail();
+  initSilkOracle();
+  initGlyphHunt();
+  initCTAParticleBurst();
+  initWeavingCountdown();
+  initNavActiveState();
+  initWarpDividers();
+  initAnimatedLoaderMessages();
+});

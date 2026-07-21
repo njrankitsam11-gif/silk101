@@ -430,7 +430,9 @@ body:has(.saree-card:hover) #cursor-ring {
 }
 
 #vault {
-  background: var(--color-surface);
+  background: 
+    linear-gradient(rgba(17,17,17,0.85), rgba(17,17,17,0.85)),
+    url('/images/vault_bg.png') no-repeat center center/cover;
 }
 
 /* ─── Holographic Warp Thread Dividers ────────────────── */

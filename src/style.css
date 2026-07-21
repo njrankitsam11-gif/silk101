@@ -269,7 +269,7 @@ html, body {
 }
 
 #genesis {
-  background: linear-gradient(135deg, #1f021b 0%, #0c0316 50%, #290b02 100%);
+  background-color: #060608;
 }
 #genesis::before {
   content: "";
@@ -278,7 +278,7 @@ html, body {
   left: 20%;
   width: 350px;
   height: 350px;
-  background: radial-gradient(circle, rgba(255, 94, 0, 0.15) 0%, rgba(255, 94, 0, 0) 70%);
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.08) 0%, rgba(212, 175, 55, 0) 70%);
   filter: blur(80px);
   pointer-events: none;
 }
@@ -289,21 +289,21 @@ html, body {
   right: 20%;
   width: 450px;
   height: 450px;
-  background: radial-gradient(circle, rgba(224, 17, 95, 0.12) 0%, rgba(224, 17, 95, 0) 70%);
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.05) 0%, rgba(212, 175, 55, 0) 70%);
   filter: blur(90px);
   pointer-events: none;
 }
 
 #artisan-pulse {
-  background: linear-gradient(135deg, #2b040a 0%, #0d0112 50%, #011c0f 100%);
+  background-color: #0b0b0d;
 }
 
 #metamorphosis {
-  background: linear-gradient(135deg, #070a24 0%, #17021b 50%, #24030a 100%);
+  background-color: #060608;
 }
 
 #vault {
-  background: linear-gradient(135deg, #170204 0%, #08000a 50%, #150601 100%);
+  background-color: #09090b;
 }
 
 .canvas-container {
@@ -358,19 +358,24 @@ html, body {
 }
 .embroidered-text {
   font-family: var(--font-serif);
-  font-size: 5rem;
-  font-weight: 300;
-  line-height: 1.1;
-  background: linear-gradient(90deg, #ffd700 0%, #ff5e00 50%, #e0115f 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  font-size: 6.2rem;
+  font-weight: 200;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: #f7f6f0;
+  text-shadow: 0 4px 20px rgba(0,0,0,0.6);
+  display: block;
   opacity: 0;
   transform: translateY(30px);
 }
 .embroidered-text.accent {
-  background: linear-gradient(90deg, #e0115f 0%, #ff007f 50%, #ffd700 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  font-style: italic;
+  font-weight: 300;
+  color: #dfba55; /* Refined luxury antique gold */
+  background: none;
+  -webkit-background-clip: initial;
+  -webkit-text-fill-color: initial;
+  text-shadow: 0 4px 25px rgba(223, 186, 85, 0.15);
 }
 .scroll-hint {
   position: absolute;
@@ -495,12 +500,17 @@ html, body {
 }
 .slide-heading {
   font-family: var(--font-serif);
-  font-size: 4rem;
+  font-size: 3.8rem;
+  font-weight: 200;
+  line-height: 1.15;
+  margin-bottom: 1.5rem;
+  color: #f7f6f0;
+  letter-spacing: -0.02em;
+}
+.slide-heading strong, .slide-heading span {
+  font-style: italic;
   font-weight: 300;
-  margin-bottom: 2rem;
-  background: linear-gradient(90deg, #ffd700 0%, #ff5e00 55%, #e0115f 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--color-zari);
 }
 .slide-desc {
   color: var(--color-text-muted);
@@ -649,11 +659,10 @@ html, body {
 .meta-heading {
   font-family: var(--font-serif);
   font-size: 2.8rem;
-  font-weight: 300;
+  font-weight: 200;
   margin-bottom: 1.5rem;
-  background: linear-gradient(90deg, #ffd700 0%, #ff5e00 55%, #e0115f 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #f7f6f0;
+  letter-spacing: -0.01em;
 }
 .meta-desc {
   color: var(--color-text-muted);
@@ -673,11 +682,10 @@ html, body {
 .vault-title {
   font-family: var(--font-serif);
   font-size: 3.5rem;
-  font-weight: 300;
+  font-weight: 200;
   margin-bottom: 0.5rem;
-  background: linear-gradient(90deg, #ffd700 0%, #ff5e00 55%, #e0115f 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #f7f6f0;
+  letter-spacing: -0.02em;
 }
 .vault-subtitle {
   color: var(--color-text-muted);
@@ -2248,3 +2256,9 @@ body::before {
     opacity: 0.018; /* lighter grain on mobile */
   }
 }
+
+.model-option:nth-child(n+6) {
+  background-size: cover !important;
+  background-position: center !important;
+}
+

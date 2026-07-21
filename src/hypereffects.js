@@ -384,8 +384,8 @@ function initPrismaticHeadings() {
 function initScrollParallaxLayers() {
   const config = [
     { selector: '.vault-heading-wrap', depth: 0.09 },
-    { selector: '.section-label',      depth: 0.13 },
-    { selector: '.mudra-icon',         depth: 0.18 },
+    { selector: '.section-label:not(.vault-heading-wrap .section-label)', depth: 0.13 },
+    { selector: '.mudra-icon:not(.vault-heading-wrap .mudra-icon)', depth: 0.18 },
     { selector: '.slide-heading',      depth: 0.06 },
   ];
 

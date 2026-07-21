@@ -1,5 +1,7 @@
 import './style.css';
 import './matchmaker.css';
+import './hyper3d.css';
+import './hypereffects.js';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -1937,7 +1939,7 @@ async function setupVaultTunnel() {
     
     sareeCollection.forEach((item, index) => {
       const card = document.createElement('div');
-      card.className = 'saree-card';
+      card.className = 'saree-card holo-border';
       card.dataset.id = item.id;
       
       const shadow = document.createElement('div');

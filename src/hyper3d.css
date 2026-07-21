@@ -1,0 +1,263 @@
+/* ═══════════════════════════════════════════════════════════════
+   HYPER3D.CSS  ·  Immersive 3D & Heritage Effects Layer
+   Additive only — zero conflicts with existing rules
+═══════════════════════════════════════════════════════════════ */
+
+/* ── Card 3D Shine Overlay ─────────────────────────────────────── */
+.card-3d-shine {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 100;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  mix-blend-mode: screen;
+  will-change: background;
+}
+
+/* ── Holographic Iridescent Conic Border ─────────────────────── */
+@property --holo-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+@keyframes holo-spin {
+  to { --holo-angle: 360deg; }
+}
+.holo-border { position: relative; }
+.holo-border::before {
+  content: '';
+  position: absolute;
+  inset: -1.5px;
+  border-radius: inherit;
+  background: conic-gradient(
+    from var(--holo-angle),
+    hsl(30, 88%, 62%) 0deg,   hsl(58, 92%, 76%) 45deg,
+    hsl(195, 84%, 66%) 90deg, hsl(278, 80%, 70%) 135deg,
+    hsl(30, 88%, 62%) 180deg, hsl(58, 92%, 76%) 225deg,
+    hsl(195, 84%, 66%) 270deg,hsl(278, 80%, 70%) 315deg,
+    hsl(30, 88%, 62%) 360deg
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  padding: 1.5px;
+  opacity: 0;
+  transition: opacity 0.5s;
+  animation: holo-spin 4s linear infinite paused;
+  z-index: 0;
+}
+.holo-border:hover::before {
+  opacity: 0.75;
+  animation-play-state: running;
+}
+
+/* ── Saree Card 3D Depth ─────────────────────────────────────── */
+.saree-card {
+  transform-style: preserve-3d;
+  will-change: transform, box-shadow, filter;
+}
+.saree-card .saree-layer.layer-silk {
+  transition: box-shadow 0.3s ease;
+}
+
+/* ── Meta Card 3D ────────────────────────────────────────────── */
+.meta-card {
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.meta-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  background: linear-gradient(135deg,
+    rgba(201,162,39,0.04) 0%,
+    transparent 50%,
+    rgba(26,42,108,0.06) 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── 3D Section Reveal (managed by JS) ──────────────────────── */
+.scroll-section {
+  will-change: transform, opacity;
+  transform-origin: center 60%;
+}
+#artisan-pulse,
+#metamorphosis,
+#heritage-soul,
+#vault {
+  transition: transform 1.2s cubic-bezier(0.16,1,0.3,1), opacity 0.9s ease;
+}
+
+/* ── Heritage Soul 3D Canvas Blend ───────────────────────────── */
+#heritage-soul {
+  transform-style: preserve-3d;
+  background:
+    radial-gradient(ellipse at 28% 50%, rgba(13,61,46,0.22) 0%, transparent 55%),
+    radial-gradient(ellipse at 72% 18%, rgba(26,42,108,0.18) 0%, transparent 50%),
+    radial-gradient(ellipse at 55% 82%, rgba(201,162,39,0.06) 0%, transparent 40%),
+    #09070b;
+}
+#canvas-3d-artifacts {
+  mix-blend-mode: screen;
+}
+
+/* ── Silk Cloth Canvas (Genesis overlay) ─────────────────────── */
+#canvas-silk-cloth {
+  mix-blend-mode: screen;
+  display: block;
+}
+
+/* ── Volumetric Gold Dust (fixed canvas) ─────────────────────── */
+#canvas-gold-dust {
+  display: block;
+  will-change: auto;
+}
+
+/* ── Iridescent Hero Accent Text Extension ───────────────────── */
+@keyframes iridescent-sweep {
+  0%   { filter: hue-rotate(0deg) brightness(1.1); }
+  50%  { filter: hue-rotate(22deg) brightness(1.28); }
+  100% { filter: hue-rotate(0deg) brightness(1.1); }
+}
+.embroidered-text.accent {
+  animation: liquid-gold 4s ease-in-out infinite,
+             iridescent-sweep 7s ease-in-out infinite;
+}
+
+/* ── Vault 3D Depth ──────────────────────────────────────────── */
+#vault {
+  transform-style: preserve-3d;
+}
+#vault .vault-heading-wrap {
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* ── Deep Parallax Glow Halos per Section ────────────────────── */
+#artisan-pulse {
+  position: relative;
+}
+#artisan-pulse::before {
+  content: '';
+  position: absolute;
+  top: -150px; left: 50%;
+  transform: translateX(-50%);
+  width: 800px; height: 800px;
+  background: radial-gradient(circle, rgba(13,61,46,0.12) 0%, transparent 62%);
+  filter: blur(90px);
+  pointer-events: none;
+  animation: aurora-shift 10s ease-in-out infinite;
+  z-index: 0;
+}
+#metamorphosis::after {
+  content: '';
+  position: absolute;
+  bottom: -120px; right: 0;
+  width: 650px; height: 650px;
+  background: radial-gradient(circle, rgba(94,15,30,0.12) 0%, transparent 62%);
+  filter: blur(100px);
+  pointer-events: none;
+  animation: aurora-shift 13s ease-in-out infinite reverse;
+}
+
+/* ── Prismatic headings (JS sets background-image via animation) */
+.vault-title,
+.slide-heading,
+.meta-heading,
+.outro-logo {
+  will-change: background-image;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 300% 100%;
+}
+
+/* ── Artisan Slide Content: Subtle 3D float ─────────────────── */
+.slide-content {
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* ── Holographic foil sweep on Zari border at section labels ─── */
+@keyframes zari-foil {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+.section-label {
+  background: linear-gradient(90deg,
+    var(--color-accent) 0%, #fff8c0 30%, var(--color-accent) 50%,
+    var(--color-accent-bright) 70%, var(--color-accent) 100%
+  );
+  background-size: 250% 100%;
+  animation: zari-foil 4s linear infinite;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── 3D Perspective Entry for Heritage Tabs ──────────────────── */
+.heritage-tabs .btn {
+  transform-style: preserve-3d;
+  transition: transform 0.3s var(--ease-silk), box-shadow 0.3s, background 0.3s;
+}
+.heritage-tabs .btn.active {
+  transform: translateZ(6px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.5), 0 0 12px rgba(201,162,39,0.2);
+}
+
+/* ── Section Divider: Golden Wave depth enhancement ──────────── */
+.warp-divider {
+  filter: drop-shadow(0 0 6px rgba(201,162,39,0.25));
+}
+
+/* ── 3D Floating Mudra Icon ──────────────────────────────────── */
+.mudra-icon {
+  filter: drop-shadow(0 0 8px rgba(201,162,39,0.55))
+          drop-shadow(0 0 20px rgba(201,162,39,0.2));
+}
+
+/* ── Footer Outro: Prism depth ───────────────────────────────── */
+.outro-section {
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(26,42,108,0.28) 0%, transparent 58%),
+    radial-gradient(ellipse at 80% 100%, rgba(201,162,39,0.06) 0%, transparent 50%),
+    #000;
+}
+
+/* ── Mobile: Graceful 3D disable ────────────────────────────── */
+@media (max-width: 768px) {
+  #canvas-silk-cloth,
+  #canvas-gold-dust,
+  #canvas-3d-artifacts { display: none !important; }
+
+  .saree-card,
+  .meta-card,
+  .slide-content { transform: none !important; }
+
+  .card-3d-shine { display: none; }
+
+  #vault, #heritage-soul, #artisan-pulse, #metamorphosis {
+    transform: none !important;
+    opacity: 1 !important;
+  }
+
+  .vault-title,
+  .slide-heading,
+  .meta-heading,
+  .outro-logo {
+    -webkit-text-fill-color: var(--color-text);
+    background: none;
+    background-clip: initial;
+    will-change: auto;
+  }
+
+  .section-label {
+    -webkit-text-fill-color: var(--color-accent);
+    background: none;
+    animation: none;
+  }
+}

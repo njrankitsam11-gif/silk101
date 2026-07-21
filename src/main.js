@@ -3883,7 +3883,7 @@ function setupInteractiveExtensions() {
 
   let activeClusterKey = null;
   let audioTimer = null;
-  let synthDrone = null;
+  let shlokaAudio = null;
 
   const audioPlayerWrap = document.getElementById('map-audio-player');
   const btnPlayOral = document.getElementById('btn-play-oral-audio');
@@ -3918,14 +3918,10 @@ function setupInteractiveExtensions() {
       clearTimeout(audioTimer);
       audioTimer = null;
     }
-    if (synthDrone) {
-      try {
-        synthDrone.osc.stop();
-        if(synthDrone.osc2) synthDrone.osc2.stop();
-        if(synthDrone.lfo) synthDrone.lfo.stop();
-        synthDrone.gain.disconnect();
-      } catch(e) {}
-      synthDrone = null;
+    if (shlokaAudio) {
+      shlokaAudio.pause();
+      shlokaAudio.currentTime = 0;
+      shlokaAudio = null;
     }
     if (visualizerWaves) {
       visualizerWaves.classList.add('hidden');
@@ -3945,35 +3941,12 @@ function setupInteractiveExtensions() {
       visualizerWaves.style.display = 'flex';
     }
 
-    if (!audioCtx) {
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    }
-
-    if (audioCtx) {
-      try {
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-        const osc = audioCtx.createOscillator();
-        const osc2 = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-
-        // Simple Submerged Drone (guaranteed audible)
-        osc.type = 'sawtooth';
-        osc2.type = 'sine';
-        const baseFreq = clusterKey === 'nuapatna' ? 108 : clusterKey === 'maniabandha' ? 136.1 : clusterKey === 'puri' ? 144 : 96;
-        osc.frequency.setValueAtTime(baseFreq, audioCtx.currentTime);
-        osc2.frequency.setValueAtTime(baseFreq * 1.5, audioCtx.currentTime);
-
-        gain.gain.setValueAtTime(0.2, audioCtx.currentTime); // Loud and clear
-
-        osc.connect(gain);
-        osc2.connect(gain);
-        gain.connect(audioCtx.destination);
-        
-        osc.start();
-        osc2.start();
-        synthDrone = { osc, osc2, gain };
-      } catch(e) { console.error("Audio error:", e); }
-    }
+    try {
+      shlokaAudio = new Audio('/audio/shloka.mp3');
+      shlokaAudio.loop = true;
+      shlokaAudio.volume = 0.6;
+      shlokaAudio.play().catch(e => console.error("Audio play failed:", e));
+    } catch(e) { console.error("Audio creation failed:", e); }
 
     const lines = ORAL_TRANSCRIPTS[clusterKey] || ["Reciting oral history..."];
     let lineIdx = 0;
@@ -3992,7 +3965,7 @@ function setupInteractiveExtensions() {
 
   if (btnPlayOral) {
     btnPlayOral.onclick = () => {
-      if (synthDrone) {
+      if (shlokaAudio && !shlokaAudio.paused) {
         stopOralAudio();
       } else {
         playOralAudio(activeClusterKey || 'nuapatna');

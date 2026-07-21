@@ -56,19 +56,10 @@ function init3DCardMagneticTilt() {
     });
   }
 
-  const selectors = ['.saree-card', '.meta-card', '.artisan-card', '.slide-content', '.entry-gate-card', '.secret-vault-card'];
+  const selectors = ['.meta-card', '.artisan-card', '.slide-content', '.entry-gate-card', '.secret-vault-card'];
   selectors.forEach(sel => document.querySelectorAll(sel).forEach(applyTilt));
-
-  // MutationObserver for dynamically injected cards (vault tunnel)
-  const tunnelStage = document.querySelector('.tunnel-stage');
-  if (tunnelStage) {
-    new MutationObserver(mutations => {
-      mutations.forEach(m => m.addedNodes.forEach(n => {
-        if (n.classList && n.classList.contains('saree-card')) applyTilt(n);
-      }));
-    }).observe(tunnelStage, { childList: true, subtree: true });
-  }
 }
+
 
 // ── B. FLOATING 3D HERITAGE ARTIFACTS CANVAS ───────────────────
 function initFloating3DHeritageArtifacts() {
@@ -430,7 +421,7 @@ function init3DSectionReveal() {
   }, { threshold: 0.08 });
 
   sections.forEach(section => {
-    if (section.id === 'genesis') return; // skip hero
+    if (section.id === 'genesis' || section.id === 'vault') return; // skip hero and pinned vault
     section.style.transform = 'perspective(1200px) rotateX(4deg) translateY(30px) scale(0.98)';
     section.style.opacity = '0.5';
     section.style.transition = 'transform 1.2s cubic-bezier(0.16,1,0.3,1), opacity 0.9s ease';

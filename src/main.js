@@ -2050,45 +2050,91 @@ function setupVaultScrollParallax() {
   const cards = document.querySelectorAll('.saree-card');
   if (cards.length === 0) return;
   
-  ScrollTrigger.create({
+  function updateVaultCards(progress) {
+    cards.forEach((card, index) => {
+      const baseZ = -1500 * (index + 0.5);
+      const currentZ = baseZ + progress * 10500;
+      
+      let opacity = 1;
+      if (currentZ > 400) {
+        opacity = 1 - (currentZ - 400) / 400;
+      } else if (currentZ < -2000) {
+        opacity = 0;
+      }
+      
+      const shadow = card.querySelector('.layer-shadow');
+      const silk = card.querySelector('.layer-silk');
+      const zari = card.querySelector('.layer-zari');
+      const info = card.querySelector('.saree-info');
+      const model = card.querySelector('.layer-model');
+      
+      card.style.transform = `translate3d(-50%, -50%, ${currentZ}px)`;
+      card.style.opacity = Math.max(0, Math.min(1, opacity));
+      card.style.pointerEvents = (currentZ > -250 && currentZ < 400) ? 'auto' : 'none';
+      
+      if (currentZ > -1000 && currentZ < 600) {
+        if (!card.dataset.tilted) {
+          if (silk) silk.style.transform = `translateZ(0px)`;
+          if (model) model.style.transform = `translateZ(12px)`;
+          if (zari) zari.style.transform = `translateZ(${20 + (scrollVelocity || 0) * 0.3}px)`;
+          if (shadow) shadow.style.transform = `translateZ(-30px)`;
+          if (info) info.style.transform = `translateZ(${35 + (scrollVelocity || 0) * 0.5}px)`;
+        }
+      }
+    });
+  }
+
+  // Inner multi-layer 3D tilt on card hover
+  cards.forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const dx = (e.clientX - cx) / (rect.width / 2);
+      const dy = (e.clientY - cy) / (rect.height / 2);
+      const rotX = -dy * 12;
+      const rotY = dx * 12;
+
+      card.dataset.tilted = 'true';
+      const silk = card.querySelector('.layer-silk');
+      const model = card.querySelector('.layer-model');
+      const zari = card.querySelector('.layer-zari');
+      const info = card.querySelector('.saree-info');
+
+      if (silk) silk.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg) translateZ(0px)`;
+      if (model) model.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg) translateZ(18px)`;
+      if (zari) zari.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg) translateZ(28px)`;
+      if (info) info.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg) translateZ(42px)`;
+    });
+
+    card.addEventListener('mouseleave', () => {
+      delete card.dataset.tilted;
+      const silk = card.querySelector('.layer-silk');
+      const model = card.querySelector('.layer-model');
+      const zari = card.querySelector('.layer-zari');
+      const info = card.querySelector('.saree-info');
+
+      if (silk) silk.style.transform = 'translateZ(0px)';
+      if (model) model.style.transform = 'translateZ(12px)';
+      if (zari) zari.style.transform = 'translateZ(20px)';
+      if (info) info.style.transform = 'translateZ(35px)';
+    });
+  });
+
+  const st = ScrollTrigger.create({
     trigger: '#vault',
     pin: true,
     start: 'top top',
     end: '+=4800',
     scrub: true,
-    onUpdate: (self) => {
-      const progress = self.progress;
-      
-      cards.forEach((card, index) => {
-        const baseZ = -1500 * (index + 0.5);
-        const currentZ = baseZ + progress * 10500;
-        
-        let opacity = 1;
-        if (currentZ > 400) {
-          opacity = 1 - (currentZ - 400) / 400;
-        } else if (currentZ < -2000) {
-          opacity = 0;
-        }
-        
-        const shadow = card.querySelector('.layer-shadow');
-        const silk = card.querySelector('.layer-silk');
-        const zari = card.querySelector('.layer-zari');
-        const info = card.querySelector('.saree-info');
-        
-        card.style.transform = `translate3d(-50%, -50%, ${currentZ}px)`;
-        card.style.opacity = Math.max(0, Math.min(1, opacity));
-        card.style.pointerEvents = (currentZ > -250 && currentZ < 400) ? 'auto' : 'none';
-        
-        if (currentZ > -1000 && currentZ < 600) {
-          silk.style.transform = `translateZ(0px)`;
-          zari.style.transform = `translateZ(${20 + scrollVelocity * 0.3}px)`;
-          shadow.style.transform = `translateZ(-30px)`;
-          info.style.transform = `translateZ(${35 + scrollVelocity * 0.5}px)`;
-        }
-      });
-    }
+    onUpdate: (self) => updateVaultCards(self.progress)
   });
+
+  // Initial call so cards are immediately placed in 3D tunnel depth!
+  updateVaultCards(st.progress || 0);
+  ScrollTrigger.refresh();
 }
+
 
 function drawSilkTexture(ctx, hue, sat) {
   const grad = ctx.createLinearGradient(0, 0, 420, 580);

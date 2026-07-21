@@ -599,9 +599,10 @@ body:has(.saree-card:hover) #cursor-ring {
   letter-spacing: 0.3em;
   color: var(--color-accent);
   text-transform: uppercase;
-  margin-bottom: 1rem;
+  margin-bottom: 2.5rem;
   display: block;
   font-weight: 600;
+  line-height: 1.5;
 }
 
 /* SECTION 1: GENESIS */
@@ -757,7 +758,9 @@ body:has(.saree-card:hover) #cursor-ring {
   font-family: var(--font-serif);
   font-size: 3.8rem;
   font-weight: 200;
-  line-height: 1.15;
+  line-height: 1.25;
+  padding-top: 0.5rem;
+  margin-top: 1rem;
   margin-bottom: 1.5rem;
   color: #f7f6f0;
   letter-spacing: -0.02em;
@@ -1532,9 +1535,10 @@ body:has(.saree-card:hover) #cursor-ring {
   font-size: 2.8rem;
   font-weight: 300;
   color: #fff;
-  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  margin-top: 1rem;
   margin-bottom: 1.5rem;
-  line-height: 1.2;
+  line-height: 1.25;
 }
 .narrative-text {
   font-family: var(--font-sans);

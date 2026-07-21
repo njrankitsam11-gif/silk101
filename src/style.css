@@ -602,29 +602,29 @@ body:has(.saree-card:hover) #cursor-ring {
 .text-mask-reveal {
   text-align: center;
 }
-.embroidered-text {
+.editorial-headline {
   font-family: var(--font-serif);
-  font-size: 6.5rem;
-  font-weight: 200;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
+  font-size: 14vw;
+  font-weight: 300;
+  line-height: 0.8;
+  letter-spacing: -0.04em;
   color: var(--color-text);
-  text-shadow: 0 4px 40px rgba(0,0,0,0.8), 0 0 80px rgba(26,42,108,0.2);
-  display: block;
+  text-shadow: 0 10px 40px rgba(0,0,0,0.9);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.overlap-text {
   opacity: 0;
   transform: translateY(40px);
 }
 .embroidered-text.accent {
   font-style: italic;
-  font-weight: 300;
-  background: linear-gradient(135deg, #c9a227 0%, #f7d76d 45%, #c9a227 100%);
-  background-size: 200% 200%;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: liquid-gold 4s ease-in-out infinite;
-  text-shadow: none;
-  filter: drop-shadow(0 0 20px rgba(201, 162, 39, 0.3));
+  font-weight: 200;
+  color: var(--color-accent);
+  background: none;
+  -webkit-text-fill-color: initial;
+  text-shadow: 0 10px 40px rgba(0,0,0,0.9);
 }
 .scroll-hint {
   position: absolute;

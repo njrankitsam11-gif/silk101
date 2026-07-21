@@ -3921,6 +3921,8 @@ function setupInteractiveExtensions() {
     if (synthDrone) {
       try {
         synthDrone.osc.stop();
+        if(synthDrone.osc2) synthDrone.osc2.stop();
+        if(synthDrone.lfo) synthDrone.lfo.stop();
         synthDrone.gain.disconnect();
       } catch(e) {}
       synthDrone = null;
@@ -3947,14 +3949,50 @@ function setupInteractiveExtensions() {
       try {
         if (audioCtx.state === 'suspended') audioCtx.resume();
         const osc = audioCtx.createOscillator();
+        const osc2 = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(clusterKey === 'nuapatna' ? 110 : clusterKey === 'maniabandha' ? 130 : clusterKey === 'puri' ? 146 : 98, audioCtx.currentTime);
-        gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
-        osc.connect(gain);
+        const filter = audioCtx.createBiquadFilter();
+        const delay = audioCtx.createDelay(3.0);
+        const fbGain = audioCtx.createGain();
+
+        // Submerged formants / chant
+        osc.type = 'sawtooth';
+        osc2.type = 'triangle';
+        const baseFreq = clusterKey === 'nuapatna' ? 108 : clusterKey === 'maniabandha' ? 136.1 : clusterKey === 'puri' ? 144 : 96;
+        osc.frequency.setValueAtTime(baseFreq, audioCtx.currentTime);
+        osc2.frequency.setValueAtTime(baseFreq * 1.5, audioCtx.currentTime); // Fifth
+
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(300, audioCtx.currentTime); // Deep underwater
+        
+        // Slow LFO for breath/chant rhythm
+        const lfo = audioCtx.createOscillator();
+        lfo.type = 'sine';
+        lfo.frequency.value = 0.15; // Slow breathing cycle
+        const lfoGain = audioCtx.createGain();
+        lfoGain.gain.value = 150; // Filter sweep depth
+        lfo.connect(lfoGain);
+        lfoGain.connect(filter.frequency);
+        lfo.start();
+
+        // Echo/Delay for submerged cave feel
+        delay.delayTime.value = 0.8;
+        fbGain.gain.value = 0.6; // Feedback
+        delay.connect(fbGain);
+        fbGain.connect(delay);
+        delay.connect(filter);
+
+        gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+
+        osc.connect(filter);
+        osc2.connect(filter);
+        filter.connect(delay);
+        filter.connect(gain);
         gain.connect(audioCtx.destination);
+        
         osc.start();
-        synthDrone = { osc, gain };
+        osc2.start();
+        synthDrone = { osc, osc2, lfo, gain, filter, delay, fbGain };
       } catch(e) {}
     }
 
@@ -5243,6 +5281,7 @@ function setupCuratorConcierge() {
   }
 
   function startAmbientLoomAudio() {
+    stopAmbientLoomAudio();
     if (!audioCtx) {
       audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     }

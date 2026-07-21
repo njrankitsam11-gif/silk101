@@ -304,8 +304,11 @@
           <div class="horizontal-scroll-section flex-row">
             
             <!-- Intro Card -->
-            <div class="slide slide-text flex-center">
-              <div class="slide-content">
+            <div class="slide slide-text flex-center" style="position:relative; background: url('/images/artisan_photo.png') no-repeat center center/cover;">
+              <!-- Dark overlay to ensure text readability -->
+              <div style="position:absolute; inset:0; background: linear-gradient(90deg, rgba(17,17,17,0.95) 0%, rgba(17,17,17,0.7) 100%); z-index:0;"></div>
+              
+              <div class="slide-content" style="position:relative; z-index:1;">
                 <span class="section-label">01 / THE HUMAN CONNECTION</span>
                 <svg class="mudra-icon" style="margin-bottom:15px; display:block;" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 40c-2.5 0-4.5-2-4.5-4.5V25l-4-15c0-1.5 2.5-1.5 2.5 1.5l3-3.5c0-1.5 2.5-1.5 2.5 1.5l3.5-2c0-1.5 2.5-1.5 2.5 1.5L27 24m-3 2c1.5 0 2.5-1 2.5-2s-1.5-2-2.5-1.5c-1 1-1.5 1.5-1.5 2.5s.5 1 1.5 1z" /><circle cx="24" cy="40" r="1.5" fill="var(--color-zari)" /></svg>
                 <h3 class="slide-heading">The Artisan's Pulse</h3>

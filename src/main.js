@@ -378,7 +378,7 @@ function setupGenesisCanvas() {
     }
   });
 
-  gsap.to('.overlap-text', {
+  gsap.to('.embroidered-text', {
     scrollTrigger: {
       trigger: '#genesis',
       start: 'top top',

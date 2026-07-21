@@ -279,19 +279,18 @@
         <span class="audio-text">AUDIO OFF</span>
       </button>
 
-      <!-- SECTION 1: THE GENESIS (Editorial Cover) -->
+      <!-- SECTION 1: THE GENESIS (Hero Drop) -->
       <section id="genesis" class="scroll-section">
-        <div class="hero-cover-image" style="position:absolute; top:0; left:0; width:100%; height:100%; background: url('/images/hero_cover.png') no-repeat center center/cover;"></div>
-        <div class="canvas-container" style="mix-blend-mode: overlay; opacity: 0.8;">
+        <div class="canvas-container">
           <canvas id="canvas-genesis"></canvas>
         </div>
-        <div class="content-overlay" style="display:flex; align-items:center; justify-content:center; width:100%; height:100%;">
-          <h1 class="text-mask-reveal editorial-headline" style="margin: 0; position:relative; z-index:2; text-align:center;">
-            <span class="embroidered-text overlap-text" style="display: block;">The Loom</span>
-            <span class="embroidered-text accent overlap-text" style="display: block; margin-top: -0.3em; margin-left: 2em;">Of Time</span>
+        <div class="content-overlay center-content">
+          <h1 class="text-mask-reveal" style="margin: 0; font-size: inherit; font-weight: inherit;">
+            <span class="embroidered-text" style="display: block;">Woven Heritage.</span>
+            <span class="embroidered-text accent" style="display: block;">Preserved Forever.</span>
           </h1>
-          <svg class="mudra-icon small" viewBox="0 0 48 48" style="position:absolute; bottom: 15%; right: 10%; opacity:0.65;" aria-hidden="true"><path d="M24 40c-2.2 0-4-1.8-4-4 0-4-6-6.5-8-12 3 0 5.5 2 7.5 5.5m4.5 10.5c2.2 0 4-1.8 4-4 0-4 6-6.5 8-12-3 0-5.5 2-7.5 5.5M24 36V16c-1.5 1.5-2.5 4.5-2.5 9M21 25c-3-3-4.5-7.5-4.5-12m11 12c3-3 4.5-7.5 4.5-12" /><circle cx="24" cy="40" r="1.5" fill="var(--color-zari)" /></svg>
-          <span class="scroll-hint" style="position:absolute; bottom:5%; left:50%; transform:translateX(-50%);">SCROLL TO WEAVE</span>
+          <svg class="mudra-icon small" viewBox="0 0 48 48" style="margin-bottom:10px; opacity:0.65;" aria-hidden="true"><path d="M24 40c-2.2 0-4-1.8-4-4 0-4-6-6.5-8-12 3 0 5.5 2 7.5 5.5m4.5 10.5c2.2 0 4-1.8 4-4 0-4 6-6.5 8-12-3 0-5.5 2-7.5 5.5M24 36V16c-1.5 1.5-2.5 4.5-2.5 9M21 25c-3-3-4.5-7.5-4.5-12m11 12c3-3 4.5-7.5 4.5-12" /><circle cx="24" cy="40" r="1.5" fill="var(--color-zari)" /></svg>
+          <span class="scroll-hint">SCROLL TO WEAVE</span>
           <!-- Hidden Glyph 1 (Genesis) -->
           <span class="hidden-glyph" data-glyph="0" title="" style="top:15%; left:8%;" aria-hidden="true">ଓ</span>
         </div>
@@ -304,15 +303,13 @@
         <div class="horizontal-wrapper">
           <div class="horizontal-scroll-section flex-row">
             
-            <!-- Intro Card: Asymmetrical Editorial Spread -->
-            <div class="slide slide-text flex-center" style="position:relative; width: 100vw; justify-content: flex-start; padding-left: 10vw;">
-              <div class="editorial-image-portrait" style="position:absolute; right: 15vw; top: 15vh; width: 35vw; height: 70vh; background: url('/images/editorial_portrait.png') no-repeat center center/cover; z-index: 1;"></div>
-              
-              <div class="slide-content" style="position:relative; z-index: 2; width: 50vw;">
+            <!-- Intro Card -->
+            <div class="slide slide-text flex-center">
+              <div class="slide-content">
                 <span class="section-label">01 / THE HUMAN CONNECTION</span>
                 <svg class="mudra-icon" style="margin-bottom:15px; display:block;" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 40c-2.5 0-4.5-2-4.5-4.5V25l-4-15c0-1.5 2.5-1.5 2.5 1.5l3-3.5c0-1.5 2.5-1.5 2.5 1.5l3.5-2c0-1.5 2.5-1.5 2.5 1.5L27 24m-3 2c1.5 0 2.5-1 2.5-2s-1.5-2-2.5-1.5c-1 1-1.5 1.5-1.5 2.5s.5 1 1.5 1z" /><circle cx="24" cy="40" r="1.5" fill="var(--color-zari)" /></svg>
-                <h3 class="editorial-headline" style="font-size: 8rem; text-align:left; line-height:0.9; margin-left:-2rem;">The<br>Artisan's<br>Pulse</h3>
-                <p class="slide-desc" style="font-size:1.2rem; max-width:400px; margin-top: 2rem; background: rgba(17,17,17,0.8); padding: 1rem;">Every masterpiece begins in the hands of a master weaver in Nuapatna and Maniabandha. Their rhythm is the clock cycle of heritage.</p>
+                <h3 class="slide-heading">The Artisan's Pulse</h3>
+                <p class="slide-desc">Every masterpiece begins in the hands of a master weaver in Nuapatna and Maniabandha. Their rhythm is the clock cycle of heritage.</p>
               </div>
             </div>
 
@@ -641,15 +638,15 @@
       </div>
 
       <!-- SECTION 3.5: THE SOUL OF ODISHA -->
-      <section id="heritage-soul" class="scroll-section flex-center" style="background:#09070b; position:relative; min-height: 100vh; padding: 10rem 5%; box-sizing: border-box;">
+      <section id="heritage-soul" class="scroll-section flex-center" style="background:#09070b; position:relative; min-height: 100vh; padding: 4rem 10%; box-sizing: border-box;">
         <!-- Hidden Glyph 4 (Heritage Soul) -->
         <span class="hidden-glyph" data-glyph="3" style="top:12%; left:50%; font-size:2rem;" aria-hidden="true">ଣ</span>
-        
-        <div class="narrative-split" style="display:flex; width:100%; height:100%; max-width:1400px; gap:8%; align-items:center;">
+        <div class="narrative-split" style="display:flex; width:100%; height:100%; max-width:1200px; gap:4%; align-items:center;">
           <!-- Left: Narrative & Toggles -->
-          <div class="narrative-col" style="flex:0.8; display:flex; flex-direction:column; justify-content:center; position:relative; z-index:2;">
+          <div class="narrative-col" style="flex:1; display:flex; flex-direction:column; justify-content:center;">
             <span class="section-label">02B / DEVOTION, FOOD & SEA</span>
-            <h3 class="narrative-heading editorial-headline" style="font-size:7rem; line-height:0.9; margin-bottom:2rem; margin-left:-3rem; text-align:left;">The Soul<br>Of Odisha</h3>
+            <svg class="mudra-icon" style="margin-bottom:12px; display:block;" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 40c-2.5 0-4.5-2-4.5-4.5V25l-4-15c0-1.5 2.5-1.5 2.5 1.5l3-3.5c0-1.5 2.5-1.5 2.5 1.5l3.5-2c0-1.5 2.5-1.5 2.5 1.5L27 24m-3 2c1.5 0 2.5-1 2.5-2s-1.5-2-2.5-1.5c-1 1-1.5 1.5-1.5 2.5s.5 1 1.5 1z" /><circle cx="24" cy="40" r="1.5" fill="var(--color-zari)" /></svg>
+            <h3 class="narrative-heading" style="font-size:2.8rem; line-height:1.15; margin-bottom:1.5rem;">The Soul of Odisha</h3>
             
             <div class="heritage-tabs" style="display:flex; gap:10px; margin-bottom:24px; flex-wrap:wrap;">
               <button class="btn btn-sm btn-outline active" data-heritage="food">Mahaprasad Feast</button>
@@ -657,27 +654,32 @@
               <button class="btn btn-sm btn-outline" data-heritage="odissi">Odissi Mudras</button>
             </div>
             
-            <div class="heritage-content-wrap" style="background: rgba(17,17,17,0.9); padding: 2rem; border-left: 2px solid var(--color-zari);">
+            <div class="heritage-content-wrap">
               <div id="heritage-food" class="heritage-pane active">
                 <h4 style="font-family:'Outfit'; color:var(--color-zari); margin-bottom:10px; font-weight:600; font-size:1.15rem;">Abhada & Stacked Clay Pots</h4>
-                <p class="narrative-text" style="margin-bottom:12px; font-size:1.1rem; line-height:1.6;">In the sacred temple kitchen of Puri, the Mahaprasad is cooked as a holy offering. In a unique design, 9 clay pots (Kudua) are stacked on top of each other over a single wood fire. Miraculously, the top pot cooks first, then the next, downwards.</p>
+                <p class="narrative-text" style="margin-bottom:12px; font-size:0.95rem; line-height:1.4;">In the sacred temple kitchen of Puri, the Mahaprasad is cooked as a holy offering. In a unique design, 9 clay pots (Kudua) are stacked on top of each other over a single wood fire. Miraculously, the top pot cooks first, then the next, downwards.</p>
+                <p class="narrative-text" style="font-size:0.95rem; line-height:1.4;">This divine culinary physics celebrates simplicity, earthen elements, and centuries of devotion.</p>
               </div>
               <div id="heritage-maritime" class="heritage-pane hidden">
                 <h4 style="font-family:'Outfit'; color:var(--color-zari); margin-bottom:10px; font-weight:600; font-size:1.15rem;">Boita Bandana: The Sea Merchant Legacy</h4>
-                <p class="narrative-text" style="margin-bottom:12px; font-size:1.1rem; line-height:1.6;">During Kartik Purnima, the rivers and shores of Odisha glow with thousands of miniature paper and cork boats (Boita) floating with oil lamps, betel leaves, and coins. This ritual honors the ancient maritime traders who sailed across oceans to trade spices and silks.</p>
+                <p class="narrative-text" style="margin-bottom:12px; font-size:0.95rem; line-height:1.4;">During Kartik Purnima, the rivers and shores of Odisha glow with thousands of miniature paper and cork boats (Boita) floating with oil lamps, betel leaves, and coins.</p>
+                <p class="narrative-text" style="font-size:0.95rem; line-height:1.4;">This ritual honors the "Sadhabas" (ancient maritime traders) who sailed across oceans to trade spices and silks, leaving an indelible imprint on Indonesian culture.</p>
               </div>
               <div id="heritage-odissi" class="heritage-pane hidden">
                 <h4 style="font-family:'Outfit'; color:var(--color-zari); margin-bottom:10px; font-weight:600; font-size:1.15rem;">The Sacred Posture of Tribhangi</h4>
-                <p class="narrative-text" style="margin-bottom:12px; font-size:1.1rem; line-height:1.6;">Odissi is the ancient classical dance form of Odisha, characterized by the <em>Tribhangi</em> (the three-bend stance of the head, chest, and pelvis). Carved in stone across temples like Konark and Mukteswar, these poses translate physical geometry into absolute spiritual surrender.</p>
+                <p class="narrative-text" style="margin-bottom:12px; font-size:0.95rem; line-height:1.4;">Odissi is the ancient classical dance form of Odisha, characterized by the <em>Tribhangi</em> (the three-bend stance of the head, chest, and pelvis) and complex hand gestures (Mudras).</p>
+                <p class="narrative-text" style="font-size:0.95rem; line-height:1.4;">Carved in stone across temples like Konark and Mukteswar, these poses translate physical geometry into absolute spiritual surrender.</p>
               </div>
             </div>
           </div>
           
-          <!-- Right: Interactive Canvas Illustration / Editorial Landscape -->
-          <div class="narrative-col flex-center" style="flex:1.2; position:relative; min-height:600px; display:flex; align-items:center; justify-content:center; padding-left: 2rem;">
-            <div class="editorial-image-landscape" style="position:absolute; right: 0; top: 10%; width: 100%; height: 80%; background: url('/images/editorial_landscape.png') no-repeat center center/cover; z-index: 1; border-radius: 4px; box-shadow: -20px 20px 60px rgba(0,0,0,0.5);"></div>
-            <div class="heritage-canvas-wrap" style="position:absolute; right: 0; top: 10%; width:100%; height:80%; z-index:2; pointer-events:none;">
+          <!-- Right: Interactive Canvas Illustration -->
+          <div class="narrative-col border-left flex-center" style="flex:1; position:relative; overflow:hidden; min-height:420px; display:flex; align-items:center; justify-content:center;">
+            <div class="heritage-canvas-wrap" style="position:relative; width:100%; height:100%; min-height:400px; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.15); border-radius:8px; border:1px solid rgba(255,255,255,0.03);">
               <canvas id="canvas-heritage-soul" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:auto;"></canvas>
+              <div class="heritage-interactive-hint" style="position:absolute; bottom:12px; font-size:0.75rem; color:rgba(255,255,255,0.45); pointer-events:none; font-family:'Outfit'; width:100%; text-align:center;">
+                Interact with the canvas to feel the rhythm of Odisha
+              </div>
             </div>
           </div>
         </div>

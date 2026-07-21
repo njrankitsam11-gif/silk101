@@ -2071,7 +2071,17 @@ function setupVaultScrollParallax() {
       const info = card.querySelector('.saree-info');
       const model = card.querySelector('.layer-model');
       
-      card.style.transform = `translateZ(${currentZ}px)`;
+      // Sophisticated S-Curve Sweep Math
+      const depth = Math.max(0, -currentZ);
+      const distRatio = depth / 1500; // Normalized by card spacing
+      
+      const translateX = Math.sin(distRatio * 1.1) * 600;
+      const translateY = Math.sin(distRatio * 2.1) * 60;
+      const rotateY = Math.sin(distRatio * 1.1) * -35; // Twist inward
+      const rotateX = Math.min(10, distRatio * 3); // Gentle lean back
+      const rotateZ = Math.sin(distRatio * 0.8) * -6; // Subtle roll
+      
+      card.style.transform = `translate3d(${translateX}px, ${translateY}px, ${currentZ}px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) rotateZ(${rotateZ}deg)`;
       card.style.opacity = Math.max(0, Math.min(1, opacity));
       card.style.pointerEvents = (currentZ > -1500 && currentZ < 1000) ? 'auto' : 'none';
       

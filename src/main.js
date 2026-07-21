@@ -2070,17 +2070,16 @@ function setupVaultScrollParallax() {
       
       card.style.transform = `translate3d(-50%, -50%, ${currentZ}px)`;
       card.style.opacity = Math.max(0, Math.min(1, opacity));
-      card.style.pointerEvents = (currentZ > -250 && currentZ < 400) ? 'auto' : 'none';
+      card.style.pointerEvents = (currentZ > -1500 && currentZ < 1000) ? 'auto' : 'none';
       
-      if (currentZ > -1000 && currentZ < 600) {
-        if (!card.dataset.tilted) {
-          if (silk) silk.style.transform = `translateZ(0px)`;
-          if (model) model.style.transform = `translateZ(12px)`;
-          if (zari) zari.style.transform = `translateZ(${20 + (scrollVelocity || 0) * 0.3}px)`;
-          if (shadow) shadow.style.transform = `translateZ(-30px)`;
-          if (info) info.style.transform = `translateZ(${35 + (scrollVelocity || 0) * 0.5}px)`;
-        }
+      if (!card.dataset.tilted) {
+        if (silk) silk.style.transform = `translateZ(0px)`;
+        if (model) model.style.transform = `translateZ(12px)`;
+        if (zari) zari.style.transform = `translateZ(${20 + (scrollVelocity || 0) * 0.3}px)`;
+        if (shadow) shadow.style.transform = `translateZ(-30px)`;
+        if (info) info.style.transform = `translateZ(${35 + (scrollVelocity || 0) * 0.5}px)`;
       }
+
     });
   }
 

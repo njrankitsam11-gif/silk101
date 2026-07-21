@@ -130,12 +130,13 @@
 
 /* ── Vault 3D Depth ──────────────────────────────────────────── */
 #vault {
-  transform-style: preserve-3d;
+  position: relative;
 }
 #vault .vault-heading-wrap {
-  transform-style: preserve-3d;
+  position: absolute;
   will-change: transform;
 }
+
 
 /* ── Deep Parallax Glow Halos per Section ────────────────────── */
 #artisan-pulse {

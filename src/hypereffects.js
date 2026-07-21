@@ -398,7 +398,12 @@ function initScrollParallaxLayers() {
         document.querySelectorAll(selector).forEach(el => {
           const rect = el.getBoundingClientRect();
           const offset = (window.innerHeight / 2 - (rect.top + rect.height / 2)) * depth;
-          el.style.transform = `translateY(${offset}px)`;
+          
+          if (el.classList.contains('vault-heading-wrap')) {
+            el.style.transform = `translateX(-50%) translateY(${offset}px)`;
+          } else {
+            el.style.transform = `translateY(${offset}px)`;
+          }
           el.style.willChange = 'transform';
         });
       });

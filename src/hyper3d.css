@@ -134,6 +134,12 @@
 }
 #vault .vault-heading-wrap {
   position: absolute;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  text-align: center;
+  z-index: 10;
   will-change: transform;
 }
 

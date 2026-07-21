@@ -2050,16 +2050,19 @@ function setupVaultScrollParallax() {
   const cards = document.querySelectorAll('.saree-card');
   if (cards.length === 0) return;
   
+  const totalScrollDist = 1500 * cards.length + 2000;
+  const pinDuration = cards.length * 800;
+  
   function updateVaultCards(progress) {
     cards.forEach((card, index) => {
       const baseZ = -1500 * (index + 0.5);
-      const currentZ = baseZ + progress * 10500;
+      const currentZ = baseZ + progress * totalScrollDist;
       
       let opacity = 1;
       if (currentZ > 400) {
         opacity = 1 - (currentZ - 400) / 400;
-      } else if (currentZ < -2000) {
-        opacity = 0;
+      } else if (currentZ < -7000) {
+        opacity = 1 - (Math.abs(currentZ) - 7000) / 3000;
       }
       
       const shadow = card.querySelector('.layer-shadow');
@@ -2124,7 +2127,7 @@ function setupVaultScrollParallax() {
     trigger: '#vault',
     pin: true,
     start: 'top top',
-    end: '+=4800',
+    end: '+=' + pinDuration,
     scrub: true,
     onUpdate: (self) => updateVaultCards(self.progress)
   });

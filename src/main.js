@@ -3967,26 +3967,25 @@ function setupInteractiveExtensions() {
         osc2.frequency.setValueAtTime(baseFreq * 1.5, audioCtx.currentTime); // Fifth
 
         filter.type = 'lowpass';
-        filter.frequency.setValueAtTime(300, audioCtx.currentTime); // Deep underwater
+        filter.frequency.setValueAtTime(600, audioCtx.currentTime); // Deep underwater
         
         // Slow LFO for breath/chant rhythm
         const lfo = audioCtx.createOscillator();
         lfo.type = 'sine';
         lfo.frequency.value = 0.15; // Slow breathing cycle
         const lfoGain = audioCtx.createGain();
-        lfoGain.gain.value = 150; // Filter sweep depth
+        lfoGain.gain.value = 250; // Filter sweep depth
         lfo.connect(lfoGain);
         lfoGain.connect(filter.frequency);
         lfo.start();
 
         // Echo/Delay for submerged cave feel
         delay.delayTime.value = 0.8;
-        fbGain.gain.value = 0.6; // Feedback
+        fbGain.gain.value = 0.5; // Feedback
         delay.connect(fbGain);
         fbGain.connect(delay);
-        delay.connect(filter);
 
-        gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
 
         osc.connect(filter);
         osc2.connect(filter);
@@ -3998,7 +3997,7 @@ function setupInteractiveExtensions() {
         osc.start();
         osc2.start();
         synthDrone = { osc, osc2, lfo, gain, filter, delay, fbGain };
-      } catch(e) {}
+      } catch(e) { console.error("Audio error:", e); }
     }
 
     const lines = ORAL_TRANSCRIPTS[clusterKey] || ["Reciting oral history..."];

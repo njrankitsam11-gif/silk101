@@ -3,25 +3,25 @@
    Top-of-the-World Luxury Edition
    ═══════════════════════════════════════════════════════════ */
 :root {
-  /* Depths */
-  --color-bg: #03050f;               /* Deep Indigo-Black */
-  --color-surface: #080c1a;          /* Elevated surface */
-  --color-surface-2: #0d1226;        /* Card elevated */
-  --color-text: #f0ede6;             /* Warm ivory */
-  --color-text-muted: #8a8da0;
+  /* Depths - Luxury Charcoal */
+  --color-bg: #111111;               /* Deep Matte Charcoal */
+  --color-surface: #181818;          /* Soft Charcoal Surface */
+  --color-surface-2: #222222;        /* Card elevated */
+  --color-text: #faf9f6;             /* Alabaster White */
+  --color-text-muted: #9e9e9e;       /* Elegant Grey */
 
-  /* Liquid Gold System */
-  --color-accent: #c9a227;           /* Antique gold */
-  --color-accent-bright: #f7d76d;    /* Highlight sheen */
-  --color-accent-deep: #7a5c0a;      /* Shadow gold */
-  --color-accent-rgb: 201, 162, 39;
-  --color-zari: #c9a227;
+  /* Champagne / Muted Accent System */
+  --color-accent: #e5d3b3;           /* Matte Champagne Gold */
+  --color-accent-bright: #f8f1e5;    /* Pale Champagne Sheen */
+  --color-accent-deep: #a69477;      /* Muted Bronze */
+  --color-accent-rgb: 229, 211, 179;
+  --color-zari: #e5d3b3;
 
-  /* Heritage Palette */
-  --color-sapphire: #1a2a6c;         /* Konark sapphire */
-  --color-crimson: #5e0f1e;          /* Deep Raktachandan */
-  --color-crimson-rgb: 94, 15, 30;
-  --color-jade: #0d3d2e;             /* Sacred malachite */
+  /* Heritage Palette - Muted / Editorial */
+  --color-sapphire: #2a3441;         /* Slate Blue */
+  --color-crimson: #4a2c2a;          /* Faded Burgundy */
+  --color-crimson-rgb: 74, 44, 42;
+  --color-jade: #2c3a32;             /* Muted Pine */
 
   /* Typography */
   --font-sans: 'Outfit', 'Inter', -apple-system, sans-serif;
@@ -226,7 +226,7 @@ body:has(.saree-card:hover) #cursor-ring {
   letter-spacing: 0.06em;
   margin: 0;
   color: var(--color-text);
-  background: linear-gradient(135deg, #f0ede6 30%, #f7d76d 60%, #c9a227 80%, #f0ede6 100%);
+  background: linear-gradient(135deg, var(--color-text) 30%, var(--color-accent-bright) 60%, var(--color-accent) 80%, var(--color-text) 100%);
   background-size: 250% 250%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -418,47 +418,19 @@ body:has(.saree-card:hover) #cursor-ring {
 }
 
 #genesis {
-  background: radial-gradient(ellipse at 30% 40%, rgba(26, 42, 108, 0.35) 0%, transparent 55%),
-              radial-gradient(ellipse at 75% 70%, rgba(94, 15, 30, 0.18) 0%, transparent 50%),
-              var(--color-bg);
-}
-#genesis::before {
-  content: "";
-  position: absolute;
-  top: 10%;
-  left: 15%;
-  width: 500px; height: 500px;
-  background: radial-gradient(circle, rgba(201, 162, 39, 0.1) 0%, transparent 65%);
-  filter: blur(70px);
-  pointer-events: none;
-  animation: aurora-shift 6s ease-in-out infinite;
-}
-#genesis::after {
-  content: "";
-  position: absolute;
-  bottom: 10%;
-  right: 15%;
-  width: 400px; height: 400px;
-  background: radial-gradient(circle, rgba(26, 42, 108, 0.15) 0%, transparent 65%);
-  filter: blur(90px);
-  pointer-events: none;
-  animation: aurora-shift 8s ease-in-out infinite reverse;
+  background: var(--color-bg);
 }
 
 #artisan-pulse {
-  background: radial-gradient(ellipse at 80% 20%, rgba(13, 61, 46, 0.2) 0%, transparent 50%),
-              var(--color-surface);
+  background: var(--color-surface);
 }
 
 #metamorphosis {
-  background: radial-gradient(ellipse at 20% 60%, rgba(26, 42, 108, 0.25) 0%, transparent 50%),
-              var(--color-bg);
+  background: var(--color-surface);
 }
 
 #vault {
-  background: radial-gradient(ellipse at 60% 30%, rgba(94, 15, 30, 0.2) 0%, transparent 50%),
-              radial-gradient(ellipse at 20% 80%, rgba(26, 42, 108, 0.1) 0%, transparent 40%),
-              var(--color-surface);
+  background: var(--color-surface);
 }
 
 /* ─── Holographic Warp Thread Dividers ────────────────── */
@@ -1026,8 +998,7 @@ body:has(.saree-card:hover) #cursor-ring {
 }
 .saree-layer.layer-silk {
   transform: translateZ(0px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.8);
 }
 .saree-layer.layer-zari {
   transform: translateZ(25px);
@@ -2382,42 +2353,25 @@ body.cursor-drag .custom-cursor-ring::after {
   z-index: 5;
 }
 .saree-card:hover::after {
-  opacity: 1;
-  animation: foil-sweep 1.6s linear infinite;
+  opacity: 0.5;
+  transition: opacity 1s ease;
 }
 .saree-card:hover .saree-layer.layer-silk {
-  box-shadow: 0 16px 60px rgba(0,0,0,0.7), 0 0 30px rgba(212, 175, 55, 0.2);
+  box-shadow: 0 30px 80px rgba(0,0,0,0.9);
+  transform: scale(1.02) translateZ(0px);
+  transition: transform 0.8s var(--ease-silk), box-shadow 0.8s var(--ease-silk);
 }
 
 /* ── CTAs — Zari Border Glow on Hover ─────────────────────── */
 .btn-primary {
   position: relative;
   overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  transition: border-color 0.6s var(--ease-silk), background-color 0.6s var(--ease-silk);
 }
-.btn-primary::before {
-  content: '';
-  position: absolute;
-  inset: -2px;
-  background: conic-gradient(
-    from var(--angle, 0deg),
-    transparent 0%, #d4af37 20%, #fff8c0 40%, #d4af37 60%, transparent 80%
-  );
-  border-radius: 6px;
-  opacity: 0;
-  transition: opacity 0.4s;
-  z-index: -1;
-  animation: spin-border 3s linear infinite;
-}
-.btn-primary:hover::before {
-  opacity: 1;
-}
-@keyframes spin-border {
-  to { --angle: 360deg; }
-}
-@property --angle {
-  syntax: '<angle>';
-  initial-value: 0deg;
-  inherits: false;
+.btn-primary:hover {
+  border-color: var(--color-accent);
+  background-color: rgba(229, 211, 179, 0.05);
 }
 
 /* ── Vault Scarcity Chip ─────────────────────────────────────── */

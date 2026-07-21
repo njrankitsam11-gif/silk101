@@ -95,11 +95,7 @@
 /* ── Heritage Soul 3D Canvas Blend ───────────────────────────── */
 #heritage-soul {
   transform-style: preserve-3d;
-  background:
-    radial-gradient(ellipse at 28% 50%, rgba(13,61,46,0.22) 0%, transparent 55%),
-    radial-gradient(ellipse at 72% 18%, rgba(26,42,108,0.18) 0%, transparent 50%),
-    radial-gradient(ellipse at 55% 82%, rgba(201,162,39,0.06) 0%, transparent 40%),
-    #09070b;
+  background: var(--color-bg);
 }
 #canvas-3d-artifacts {
   mix-blend-mode: screen;
@@ -109,12 +105,14 @@
 #canvas-silk-cloth {
   mix-blend-mode: screen;
   display: block;
+  opacity: 0.2;
 }
 
 /* ── Volumetric Gold Dust (fixed canvas) ─────────────────────── */
 #canvas-gold-dust {
   display: block;
   will-change: auto;
+  opacity: 0.15;
 }
 
 /* ── Iridescent Hero Accent Text Extension ───────────────────── */

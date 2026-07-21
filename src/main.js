@@ -3955,48 +3955,23 @@ function setupInteractiveExtensions() {
         const osc = audioCtx.createOscillator();
         const osc2 = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
-        const filter = audioCtx.createBiquadFilter();
-        const delay = audioCtx.createDelay(3.0);
-        const fbGain = audioCtx.createGain();
 
-        // Submerged formants / chant
+        // Simple Submerged Drone (guaranteed audible)
         osc.type = 'sawtooth';
-        osc2.type = 'triangle';
+        osc2.type = 'sine';
         const baseFreq = clusterKey === 'nuapatna' ? 108 : clusterKey === 'maniabandha' ? 136.1 : clusterKey === 'puri' ? 144 : 96;
         osc.frequency.setValueAtTime(baseFreq, audioCtx.currentTime);
-        osc2.frequency.setValueAtTime(baseFreq * 1.5, audioCtx.currentTime); // Fifth
+        osc2.frequency.setValueAtTime(baseFreq * 1.5, audioCtx.currentTime);
 
-        filter.type = 'lowpass';
-        filter.frequency.setValueAtTime(600, audioCtx.currentTime); // Deep underwater
-        
-        // Slow LFO for breath/chant rhythm
-        const lfo = audioCtx.createOscillator();
-        lfo.type = 'sine';
-        lfo.frequency.value = 0.15; // Slow breathing cycle
-        const lfoGain = audioCtx.createGain();
-        lfoGain.gain.value = 250; // Filter sweep depth
-        lfo.connect(lfoGain);
-        lfoGain.connect(filter.frequency);
-        lfo.start();
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime); // Loud and clear
 
-        // Echo/Delay for submerged cave feel
-        delay.delayTime.value = 0.8;
-        fbGain.gain.value = 0.5; // Feedback
-        delay.connect(fbGain);
-        fbGain.connect(delay);
-
-        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-
-        osc.connect(filter);
-        osc2.connect(filter);
-        filter.connect(delay);
-        delay.connect(gain);
-        filter.connect(gain);
+        osc.connect(gain);
+        osc2.connect(gain);
         gain.connect(audioCtx.destination);
         
         osc.start();
         osc2.start();
-        synthDrone = { osc, osc2, lfo, gain, filter, delay, fbGain };
+        synthDrone = { osc, osc2, gain };
       } catch(e) { console.error("Audio error:", e); }
     }
 
@@ -4019,8 +3994,8 @@ function setupInteractiveExtensions() {
     btnPlayOral.onclick = () => {
       if (synthDrone) {
         stopOralAudio();
-      } else if (activeClusterKey) {
-        playOralAudio(activeClusterKey);
+      } else {
+        playOralAudio(activeClusterKey || 'nuapatna');
       }
     };
   }

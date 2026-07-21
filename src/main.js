@@ -2071,7 +2071,7 @@ function setupVaultScrollParallax() {
       const info = card.querySelector('.saree-info');
       const model = card.querySelector('.layer-model');
       
-      card.style.transform = `translate3d(-50%, -50%, ${currentZ}px)`;
+      card.style.transform = `translateZ(${currentZ}px)`;
       card.style.opacity = Math.max(0, Math.min(1, opacity));
       card.style.pointerEvents = (currentZ > -1500 && currentZ < 1000) ? 'auto' : 'none';
       

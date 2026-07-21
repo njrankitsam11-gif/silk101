@@ -994,7 +994,9 @@ body:has(.saree-card:hover) #cursor-ring {
   left: 50%;
   width: 420px;
   height: 580px;
-  transform: translate3d(-50%, -50%, -1000px);
+  margin-top: -290px;
+  margin-left: -210px;
+  transform: translateZ(-1000px);
   transform-style: preserve-3d;
   cursor: pointer;
   display: flex;

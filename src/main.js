@@ -106,28 +106,40 @@ function triggerLoomClack() {
 function playClackSound(panValue) {
   if (!audioCtx) return;
   
+  // 1. Sub-bass heavy wooden frame thud
   const thudOsc = audioCtx.createOscillator();
   const thudGain = audioCtx.createGain();
-  thudOsc.type = 'sine';
-  thudOsc.frequency.setValueAtTime(90 * (1 + warpTension * 0.15), audioCtx.currentTime);
-  thudOsc.frequency.exponentialRampToValueAtTime(30, audioCtx.currentTime + 0.12);
+  thudOsc.type = 'triangle';
+  thudOsc.frequency.setValueAtTime(110 * (1 + warpTension * 0.12), audioCtx.currentTime);
+  thudOsc.frequency.exponentialRampToValueAtTime(24, audioCtx.currentTime + 0.14);
   
-  thudGain.gain.setValueAtTime(0.25, audioCtx.currentTime);
-  thudGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.12);
+  thudGain.gain.setValueAtTime(0.32, audioCtx.currentTime);
+  thudGain.gain.exponentialRampToValueAtTime(0.005, audioCtx.currentTime + 0.14);
   
+  // 2. Wooden shuttle impact click (wood resonant body)
   const clickBuffer = createNoiseBuffer();
   const clickSource = audioCtx.createBufferSource();
   clickSource.buffer = clickBuffer;
   
   const clickFilter = audioCtx.createBiquadFilter();
   clickFilter.type = 'bandpass';
-  clickFilter.frequency.value = 1200;
-  clickFilter.Q.value = 6;
+  clickFilter.frequency.value = 1450;
+  clickFilter.Q.value = 7.5;
   
   const clickGain = audioCtx.createGain();
-  clickGain.gain.setValueAtTime(0.08, audioCtx.currentTime);
-  clickGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+  clickGain.gain.setValueAtTime(0.14, audioCtx.currentTime);
+  clickGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.06);
   
+  // 3. Silk thread friction whirr (short high-frequency breeze)
+  const whirrSource = audioCtx.createBufferSource();
+  whirrSource.buffer = clickBuffer;
+  const whirrFilter = audioCtx.createBiquadFilter();
+  whirrFilter.type = 'highpass';
+  whirrFilter.frequency.value = 3200;
+  const whirrGain = audioCtx.createGain();
+  whirrGain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+  whirrGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+
   const panner = audioCtx.createStereoPanner ? audioCtx.createStereoPanner() : null;
   if (panner) {
     panner.pan.setValueAtTime(Math.max(-0.8, Math.min(0.8, panValue)), audioCtx.currentTime);
@@ -138,6 +150,10 @@ function playClackSound(panValue) {
     clickSource.connect(clickFilter);
     clickFilter.connect(clickGain);
     clickGain.connect(panner);
+
+    whirrSource.connect(whirrFilter);
+    whirrFilter.connect(whirrGain);
+    whirrGain.connect(panner);
     
     panner.connect(audioCtx.destination);
   } else {
@@ -147,16 +163,89 @@ function playClackSound(panValue) {
     clickSource.connect(clickFilter);
     clickFilter.connect(clickGain);
     clickGain.connect(audioCtx.destination);
+
+    whirrSource.connect(whirrFilter);
+    whirrFilter.connect(whirrGain);
+    whirrGain.connect(audioCtx.destination);
   }
   
   thudOsc.start();
-  thudOsc.stop(audioCtx.currentTime + 0.15);
+  thudOsc.stop(audioCtx.currentTime + 0.16);
   clickSource.start();
-  clickSource.stop(audioCtx.currentTime + 0.06);
+  clickSource.stop(audioCtx.currentTime + 0.07);
+  whirrSource.start();
+  whirrSource.stop(audioCtx.currentTime + 0.09);
+}
+
+// Silk Thread Friction Rustle for card drags & 360 rotation
+let lastRustleTime = 0;
+function playSilkRustleSound(intensity = 1.0) {
+  if (!audioCtx || !isAudioPlaying) return;
+  const now = Date.now();
+  if (now - lastRustleTime < 80) return; // throttle rustles
+  lastRustleTime = now;
+
+  try {
+    const noise = createNoiseBuffer();
+    const source = audioCtx.createBufferSource();
+    source.buffer = noise;
+
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.setValueAtTime(2400 + Math.random() * 800, audioCtx.currentTime);
+    filter.Q.value = 3.0;
+
+    const gain = audioCtx.createGain();
+    const vol = Math.min(0.06 * intensity, 0.12);
+    gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.12);
+
+    source.connect(filter);
+    filter.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    source.start();
+    source.stop(audioCtx.currentTime + 0.13);
+  } catch (e) {}
+}
+
+// Weaver Foot-Pedal Thud Sound
+function playPedalThudSound() {
+  if (!audioCtx || !isAudioPlaying) return;
+  try {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(75, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(18, audioCtx.currentTime + 0.22);
+    gain.gain.setValueAtTime(0.28, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.22);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.23);
+  } catch (e) {}
+}
+
+// Warm Resonant Temple Bell Chime
+function playTempleChimeSound(freq = 528) {
+  if (!audioCtx) return;
+  try {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 1.8);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 1.85);
+  } catch (e) {}
 }
 
 function createNoiseBuffer() {
-  const bufferSize = audioCtx.sampleRate * 0.05;
+  const bufferSize = audioCtx.sampleRate * 0.08;
   const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
   const data = buffer.getChannelData(0);
   for (let i = 0; i < bufferSize; i++) {
@@ -665,81 +754,144 @@ function setupHorizontalPulse() {
     tooltip.classList.remove('active');
   });
   
+  let lastShuttleSide = false;
+
   function drawLeft() {
-    ctxLeft.fillStyle = '#060606';
+    ctxLeft.fillStyle = '#08080a';
     ctxLeft.fillRect(0, 0, canvasLeft.width, canvasLeft.height);
     
     const time = Date.now() * 0.0025;
     
-    // Wood frame
-    ctxLeft.strokeStyle = 'rgba(255, 255, 255, 0.03)';
-    ctxLeft.lineWidth = 10;
-    ctxLeft.strokeRect(40, 40, canvasLeft.width - 80, canvasLeft.height - 80);
+    // Wood frame with grain texture and warm shadow
+    ctxLeft.save();
+    ctxLeft.strokeStyle = 'rgba(212, 175, 55, 0.08)';
+    ctxLeft.lineWidth = 14;
+    ctxLeft.shadowColor = '#000';
+    ctxLeft.shadowBlur = 20;
+    ctxLeft.strokeRect(30, 30, canvasLeft.width - 60, canvasLeft.height - 60);
+    ctxLeft.restore();
+
+    // Fabric Backing Texture (Subtle Weave Pattern)
+    ctxLeft.fillStyle = 'rgba(255, 255, 255, 0.012)';
+    for (let wy = 40; wy < canvasLeft.height - 40; wy += 8) {
+      ctxLeft.fillRect(40, wy, canvasLeft.width - 80, 1);
+    }
     
-    // Threads count based on threadCount slider
-    ctxLeft.lineWidth = 1;
-    const spacing = canvasLeft.width / threadCount;
+    // Warp Threads count based on threadCount slider
+    const spacing = (canvasLeft.width - 80) / threadCount;
     
     for (let i = 0; i < threadCount; i++) {
-      const tx = i * spacing;
+      const tx = 40 + i * spacing;
       ctxLeft.beginPath();
-      ctxLeft.moveTo(tx, 0);
+      ctxLeft.moveTo(tx, 30);
       
       // Thread tension/bend varies with warpTension slider
       let bend = 0;
       if (mouse.isOver) {
         const dist = Math.abs(mouse.x - tx);
-        if (dist < 150) {
-          // Higher tension results in less warp deflection/bending
-          bend = (1 - dist / 150) * (mouse.y - canvasLeft.height / 2) * (0.85 / warpTension);
+        if (dist < 160) {
+          // Tension strain physics
+          bend = (1 - dist / 160) * (mouse.y - canvasLeft.height / 2) * (1.1 / warpTension);
+          if (dist < 20) {
+            playSilkRustleSound(0.4);
+          }
         }
       }
       
-      const wave = Math.sin(time + i * 0.5) * 4;
-      // Thread color changes based on select-pattern motif
-      let threadColor = 'rgba(128, 0, 32, 0.25)'; // Default crimson
-      if (borderPattern === 'lotus' && i % 4 === 0) threadColor = 'rgba(212, 175, 55, 0.45)';
-      else if (borderPattern === 'temple' && i % 3 === 0) threadColor = 'rgba(255, 255, 255, 0.35)';
-      else if (borderPattern === 'grid' && i % 2 === 0) threadColor = 'rgba(100, 180, 255, 0.35)';
+      const wave = Math.sin(time + i * 0.4) * 3;
       
-      ctxLeft.strokeStyle = threadColor;
-      ctxLeft.bezierCurveTo(tx, canvasLeft.height * 0.25, tx + bend + wave, canvasLeft.height * 0.5, tx, canvasLeft.height);
+      // Photorealistic Thread Color Layers
+      let mainHue = 340; // Crimson Patta
+      let isZari = false;
+
+      if (borderPattern === 'lotus' && i % 4 === 0) { isZari = true; mainHue = 45; }
+      else if (borderPattern === 'temple' && i % 3 === 0) { mainHue = 30; }
+      else if (borderPattern === 'grid' && i % 2 === 0) { mainHue = 200; }
+      
+      // Core thread strand
+      ctxLeft.save();
+      if (isZari) {
+        ctxLeft.strokeStyle = 'rgba(255, 215, 0, 0.85)';
+        ctxLeft.lineWidth = 2.2;
+        ctxLeft.shadowColor = 'rgba(255, 215, 0, 0.6)';
+        ctxLeft.shadowBlur = 6;
+      } else {
+        ctxLeft.strokeStyle = `hsla(${mainHue}, 75%, 45%, 0.6)`;
+        ctxLeft.lineWidth = 1.6;
+      }
+
+      ctxLeft.bezierCurveTo(tx, canvasLeft.height * 0.25, tx + bend + wave, canvasLeft.height * 0.5, tx, canvasLeft.height - 30);
       ctxLeft.stroke();
+
+      // Micro-fiber Fuzz strands (Photorealistic Thread Detail)
+      if (i % 3 === 0) {
+        ctxLeft.strokeStyle = isZari ? 'rgba(255, 245, 180, 0.4)' : `hsla(${mainHue}, 60%, 70%, 0.25)`;
+        ctxLeft.lineWidth = 0.6;
+        ctxLeft.beginPath();
+        const fuzzY = (Math.sin(time * 2 + i) * 0.4 + 0.5) * (canvasLeft.height - 80) + 40;
+        ctxLeft.moveTo(tx + bend, fuzzY);
+        ctxLeft.lineTo(tx + bend + (i % 2 === 0 ? 4 : -4), fuzzY - 3);
+        ctxLeft.stroke();
+      }
+      ctxLeft.restore();
     }
     
-    // Loom Shuttle
-    const shuttleX = (Math.sin(time * 0.5) * 0.4 + 0.5) * canvasLeft.width;
+    // Loom Shuttle (3D Wood Shell + Gilded Weft Spool)
+    const shuttleProgress = Math.sin(time * 0.6) * 0.42 + 0.5;
+    const shuttleX = 40 + shuttleProgress * (canvasLeft.width - 80);
     const shuttleY = canvasLeft.height / 2;
     
-    ctxLeft.fillStyle = '#d4af37';
+    // Trigger acoustic clack on shuttle direction change
+    const isRightSide = shuttleProgress > 0.5;
+    if (isRightSide !== lastShuttleSide) {
+      lastShuttleSide = isRightSide;
+      playClackSound(isRightSide ? 0.6 : -0.6);
+      playPedalThudSound();
+    }
+
     ctxLeft.save();
     ctxLeft.translate(shuttleX, shuttleY);
+    
+    // Shuttle Drop Shadow
+    ctxLeft.fillStyle = 'rgba(0, 0, 0, 0.5)';
     ctxLeft.beginPath();
-    ctxLeft.moveTo(-45, 0);
-    ctxLeft.lineTo(0, -12);
-    ctxLeft.lineTo(45, 0);
-    ctxLeft.lineTo(0, 12);
+    ctxLeft.ellipse(0, 16, 48, 8, 0, 0, Math.PI * 2);
+    ctxLeft.fill();
+
+    // Wooden Shuttle Body
+    const woodGrad = ctxLeft.createLinearGradient(-50, 0, 50, 0);
+    woodGrad.addColorStop(0, '#5a2e0a');
+    woodGrad.addColorStop(0.5, '#8c4a18');
+    woodGrad.addColorStop(1, '#5a2e0a');
+    ctxLeft.fillStyle = woodGrad;
+    ctxLeft.strokeStyle = '#d4af37';
+    ctxLeft.lineWidth = 1;
+    
+    ctxLeft.beginPath();
+    ctxLeft.moveTo(-52, 0);
+    ctxLeft.quadraticCurveTo(-15, -14, 0, -14);
+    ctxLeft.quadraticCurveTo(15, -14, 52, 0);
+    ctxLeft.quadraticCurveTo(15, 14, 0, 14);
+    ctxLeft.quadraticCurveTo(-15, 14, -52, 0);
     ctxLeft.closePath();
     ctxLeft.fill();
+    ctxLeft.stroke();
+
+    // Gold Weft Thread Spool Inside Shuttle
+    ctxLeft.fillStyle = '#ffd700';
+    ctxLeft.fillRect(-12, -4, 24, 8);
     
-    ctxLeft.strokeStyle = '#fff';
-    ctxLeft.lineWidth = 2.5;
-    ctxLeft.shadowBlur = 8;
-    ctxLeft.shadowColor = 'rgba(255,255,255,0.8)';
+    // Active Trailing Weft Thread
+    ctxLeft.strokeStyle = '#ffd700';
+    ctxLeft.lineWidth = 2;
+    ctxLeft.shadowBlur = 10;
+    ctxLeft.shadowColor = '#ffd700';
     ctxLeft.beginPath();
     ctxLeft.moveTo(0, 0);
-    ctxLeft.lineTo(-canvasLeft.width, 0);
+    ctxLeft.lineTo(isRightSide ? -shuttleX : canvasLeft.width - shuttleX, 0);
     ctxLeft.stroke();
-    ctxLeft.shadowBlur = 0;
-    ctxLeft.restore();
     
-    ctxLeft.strokeStyle = 'rgba(255,255,255,0.06)';
-    ctxLeft.lineWidth = 2;
-    ctxLeft.beginPath();
-    ctxLeft.arc(shuttleX, shuttleY - 60, 20, 0, Math.PI * 2);
-    ctxLeft.moveTo(shuttleX, shuttleY - 40);
-    ctxLeft.lineTo(shuttleX, shuttleY - 10);
-    ctxLeft.stroke();
+    ctxLeft.restore();
     
     requestAnimationFrame(drawLeft);
   }
@@ -3007,7 +3159,8 @@ function setupShowroomDrape(initialItem, itemsList) {
       rotation += dx * 0.007;
       startX = e.clientX;
 
-      if (Math.abs(dx) > 2) {
+      if (Math.abs(dx) > 1) {
+        playSilkRustleSound(Math.abs(dx) * 0.15);
         playShowroomSound(200 + Math.min(Math.abs(dx) * 10, 550), 0.01, 0.03);
       }
       if (Math.random() < 0.4) {

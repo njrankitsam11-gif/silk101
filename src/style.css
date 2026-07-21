@@ -985,17 +985,15 @@ body:has(.saree-card:hover) #cursor-ring {
   height: 100%;
   transform-style: preserve-3d;
   position: relative;
+  display: grid;
+  place-items: center;
 }
 
 /* Saree Tunnel Card */
 .saree-card {
-  position: absolute;
-  top: 50%;
-  left: 50%;
+  grid-area: 1 / 1;
   width: 420px;
   height: 580px;
-  margin-top: -290px;
-  margin-left: -210px;
   transform: translateZ(-1000px);
   transform-style: preserve-3d;
   cursor: pointer;

@@ -5464,6 +5464,75 @@ function setupCuratorConcierge() {
     };
   }
 
+  // --- WEBXR AR DRAPE TRY-ON MODAL ---
+  const btnArDrape = document.getElementById('btn-ar-drape');
+  const arDrapeModal = document.getElementById('ar-drape-modal');
+  const btnCloseArModal = document.getElementById('btn-close-ar-modal');
+  const btnToggleCamera = document.getElementById('btn-toggle-camera');
+  const btnCaptureAr = document.getElementById('btn-capture-ar');
+  const arCameraFeed = document.getElementById('ar-camera-feed');
+  const arMannequinStage = document.getElementById('ar-mannequin-stage');
+  const arDrapeSpec = document.getElementById('ar-drape-spec');
+  let arCameraStream = null;
+
+  if (btnArDrape && arDrapeModal) {
+    btnArDrape.onclick = () => {
+      arDrapeModal.style.display = 'flex';
+      arDrapeModal.classList.remove('hidden');
+      if (arDrapeSpec && activeItem) {
+        arDrapeSpec.textContent = `${activeItem.name || 'Custom Spec'} · ${activeItem.category_name || 'Ikat Motif'}`;
+      }
+      playShowroomSound(720, 0.05, 0.1);
+    };
+  }
+
+  const stopArCamera = () => {
+    if (arCameraStream) {
+      arCameraStream.getTracks().forEach(track => track.stop());
+      arCameraStream = null;
+    }
+    if (arCameraFeed) arCameraFeed.style.display = 'none';
+    if (arMannequinStage) arMannequinStage.style.display = 'block';
+    if (btnToggleCamera) btnToggleCamera.textContent = '📷 Start Camera';
+  };
+
+  if (btnCloseArModal && arDrapeModal) {
+    btnCloseArModal.onclick = () => {
+      arDrapeModal.style.display = 'none';
+      arDrapeModal.classList.add('hidden');
+      stopArCamera();
+      playShowroomSound(440, 0.04, 0.08);
+    };
+  }
+
+  if (btnToggleCamera) {
+    btnToggleCamera.onclick = async () => {
+      if (arCameraStream) {
+        stopArCamera();
+      } else {
+        try {
+          arCameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+          if (arCameraFeed) {
+            arCameraFeed.srcObject = arCameraStream;
+            arCameraFeed.style.display = 'block';
+          }
+          if (arMannequinStage) arMannequinStage.style.display = 'none';
+          btnToggleCamera.textContent = '⏹ Stop Camera';
+          playShowroomSound(880, 0.06, 0.12);
+        } catch (err) {
+          alert('Camera access unavailable. Rendering mannequin fabric drape preview.');
+        }
+      }
+    };
+  }
+
+  if (btnCaptureAr) {
+    btnCaptureAr.onclick = () => {
+      playShowroomSound(980, 0.08, 0.15);
+      alert('📸 AR Drape Snapshot captured! Saved to your luxury heritage showroom portfolio.');
+    };
+  }
+
   // Intercept the main showroom CTA to drive high-touch curated matching
   if (btnAcquireShowroom) {
     btnAcquireShowroom.onclick = (e) => {

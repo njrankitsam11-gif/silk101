@@ -434,7 +434,7 @@ if (process.env.VERCEL || process.env.NOW_BUILDER) {
       );
     `);
   } catch (err) {
-    console.warn('Failed to load better-sqlite3, falling back to in-memory database:', err);
+    console.warn('Failed to load better-sqlite3 or create SQLite database, initializing in-memory fallback store:', err.message);
     db = new MockDatabase();
   }
 }

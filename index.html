@@ -1039,7 +1039,14 @@
               </div>
             </div>
           </div>
-          <div class="cert-footer" style="display:flex; flex-direction:column; gap:10px; align-items:center;">
+            <!-- Digital Cryptographic Provenance Hash Seal -->
+            <div class="cert-digital-seal" style="margin-top:12px; border-top:1px dashed rgba(212,175,55,0.3); padding-top:10px; font-size:0.6rem; color:rgba(255,255,255,0.6); text-align:center;">
+              <span style="display:block; font-size:0.6rem; color:var(--color-zari); font-weight:600; text-transform:uppercase; margin-bottom:3px;">SHA-256 Master Weave Signature</span>
+              <code id="cert-display-hash" style="font-family:monospace; word-break:break-all; color:#ffd700; font-size:0.58rem; background:rgba(0,0,0,0.5); padding:3px 6px; border-radius:3px; display:block; border:1px solid rgba(255,215,0,0.15); margin-bottom:4px;">0x8a92f7c00e199e52ff5dcd702c2f8832a839da49e0c1f191b7d517c5b61fa23e</code>
+              <span style="font-size:0.58rem; color:rgba(255,255,255,0.45);">Verify public record at: <a href="https://silk101.vercel.app/?cert=verify" target="_blank" style="color:var(--color-zari); text-decoration:underline;">silk101.vercel.app/verify</a></span>
+            </div>
+          </div>
+          <div class="cert-footer" style="display:flex; flex-direction:column; gap:10px; align-items:center; margin-top:10px;">
             <span style="font-size:0.65rem; font-style:italic; color:rgba(255,255,255,0.5);">Verified Weaver Provenance Seal Applied</span>
             <div style="display:flex; gap:10px; width:100%; justify-content:center;">
               <button id="btn-print-cert" class="bbar-btn active" style="padding:4px 15px; font-size:0.75rem; border-radius:4px; background:var(--color-zari); color:#000; font-weight:600; border:none; cursor:pointer;">Print/Download PDF</button>

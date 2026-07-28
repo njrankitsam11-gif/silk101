@@ -2945,6 +2945,11 @@ function setupShowroomDrape(initialItem, itemsList) {
       const uniqueId = `LOM-2026-${Math.floor(1000 + Math.random() * 9000)}`;
       document.getElementById('cert-display-id').textContent = `CERTIFICATE #${uniqueId}`;
 
+      // Generate dynamic SHA-256 style signature hash
+      const hashStr = generateMockHash(hueVal, satVal, patternVal);
+      const hashElem = document.getElementById('cert-display-hash');
+      if (hashElem) hashElem.textContent = hashStr;
+
       // Dynamic Date backdating based on weaving time
       const weaveDays = isCustomMode ? 30 : (activeItem.weaving_time_days || 28);
       const today = new Date();

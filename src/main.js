@@ -5146,17 +5146,47 @@ function setupHeritageMatchmaker() {
   }
 
   function revealSareeMatch() {
-    // Math matching mapping
-    let matchedId = 2; // Default Lotus
+    // Intelligent predictive matching algorithm
+    let matchedId = 2; // Default Sambalpuri Lotus
+
+    // Calculate aura score based on occasion, color, class, and local storage interest
+    let scoreMap = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0 };
 
     if (answers.occasion === 'wedding') {
-      if (answers.color === 'crimson') matchedId = 5; // Jagannath
-      else if (answers.color === 'gold') matchedId = 4; // Konark Sundial
+      scoreMap[5] += 50; // Jagannath Provenance
+      scoreMap[1] += 40; // Nuapatana Khandua
+      scoreMap[4] += 30; // Konark Sundial
     } else if (answers.occasion === 'offering') {
-      if (answers.color === 'crimson') matchedId = 1; // Nuapatana Khandua
-      else matchedId = 6; // Maniabandha Grid
+      scoreMap[1] += 50; // Khandua Sacred Weave
+      scoreMap[6] += 40; // Maniabandha Grid
     } else if (answers.occasion === 'gala') {
-      if (answers.color === 'earth') matchedId = 3; // Kotpad Temple
+      scoreMap[3] += 50; // Kotpad Temple
+      scoreMap[4] += 45; // Konark Gold Tissue
+    } else {
+      scoreMap[2] += 40; // Sambalpuri Lotus
+    }
+
+    if (answers.color === 'crimson') {
+      scoreMap[1] += 30; scoreMap[5] += 30; scoreMap[2] += 20;
+    } else if (answers.color === 'gold') {
+      scoreMap[4] += 40; scoreMap[8] += 30;
+    } else if (answers.color === 'indigo') {
+      scoreMap[6] += 30; scoreMap[7] += 30;
+    } else if (answers.color === 'earth') {
+      scoreMap[3] += 40;
+    }
+
+    if (answers.complexity === 'collector') {
+      scoreMap[5] += 30; scoreMap[4] += 30; scoreMap[1] += 20;
+    }
+
+    // Pick top scoring saree ID
+    let maxScore = -1;
+    for (const [idStr, score] of Object.entries(scoreMap)) {
+      if (score > maxScore) {
+        maxScore = score;
+        matchedId = parseInt(idStr);
+      }
     }
 
     // Dynamic navigate and select item

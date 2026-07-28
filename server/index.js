@@ -78,8 +78,8 @@ const ITEM_VARIATIONS = {
   ]
 };
 
-// GET all inventory / products
-app.get(['/api/inventory', '/api/products'], (req, res) => {
+// GET all inventory / products / sarees
+const getInventoryHandler = (req, res) => {
   try {
     const stmt = db.prepare(`
       SELECT i.*, a.name AS artisan_name, a.location AS artisan_location, a.experience_years AS artisan_exp, a.bio AS artisan_bio, c.name AS category_name
@@ -98,7 +98,11 @@ app.get(['/api/inventory', '/api/products'], (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-});
+};
+
+app.get('/api/inventory', getInventoryHandler);
+app.get('/api/products', getInventoryHandler);
+app.get('/api/sarees', getInventoryHandler);
 
 // POST new inventory item
 app.post('/api/inventory', (req, res) => {

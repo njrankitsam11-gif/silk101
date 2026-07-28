@@ -312,6 +312,7 @@ if (btnGateOn) {
   btnGateOn.addEventListener('click', () => {
     initAudio();
     isAudioPlaying = true;
+    sessionStorage.setItem('loom_gate_dismissed', 'true');
     if (entryGate) entryGate.classList.add('hidden');
     document.getElementById('audio-toggle').classList.add('playing');
     document.getElementById('audio-toggle').setAttribute('aria-pressed', 'true');
@@ -322,6 +323,7 @@ if (btnGateOn) {
 
 if (btnGateOff) {
   btnGateOff.addEventListener('click', () => {
+    sessionStorage.setItem('loom_gate_dismissed', 'true');
     if (entryGate) entryGate.classList.add('hidden');
     document.getElementById('audio-toggle').classList.remove('playing');
     document.getElementById('audio-toggle').setAttribute('aria-pressed', 'false');
@@ -3653,7 +3655,12 @@ window.addEventListener('DOMContentLoaded', () => {
     
     setTimeout(() => {
       const gate = document.getElementById('entry-gate');
-      if (gate) gate.classList.remove('hidden');
+      // If user has already visited or prefers reduced motion/audio, keep hidden by default
+      if (sessionStorage.getItem('loom_gate_dismissed')) {
+        if (gate) gate.classList.add('hidden');
+      } else if (gate) {
+        gate.classList.remove('hidden');
+      }
     }, 1200);
   }, 1800);
   

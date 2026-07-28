@@ -751,6 +751,10 @@ function setupHorizontalPulse() {
     tooltip.style.top = `${ry}px`;
   });
   
+  canvasLeft.addEventListener('pointerleave', () => {
+    mouse.isOver = false;
+    tooltip.classList.remove('active');
+  });
   canvasLeft.addEventListener('mouseleave', () => {
     mouse.isOver = false;
     tooltip.classList.remove('active');
@@ -2025,12 +2029,15 @@ async function setupVaultTunnel() {
         zari.style.backgroundImage = `url(${zariCanvas.toDataURL()})`;
       });
       
-      card.addEventListener('mouseleave', () => {
+      // Support both mouse and touch pointer events
+      const clearZariHighlight = () => {
         const zariCtx = zariCanvas.getContext('2d');
         zariCtx.clearRect(0, 0, 420, 580);
         drawZariPattern(zariCtx, item);
         zari.style.backgroundImage = `url(${zariCanvas.toDataURL()})`;
-      });
+      };
+      card.addEventListener('mouseleave', clearZariHighlight);
+      card.addEventListener('pointerleave', clearZariHighlight);
       
       card.addEventListener('click', () => {
         openUnweaveModal(item, sareeCollection);
@@ -2119,7 +2126,7 @@ function setupVaultScrollParallax() {
       if (info) info.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg) translateZ(42px)`;
     });
 
-    card.addEventListener('mouseleave', () => {
+    const resetTilt = () => {
       delete card.dataset.tilted;
       const silk = card.querySelector('.layer-silk');
       const model = card.querySelector('.layer-model');
@@ -2130,7 +2137,9 @@ function setupVaultScrollParallax() {
       if (model) model.style.transform = 'translateZ(12px)';
       if (zari) zari.style.transform = 'translateZ(20px)';
       if (info) info.style.transform = 'translateZ(35px)';
-    });
+    };
+    card.addEventListener('mouseleave', resetTilt);
+    card.addEventListener('pointerleave', resetTilt);
   });
 
   const st = ScrollTrigger.create({
@@ -3589,7 +3598,30 @@ function closeUnweaveModal() {
   }
 }
 
-document.getElementById('close-modal').addEventListener('click', closeUnweaveModal);
+const _closeModalBtn = document.getElementById('close-modal');
+if (_closeModalBtn) _closeModalBtn.addEventListener('click', closeUnweaveModal);
+
+// Focus trap for unweave modal
+function trapFocusInModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (!modal) return null;
+  const focusable = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+  const getFocusable = () => [...modal.querySelectorAll(focusable)].filter(el => !el.disabled && el.offsetParent !== null);
+  const handler = (e) => {
+    if (!modal.classList.contains('hidden') && e.key === 'Tab') {
+      const els = getFocusable();
+      if (!els.length) { e.preventDefault(); return; }
+      const first = els[0], last = els[els.length - 1];
+      if (e.shiftKey ? document.activeElement === first : document.activeElement === last) {
+        e.preventDefault();
+        (e.shiftKey ? last : first).focus();
+      }
+    }
+  };
+  window.addEventListener('keydown', handler);
+  return handler;
+}
+trapFocusInModal('unweave-modal');
 
 window.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') closeUnweaveModal();
@@ -3723,9 +3755,9 @@ function setupInteractiveExtensions() {
     };
   }
 
-  window.addEventListener('keydown', (e) => {
+  // Named handler so we can remove it if the section leaves view
+  function handleShuttleKey(e) {
     if (!isManualActive || weftProgress >= 100) return;
-    
     const key = e.key.toLowerCase();
     if (key === 'a' && lastSide === 'right') {
       weftProgress += 5;
@@ -3740,7 +3772,55 @@ function setupInteractiveExtensions() {
       triggerShuttleSound(false);
       updateWeftProgress();
     }
-  });
+  }
+  window.addEventListener('keydown', handleShuttleKey);
+
+  // Pause keys when user scrolls away from the loom section
+  const _loomSection = document.getElementById('loom-console');
+  if (_loomSection && 'IntersectionObserver' in window) {
+    new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) {
+          window.removeEventListener('keydown', handleShuttleKey);
+        } else {
+          window.removeEventListener('keydown', handleShuttleKey); // prevent double-add
+          window.addEventListener('keydown', handleShuttleKey);
+        }
+      });
+    }, { threshold: 0.1 }).observe(_loomSection);
+  }
+
+  // Mobile touch buttons for shuttle game
+  const btnShuttleLeft = document.getElementById('btn-shuttle-left');
+  const btnShuttleRight = document.getElementById('btn-shuttle-right');
+  if (btnShuttleLeft) {
+    btnShuttleLeft.addEventListener('click', () => {
+      if (!isManualActive || weftProgress >= 100) return;
+      if (lastSide === 'right') {
+        weftProgress += 5;
+        lastSide = 'left';
+        if (shuttleSlider) shuttleSlider.style.left = '0';
+        triggerShuttleSound(true);
+        updateWeftProgress();
+        btnShuttleLeft.style.background = 'rgba(212,175,55,0.35)';
+        setTimeout(() => { btnShuttleLeft.style.background = 'rgba(212,175,55,0.15)'; }, 150);
+      }
+    });
+  }
+  if (btnShuttleRight) {
+    btnShuttleRight.addEventListener('click', () => {
+      if (!isManualActive || weftProgress >= 100) return;
+      if (lastSide === 'left') {
+        weftProgress += 5;
+        lastSide = 'right';
+        if (shuttleSlider) shuttleSlider.style.left = 'calc(100% - 20px)';
+        triggerShuttleSound(false);
+        updateWeftProgress();
+        btnShuttleRight.style.background = 'rgba(212,175,55,0.35)';
+        setTimeout(() => { btnShuttleRight.style.background = 'rgba(212,175,55,0.15)'; }, 150);
+      }
+    });
+  }
 
   function triggerShuttleSound(isLeft) {
     if (!audioCtx || audioCtx.state !== 'running') return;
@@ -3975,29 +4055,46 @@ function setupInteractiveExtensions() {
 
   markers.forEach(marker => {
     const clusterKey = marker.dataset.cluster;
-    marker.onmouseenter = () => {
+    // Activate on hover (desktop) or tap (mobile) — pointer events cover both
+    const activateMarker = () => {
       const data = CLUSTER_DATA[clusterKey];
       if (data && infoName && infoDesc) {
         infoName.textContent = data.name;
         infoDesc.textContent = data.desc;
         marker.querySelector('circle').setAttribute('fill', '#ffd700');
         marker.querySelector('circle').setAttribute('r', '7');
-        
         activeClusterKey = clusterKey;
         stopOralAudio();
         if (audioPlayerWrap) audioPlayerWrap.classList.remove('hidden');
       }
     };
-
-    marker.onmouseleave = () => {
+    const deactivateMarker = () => {
       marker.querySelector('circle').setAttribute('fill', '#d4af37');
       marker.querySelector('circle').setAttribute('r', '5');
     };
+
+    marker.addEventListener('pointerenter', activateMarker);
+    marker.addEventListener('pointerleave', deactivateMarker);
+    // Keep backward-compat for non-pointer browsers
+    marker.onmouseenter = activateMarker;
+    marker.onmouseleave = deactivateMarker;
 
     marker.onclick = () => {
       activeClusterKey = clusterKey;
       playOralAudio(clusterKey);
     };
+
+    // Make markers keyboard-navigable
+    marker.setAttribute('tabindex', '0');
+    marker.setAttribute('role', 'button');
+    marker.setAttribute('aria-label', `Select ${CLUSTER_DATA[clusterKey]?.name || clusterKey} weaving cluster`);
+    marker.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        activateMarker();
+        playOralAudio(clusterKey);
+      }
+    });
   });
 }
 
@@ -4081,8 +4178,9 @@ function setupCustomCursor() {
   
   function addHoverListeners() {
     document.querySelectorAll(hoverSelectors).forEach(el => {
-      el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
-      el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+      // Use pointer events so hover states work on touch-capable devices too
+      el.addEventListener('pointerenter', () => document.body.classList.add('cursor-hover'));
+      el.addEventListener('pointerleave', () => document.body.classList.remove('cursor-hover'));
     });
   }
   addHoverListeners();
@@ -5656,17 +5754,18 @@ function setupCuratorWhisper() {
     }, 48);
   }
 
-  brand.addEventListener('mousedown', () => {
-    holdTimer = setTimeout(() => { triggerWhisper(); holdTimer = null; }, 3000);
-  });
+  // Support both mouse and touch (pointer events cover both)
+  const startHold = () => { holdTimer = setTimeout(() => { triggerWhisper(); holdTimer = null; }, 3000); };
+  const cancelHold = () => { if (holdTimer) { clearTimeout(holdTimer); holdTimer = null; } };
 
-  brand.addEventListener('mouseup', () => {
-    if (holdTimer) { clearTimeout(holdTimer); holdTimer = null; }
-  });
-
-  brand.addEventListener('mouseleave', () => {
-    if (holdTimer) { clearTimeout(holdTimer); holdTimer = null; }
-  });
+  brand.addEventListener('mousedown', startHold);
+  brand.addEventListener('pointerdown', startHold);
+  brand.addEventListener('mouseup', cancelHold);
+  brand.addEventListener('pointerup', cancelHold);
+  brand.addEventListener('mouseleave', cancelHold);
+  brand.addEventListener('pointerleave', cancelHold);
+  brand.addEventListener('touchstart', (e) => { e.preventDefault(); startHold(); }, { passive: false });
+  brand.addEventListener('touchend', cancelHold);
 
   brand.setAttribute('title', 'Hold for 3 seconds...');
 }
@@ -5783,8 +5882,11 @@ function initSilkOracle() {
 
   function openOracle() {
     panel.classList.add('open');
+    panel.setAttribute('aria-hidden', 'false');
     btnOpen.classList.add('oracle-open');
-    input.focus();
+    btnOpen.setAttribute('aria-expanded', 'true');
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => input && input.focus(), 50);
 
     // Awaken sequence
     if (chatArea.children.length === 0) {
@@ -5801,11 +5903,32 @@ function initSilkOracle() {
 
   function closeOracle() {
     panel.classList.remove('open');
+    panel.setAttribute('aria-hidden', 'true');
     btnOpen.classList.remove('oracle-open');
+    btnOpen.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+    btnOpen.focus();
   }
 
   btnOpen.addEventListener('click', openOracle);
-  btnClose.addEventListener('click', closeOracle);
+  if (btnClose) btnClose.addEventListener('click', closeOracle);
+
+  // Escape key closes oracle
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && panel.classList.contains('open')) closeOracle();
+  });
+
+  // Focus trap inside oracle panel
+  panel.addEventListener('keydown', (e) => {
+    if (e.key !== 'Tab' || !panel.classList.contains('open')) return;
+    const focusable = [...panel.querySelectorAll('button, input, textarea, [tabindex]:not([tabindex="-1"])')].filter(el => !el.disabled);
+    if (!focusable.length) { e.preventDefault(); return; }
+    const first = focusable[0], last = focusable[focusable.length - 1];
+    if (e.shiftKey ? document.activeElement === first : document.activeElement === last) {
+      e.preventDefault();
+      (e.shiftKey ? last : first).focus();
+    }
+  });
 
   // Close on outside click
   document.addEventListener('click', (e) => {
@@ -5890,9 +6013,9 @@ function initGlyphHunt() {
 
   if (!glyphs.length) return;
 
-  // Show counter when first glyph is hovered
+  // Show counter on hover (desktop) or first touch (mobile)
   glyphs.forEach(glyph => {
-    glyph.addEventListener('mouseenter', () => {
+    glyph.addEventListener('pointerenter', () => {
       if (counter) counter.classList.add('visible');
     });
   });

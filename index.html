@@ -32,13 +32,16 @@
     <meta property="og:description" content="Shop museum-grade Khandua Ikat & Patta Silk sarees. Woven on zero-electricity traditional wooden looms in Odisha, India. Global shipping available." />
     <meta property="og:url" content="https://silk101.vercel.app/" />
     <meta property="og:site_name" content="The Loom of Time" />
-    <meta property="og:image" content="https://silk101.vercel.app/favicon.svg" />
+    <meta property="og:image" content="https://silk101.vercel.app/og-social-card.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="The Loom of Time — Odisha Handloom Silk Sarees" />
 
     <!-- Twitter / X -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="The Loom of Time | Authentic Handloom Odisha Silk Sarees" />
     <meta name="twitter:description" content="Explore pure Khandua Ikat & Patta Silk from Odisha. Verified provenance, zero carbon footprint. We deliver to US, UK, Canada, Gulf, & Singapore." />
-    <meta name="twitter:image" content="https://silk101.vercel.app/favicon.svg" />
+    <meta name="twitter:image" content="https://silk101.vercel.app/og-social-card.png" />
 
     <!-- Fonts prefetching -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -366,7 +369,12 @@
                     <!-- Manual Loom Minigame Panel -->
                     <button id="btn-toggle-manual-loom" class="btn btn-secondary btn-sm" style="margin-top:12px; width:100%; font-family:'Outfit';">Activate Manual Shuttle Loom</button>
                     <div id="manual-loom-panel" class="manual-loom-panel hidden" style="margin-top:12px; padding:10px; background:rgba(212,175,55,0.05); border:1px solid rgba(212,175,55,0.2); border-radius:4px;">
-                      <span class="game-instruction" style="font-size:0.8rem; color:rgba(255,255,255,0.7); display:block; margin-bottom:8px; line-height:1.2;">Press <strong>A</strong> and <strong>D</strong> keys alternately to throw the shuttle!</span>
+                      <!-- Mobile touch controls for shuttle game -->
+                      <div id="shuttle-mobile-controls" style="display:flex; gap:8px; margin-bottom:10px; touch-action:none;">
+                        <button id="btn-shuttle-left" aria-label="Throw shuttle left (A key)" style="flex:1; padding:10px 0; border-radius:6px; background:rgba(212,175,55,0.15); border:1px solid rgba(212,175,55,0.3); color:var(--color-zari); font-size:1.3rem; font-family:'Outfit'; cursor:pointer; transition:background 0.15s; touch-action:manipulation;">← A</button>
+                        <button id="btn-shuttle-right" aria-label="Throw shuttle right (D key)" style="flex:1; padding:10px 0; border-radius:6px; background:rgba(212,175,55,0.15); border:1px solid rgba(212,175,55,0.3); color:var(--color-zari); font-size:1.3rem; font-family:'Outfit'; cursor:pointer; transition:background 0.15s; touch-action:manipulation;">D →</button>
+                      </div>
+                      <span class="game-instruction" style="font-size:0.8rem; color:rgba(255,255,255,0.7); display:block; margin-bottom:8px; line-height:1.2;">Press <strong>A</strong> / <strong>D</strong> keys alternately, or tap the buttons above, to throw the shuttle!</span>
                       <div class="shuttle-track" style="height:6px; background:rgba(255,255,255,0.1); border-radius:3px; position:relative; overflow:hidden; margin-bottom:8px;">
                         <div id="shuttle-slider" class="shuttle-slider" style="width:20px; height:100%; background:var(--color-zari); position:absolute; left:0; transition:left 0.15s ease;"></div>
                       </div>

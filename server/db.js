@@ -296,6 +296,9 @@ class MockStatement {
 
   all(...args) {
     console.log('MockStatement.all:', this.sql, args);
+    if (this.sql.includes('enquiries')) {
+      return MOCK_ENQUIRIES;
+    }
     if (this.sql.includes('inventory')) {
       const mockVars = {
         'Ikat': [
@@ -328,9 +331,6 @@ class MockStatement {
     }
     if (this.sql.includes('categories')) {
       return MOCK_CATEGORIES;
-    }
-    if (this.sql.includes('enquiries')) {
-      return MOCK_ENQUIRIES;
     }
     if (this.sql.includes('articles')) {
       return MOCK_ARTICLES;

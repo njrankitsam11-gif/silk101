@@ -17,6 +17,16 @@ export default defineConfig({
         main: 'index.html',
         admin: 'admin.html',
         articles: 'articles.html'
+      },
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules/gsap')) {
+            return 'vendor-gsap';
+          }
+          if (id.includes('node_modules')) {
+            return 'vendor-core';
+          }
+        }
       }
     }
   }

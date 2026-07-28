@@ -32,6 +32,28 @@
   --ease-snap: cubic-bezier(0.6, 0.05, 0.01, 0.99);
 }
 
+/* ─── Media Print Stylesheet for Provenance Certificate ────── */
+@media print {
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+  header, nav, #cursor-dot, #cursor-ring, #audio-toggle, #btn-open-oracle, .entry-gate-overlay {
+    display: none !important;
+  }
+  #unweave-modal, #secret-vault-panel, #oracle-panel {
+    position: static !important;
+    background: #fff !important;
+    color: #000 !important;
+    box-shadow: none !important;
+  }
+  .modal-card {
+    border: 2px solid #000 !important;
+    color: #000 !important;
+    background: #fff !important;
+  }
+}
+
 /* ─── Liquid Gold Shimmer Animation ────────────────────── */
 @keyframes liquid-gold {
   0%   { background-position: 0% 50%; }

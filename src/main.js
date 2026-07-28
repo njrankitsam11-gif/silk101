@@ -5508,15 +5508,73 @@ function setupCuratorConcierge() {
   const arCameraFeed = document.getElementById('ar-camera-feed');
   const arMannequinStage = document.getElementById('ar-mannequin-stage');
   const arDrapeSpec = document.getElementById('ar-drape-spec');
+  const arCanvasOverlay = document.getElementById('ar-canvas-overlay');
   let arCameraStream = null;
+  let arAnimId = null;
+
+  function renderArSilkSheen() {
+    if (!arCanvasOverlay) return;
+    const ctx = arCanvasOverlay.getContext('2d');
+    const w = arCanvasOverlay.width = arCanvasOverlay.clientWidth || 380;
+    const h = arCanvasOverlay.height = arCanvasOverlay.clientHeight || 260;
+
+    let time = 0;
+    function drawSheen() {
+      time += 0.04;
+      ctx.clearRect(0, 0, w, h);
+
+      // Render flowing silk shimmer drape lines across mannequin chest
+      const hue = isCustomMode ? customHue : (activeItem ? (activeItem.color_hue || 0) : 0);
+      const sat = isCustomMode ? customSat : (activeItem ? (activeItem.color_saturation || 1) : 1);
+      
+      ctx.save();
+      ctx.globalCompositeOperation = 'screen';
+      
+      const grad = ctx.createLinearGradient(0, 0, w, h);
+      grad.addColorStop(0, `hsla(${hue}, ${Math.floor(sat * 70)}%, 50%, 0.15)`);
+      grad.addColorStop(0.5, `hsla(${(hue + 30) % 360}, 90%, 65%, 0.35)`);
+      grad.addColorStop(1, `hsla(${hue}, ${Math.floor(sat * 70)}%, 50%, 0.15)`);
+      
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.moveTo(0, h * 0.3);
+      for (let x = 0; x <= w; x += 20) {
+        const y = h * 0.4 + Math.sin(x * 0.015 + time) * 18 + Math.cos(time * 0.8) * 10;
+        ctx.lineTo(x, y);
+      }
+      ctx.lineTo(w, h);
+      ctx.lineTo(0, h);
+      ctx.closePath();
+      ctx.fill();
+
+      // Zari border golden highlights
+      ctx.strokeStyle = `rgba(255, 215, 0, ${0.4 + Math.sin(time * 2) * 0.2})`;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      for (let x = 0; x <= w; x += 15) {
+        const y = h * 0.38 + Math.sin(x * 0.015 + time) * 18 + Math.cos(time * 0.8) * 10;
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      ctx.restore();
+
+      arAnimId = requestAnimationFrame(drawSheen);
+    }
+    if (arAnimId) cancelAnimationFrame(arAnimId);
+    drawSheen();
+  }
 
   if (btnArDrape && arDrapeModal) {
     btnArDrape.onclick = () => {
       arDrapeModal.style.display = 'flex';
       arDrapeModal.classList.remove('hidden');
-      if (arDrapeSpec && activeItem) {
-        arDrapeSpec.textContent = `${activeItem.name || 'Custom Spec'} · ${activeItem.category_name || 'Ikat Motif'}`;
+      if (arDrapeSpec) {
+        const name = isCustomMode ? `Custom ${customPattern} Weave` : (activeItem ? activeItem.name : 'Nuapatana Khandua Ikat Saree');
+        const cat = isCustomMode ? `${customHue}° HSL` : (activeItem ? (activeItem.category_name || 'Mulberry Silk') : 'Pure Silk');
+        arDrapeSpec.textContent = `${name} · ${cat}`;
       }
+      renderArSilkSheen();
       playShowroomSound(720, 0.05, 0.1);
     };
   }
@@ -5529,6 +5587,10 @@ function setupCuratorConcierge() {
     if (arCameraFeed) arCameraFeed.style.display = 'none';
     if (arMannequinStage) arMannequinStage.style.display = 'block';
     if (btnToggleCamera) btnToggleCamera.textContent = '📷 Start Camera';
+    if (arAnimId) {
+      cancelAnimationFrame(arAnimId);
+      arAnimId = null;
+    }
   };
 
   if (btnCloseArModal && arDrapeModal) {
@@ -5544,8 +5606,12 @@ function setupCuratorConcierge() {
     btnToggleCamera.onclick = async () => {
       if (arCameraStream) {
         stopArCamera();
+        renderArSilkSheen();
       } else {
         try {
+          if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            throw new Error('Camera API unavailable');
+          }
           arCameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
           if (arCameraFeed) {
             arCameraFeed.srcObject = arCameraStream;
@@ -5553,9 +5619,11 @@ function setupCuratorConcierge() {
           }
           if (arMannequinStage) arMannequinStage.style.display = 'none';
           btnToggleCamera.textContent = '⏹ Stop Camera';
+          renderArSilkSheen();
           playShowroomSound(880, 0.06, 0.12);
         } catch (err) {
-          alert('Camera access unavailable. Rendering mannequin fabric drape preview.');
+          console.warn('Camera access unavailable:', err);
+          alert('Camera access permissions required for live video feed. Rendering mannequin silk drape simulation overlay.');
         }
       }
     };

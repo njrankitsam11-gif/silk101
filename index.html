@@ -1373,11 +1373,13 @@
           <span style="font-size:0.65rem; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:1px;">WebXR Camera & Mannequin Mapping</span>
         </div>
 
-        <div style="width:100%; height:260px; background:#000; border-radius:8px; border:1px id=ar-viewport-border solid rgba(212,175,55,0.3); position:relative; overflow:hidden; margin-bottom:12px;">
+        <div id="ar-viewport-border" style="width:100%; height:260px; background:#000; border-radius:8px; border:1px solid rgba(212,175,55,0.3); position:relative; overflow:hidden; margin-bottom:12px;">
           <!-- Live Camera Video element -->
           <video id="ar-camera-feed" autoplay playsinline style="width:100%; height:100%; object-fit:cover; display:none;"></video>
           <!-- Mannequin Fallback Stage -->
           <div id="ar-mannequin-stage" style="width:100%; height:100%; background:url('/avatars/model1_front.png') no-repeat center center/contain; opacity:0.85; transition:filter 0.3s ease;"></div>
+          <!-- AR Canvas Drape Overlay -->
+          <canvas id="ar-canvas-overlay" style="position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:5;"></canvas>
           
           <div style="position:absolute; bottom:10px; left:10px; right:10px; background:rgba(0,0,0,0.7); padding:6px; border-radius:4px; font-size:0.65rem; color:#ffd700; border:1px solid rgba(255,215,0,0.2);">
             ✨ Real-time Silk Sheen Overlay: <span id="ar-drape-spec">Crimson Mulberry · Lotus Pallu</span>

@@ -5267,6 +5267,53 @@ function setupCuratorConcierge() {
   btnOpen.onclick = openConcierge;
   btnClose.onclick = closeConcierge;
 
+  // Wire Concierge Chat Form to API
+  const conciergeForm = document.getElementById('form-concierge-chat');
+  const conciergeInput = document.getElementById('concierge-chat-input');
+  const conciergeChatArea = document.getElementById('concierge-chat-area');
+  const conciergeTyping = document.getElementById('concierge-typing-indicator');
+
+  if (conciergeForm && conciergeInput) {
+    conciergeForm.onsubmit = async (e) => {
+      e.preventDefault();
+      const msg = conciergeInput.value.trim();
+      if (!msg) return;
+      conciergeInput.value = '';
+
+      if (conciergeChatArea) {
+        const userBubble = document.createElement('div');
+        userBubble.style.cssText = 'background:rgba(212,175,55,0.15); border:1px solid rgba(212,175,55,0.3); color:#fff; padding:8px 12px; border-radius:6px; margin-bottom:8px; font-size:0.75rem; text-align:right; align-self:flex-end; max-width:85%;';
+        userBubble.textContent = msg;
+        conciergeChatArea.appendChild(userBubble);
+        conciergeChatArea.scrollTop = conciergeChatArea.scrollHeight;
+      }
+
+      if (conciergeTyping) conciergeTyping.style.visibility = 'visible';
+
+      try {
+        const res = await fetch('/api/concierge/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: msg })
+        });
+        const data = await res.json();
+        
+        if (conciergeTyping) conciergeTyping.style.visibility = 'hidden';
+
+        if (conciergeChatArea && data.reply) {
+          const aiBubble = document.createElement('div');
+          aiBubble.style.cssText = 'background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:rgba(255,255,255,0.9); padding:8px 12px; border-radius:6px; margin-bottom:8px; font-size:0.75rem; text-align:left; max-width:90%; line-height:1.4;';
+          aiBubble.innerHTML = `<strong style="color:var(--color-zari); display:block; margin-bottom:3px;">Priyadarshini</strong>${data.reply}`;
+          conciergeChatArea.appendChild(aiBubble);
+          conciergeChatArea.scrollTop = conciergeChatArea.scrollHeight;
+          playShowroomSound(520, 0.03, 0.06);
+        }
+      } catch (err) {
+        if (conciergeTyping) conciergeTyping.style.visibility = 'hidden';
+      }
+    };
+  }
+
   // Bottom Bar Retract Toggle
   const btnToggleControls = document.getElementById('btn-toggle-controls');
   const showroomBottomBar = document.getElementById('showroom-bottom-bar');
@@ -5397,6 +5444,11 @@ function setupCuratorConcierge() {
         const velocity = Math.floor(220 + Math.random() * 40);
         document.getElementById('loom-stat-tension').textContent = `${tension} N`;
         document.getElementById('loom-stat-velocity').textContent = `${velocity} picks/min`;
+        
+        // Sonify pick velocity into loom rhythmic shuttle clicks
+        if (audioCtx) {
+          playShuttleSound(audioCtx.currentTime);
+        }
       }, 1000);
     };
   }

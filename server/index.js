@@ -17,6 +17,44 @@ app.use((req, res, next) => {
   next();
 });
 
+// ── CONCIERGE RAG AI AGENT API ─────────────────────────────────────────────
+
+const HERITAGE_KNOWLEDGE_BASE = [
+  { keywords: ['ship', 'delivery', 'dhl', 'fedex', 'usa', 'uk', 'canada', 'uae', 'dubai', 'singapore', 'express'], reply: "We provide fully insured global express delivery via DHL & FedEx Express (5-7 business days) to the USA, UK, Canada, UAE, Singapore, Australia, and 40+ countries. All shipments include custom protective wooden chest packaging and zero-duty documentation support." },
+  { keywords: ['price', 'cost', 'range', 'rupee', 'dollar', 'inr', 'usd'], reply: "Our authentic zero-electricity handloom sarees range from ₹1,25,000 (~$1,500 USD) for classic 80-count Khandua Ikat up to ₹2,50,000 (~$3,000 USD) for bespoke double-Warp 120-count Patta Silk masterworks. Each piece comes with a verifiable SHA-256 digital provenance certificate." },
+  { keywords: ['custom', 'commission', 'bespoke', 'design', 'motif', 'color', 'hue'], reply: "Our Bespoke Handloom Commission Studio allows you to specify body hue, border motifs (Sambalpuri Lotus, Kotpad Temple, Konark Sundial), and thread density directly with master weavers like Smt. Sebati Mohanty in Nuapatna. Commissions take 25–40 weaving days and require a 30% reservation deposit." },
+  { keywords: ['weaver', 'artisan', 'nuapatna', 'maniabandha', 'puri', 'cluster', 'who weaves'], reply: "Our sarees are handcrafted by master artisan households in the historical weaving clusters of Nuapatna, Maniabandha, and Puri in Odisha. We partner directly with the Brahma Weavers Co-operative (BWC) ensuring 100% fair-trade compensation and zero-electricity wooden handlooms." },
+  { keywords: ['silk', 'mark', 'pure', 'mulberry', 'tussar', 'ikat', 'khandua', 'authentic', 'quality'], reply: "Every saree is woven using 100% certified pure Mulberry or Tussar silk threads dyed with natural organic pigments. We embed a physical Silk Mark barcode alongside an immutable SHA-256 cryptographic provenance hash on your certificate for instant verification." },
+  { keywords: ['return', 'policy', 'guarantee', 'exchange'], reply: "We offer a 14-day global white-glove inspection guarantee. If the drape texture or weave density does not meet your expectations, our concierge arranges complimentary insured return pickup worldwide." }
+];
+
+app.post('/api/concierge/chat', (req, res) => {
+  const { message } = req.body;
+  if (!message) {
+    return res.status(400).json({ error: 'Message is required' });
+  }
+
+  const queryLower = message.toLowerCase();
+  let selectedReply = null;
+
+  for (const item of HERITAGE_KNOWLEDGE_BASE) {
+    if (item.keywords.some(kw => queryLower.includes(kw))) {
+      selectedReply = item.reply;
+      break;
+    }
+  }
+
+  if (!selectedReply) {
+    selectedReply = `Namaste! Regarding "${message}", our heritage concierge Priyadarshini specializes in authentic Odisha Patta Silk & Khandua Ikat masterworks. Would you like to schedule a virtual 1-on-1 video tour of our Nuapatna looms or speak directly with our curator on WhatsApp?`;
+  }
+
+  res.json({
+    reply: selectedReply,
+    concierge: 'Priyadarshini',
+    timestamp: new Date().toISOString()
+  });
+});
+
 // ── INVENTORY API ──────────────────────────────────────────────────────────
 
 const ITEM_VARIATIONS = {

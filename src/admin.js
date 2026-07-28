@@ -380,29 +380,69 @@ function renderDashboard() {
     </tr>
   `).join('');
 
-  // Render Enquiries table
-  const enqBody = document.getElementById('enquiries-table-body');
-  enqBody.innerHTML = enquiries.map(e => {
-    const formattedDate = new Date(e.created_at).toLocaleDateString('en-IN', {
-      day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
-    });
-    return `
+  // Render Weavers Module Workload table
+  const weaversBody = document.getElementById('weavers-table-body');
+  if (weaversBody) {
+    const mockWeavers = [
+      { id: 1, name: 'Smt. Sebati Mohanty', village: 'Nuapatna, Odisha', saree: 'Nuapatana Khandua Ikat Saree', progress: 75, days_left: 7, est_date: 'Nov 04, 2026' },
+      { id: 2, name: 'Shri Ranjan Meher', village: 'Maniabandha, Odisha', saree: 'Konark Sundial Relic Saree', progress: 45, days_left: 16, est_date: 'Nov 14, 2026' },
+      { id: 3, name: 'Shri Kailash Meher', village: 'Puri, Odisha', saree: 'Lord Jagannath Provenance Saree', progress: 90, days_left: 4, est_date: 'Nov 01, 2026' }
+    ];
+
+    weaversBody.innerHTML = mockWeavers.map(w => `
       <tr>
-        <td style="font-family:monospace; font-size:0.8rem; color:#86868b;">${formattedDate}</td>
-        <td style="font-weight:600;">${e.customer_name}</td>
-        <td><a href="mailto:${e.customer_email}" style="color:var(--color-accent); text-decoration:none;">${e.customer_email}</a></td>
-        <td style="color:#fff;">${e.item_name || 'General Inquiry'}</td>
-        <td style="color:#86868b; font-size:0.85rem; max-width:300px; word-wrap:break-word;">${e.message || '---'}</td>
+        <td style="font-family:monospace; color:#86868b;">#00${w.id}</td>
+        <td style="font-weight:600; color:#fff;">${w.name}</td>
+        <td style="color:var(--color-accent);">${w.village}</td>
+        <td style="color:#fff;">${w.saree}</td>
         <td>
-          <select class="status-select" onchange="updateEnquiryStatus(${e.id}, this.value)">
-            <option value="pending" ${e.status === 'pending' ? 'selected' : ''}>Pending</option>
-            <option value="contacted" ${e.status === 'contacted' ? 'selected' : ''}>Contacted</option>
-            <option value="closed" ${e.status === 'closed' ? 'selected' : ''}>Closed</option>
-          </select>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <div style="flex:1; height:6px; background:rgba(255,255,255,0.1); border-radius:3px; overflow:hidden;">
+              <div style="width:${w.progress}%; height:100%; background:var(--color-accent);"></div>
+            </div>
+            <span style="font-family:monospace; font-size:0.75rem; color:#ffd700;">${w.progress}%</span>
+          </div>
+        </td>
+        <td style="font-family:monospace; font-size:0.8rem; color:#2ecc71;">${w.est_date} (${w.days_left}d left)</td>
+        <td>
+          <button class="btn-submit" style="padding:0.25rem 0.6rem; font-size:0.75rem;" onclick="generateProvenanceHash('${w.saree}')">⚡ Certificate</button>
         </td>
       </tr>
-    `;
-  }).join('');
+    `).join('');
+  }
+
+  // Render Enquiry-to-Commission Kanban Pipeline
+  const renderKanbanCard = (enq) => `
+    <div style="background:rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.08); border-radius:6px; padding:0.8rem; font-size:0.8rem;">
+      <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+        <strong style="color:#fff;">${enq.customer_name}</strong>
+        <span style="color:#86868b; font-size:0.7rem;">#ENQ-${enq.id}</span>
+      </div>
+      <div style="color:var(--color-accent); font-size:0.75rem; margin-bottom:4px;">${enq.item_name || 'Bespoke Saree'}</div>
+      <p style="color:rgba(255,255,255,0.6); font-size:0.7rem; margin-bottom:8px;">"${enq.message || 'Consultation request'}"</p>
+      <div style="display:flex; gap:4px;">
+        <select class="status-select" style="font-size:0.7rem; padding:2px 4px; width:100%;" onchange="updateEnquiryStatus(${enq.id}, this.value)">
+          <option value="pending" ${enq.status === 'pending' ? 'selected' : ''}>New</option>
+          <option value="contacted" ${enq.status === 'contacted' ? 'selected' : ''}>Consultation</option>
+          <option value="commissioned" ${enq.status === 'commissioned' ? 'selected' : ''}>Commissioned</option>
+          <option value="weaving" ${enq.status === 'weaving' ? 'selected' : ''}>Weaving</option>
+          <option value="closed" ${enq.status === 'closed' ? 'selected' : ''}>Shipped</option>
+        </select>
+      </div>
+    </div>
+  `;
+
+  const kNew = document.getElementById('kanban-new');
+  const kConsult = document.getElementById('kanban-consult');
+  const kComm = document.getElementById('kanban-commissioned');
+  const kWeav = document.getElementById('kanban-weaving');
+  const kShip = document.getElementById('kanban-shipped');
+
+  if (kNew) kNew.innerHTML = enquiries.filter(e => e.status === 'pending' || !e.status).map(renderKanbanCard).join('') || '<div style="color:rgba(255,255,255,0.2); font-size:0.75rem;">Empty</div>';
+  if (kConsult) kConsult.innerHTML = enquiries.filter(e => e.status === 'contacted').map(renderKanbanCard).join('') || '<div style="color:rgba(255,255,255,0.2); font-size:0.75rem;">Empty</div>';
+  if (kComm) kComm.innerHTML = enquiries.filter(e => e.status === 'commissioned').map(renderKanbanCard).join('') || '<div style="color:rgba(255,255,255,0.2); font-size:0.75rem;">Empty</div>';
+  if (kWeav) kWeav.innerHTML = enquiries.filter(e => e.status === 'weaving').map(renderKanbanCard).join('') || '<div style="color:rgba(255,255,255,0.2); font-size:0.75rem;">Empty</div>';
+  if (kShip) kShip.innerHTML = enquiries.filter(e => e.status === 'closed' || e.status === 'shipped').map(renderKanbanCard).join('') || '<div style="color:rgba(255,255,255,0.2); font-size:0.75rem;">Empty</div>';
 
   // Render Artisans table
   const artBody = document.getElementById('artisans-table-body');

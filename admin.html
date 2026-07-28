@@ -287,7 +287,9 @@
         <nav class="admin-nav">
           <button class="admin-nav-btn active" data-target="sec-inventory">Inventory</button>
           <button class="admin-nav-btn" data-target="sec-enquiries">Enquiries</button>
-          <button class="admin-nav-btn" data-target="sec-artisans">Artisans</button>
+          <button class="admin-nav-btn" data-target="sec-weavers">Weavers Module</button>
+          <button class="admin-nav-btn" data-target="sec-pipeline">Commission Pipeline</button>
+          <button class="admin-nav-btn" data-target="sec-impact">Impact Metrics</button>
           <button class="admin-nav-btn" data-target="sec-articles">SEO Articles</button>
           <a href="/index.html" class="admin-nav-btn">← Back to Site</a>
         </nav>
@@ -366,10 +368,10 @@
         </div>
       </section>
 
-      <!-- SECTION 3: ARTISANS DIRECTORY -->
-      <section id="sec-artisans" class="admin-section">
+      <!-- SECTION 3: WEAVERS MODULE & COMMISSION TRACKING -->
+      <section id="sec-weavers" class="admin-section">
         <div class="action-row">
-          <h3 style="font-family:'Playfair Display', serif; font-size:1.4rem;">Artisan & Weaving Registry</h3>
+          <h3 style="font-family:'Playfair Display', serif; font-size:1.4rem;">Master Weavers Availability & Workload Tracking</h3>
         </div>
         <div class="table-container">
           <table>
@@ -377,16 +379,71 @@
               <tr>
                 <th>ID</th>
                 <th>Weaver Name</th>
-                <th>Village Location</th>
-                <th>Years of Experience</th>
-                <th>Bio / Details</th>
-                <th>Status</th>
+                <th>Village Cluster</th>
+                <th>Assigned Commission Saree</th>
+                <th>Weaving Workload Progress</th>
+                <th>Est. Completion Date</th>
+                <th>Actions</th>
               </tr>
             </thead>
-            <tbody id="artisans-table-body">
+            <tbody id="weavers-table-body">
               <!-- Dynamically populated -->
             </tbody>
           </table>
+        </div>
+      </section>
+
+      <!-- SECTION 4: ENQUIRY-TO-COMMISSION KANBAN PIPELINE -->
+      <section id="sec-pipeline" class="admin-section">
+        <div class="action-row">
+          <h3 style="font-family:'Playfair Display', serif; font-size:1.4rem;">Enquiry-to-Commission Kanban Pipeline</h3>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(5, 1fr); gap:1rem; overflow-x:auto; padding-bottom:1rem;">
+          <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:8px; padding:1rem;">
+            <h4 style="font-size:0.8rem; text-transform:uppercase; letter-spacing:1px; color:#ffd700; margin-bottom:1rem; border-bottom:1px solid rgba(255,215,0,0.2); padding-bottom:0.5rem;">📥 1. New Enquiry</h4>
+            <div id="kanban-new" style="display:flex; flex-direction:column; gap:0.8rem; min-height:200px;"></div>
+          </div>
+          <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:8px; padding:1rem;">
+            <h4 style="font-size:0.8rem; text-transform:uppercase; letter-spacing:1px; color:#3498db; margin-bottom:1rem; border-bottom:1px solid rgba(52,152,219,0.2); padding-bottom:0.5rem;">💬 2. Consultation Scheduled</h4>
+            <div id="kanban-consult" style="display:flex; flex-direction:column; gap:0.8rem; min-height:200px;"></div>
+          </div>
+          <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:8px; padding:1rem;">
+            <h4 style="font-size:0.8rem; text-transform:uppercase; letter-spacing:1px; color:#9b59b6; margin-bottom:1rem; border-bottom:1px solid rgba(155,89,182,0.2); padding-bottom:0.5rem;">🎨 3. Bespoke Commissioned</h4>
+            <div id="kanban-commissioned" style="display:flex; flex-direction:column; gap:0.8rem; min-height:200px;"></div>
+          </div>
+          <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:8px; padding:1rem;">
+            <h4 style="font-size:0.8rem; text-transform:uppercase; letter-spacing:1px; color:#e67e22; margin-bottom:1rem; border-bottom:1px solid rgba(230,126,34,0.2); padding-bottom:0.5rem;">☸ 4. Weaving on Loom</h4>
+            <div id="kanban-weaving" style="display:flex; flex-direction:column; gap:0.8rem; min-height:200px;"></div>
+          </div>
+          <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:8px; padding:1rem;">
+            <h4 style="font-size:0.8rem; text-transform:uppercase; letter-spacing:1px; color:#2ecc71; margin-bottom:1rem; border-bottom:1px solid rgba(46,204,113,0.2); padding-bottom:0.5rem;">✈️ 5. Shipped & Certified</h4>
+            <div id="kanban-shipped" style="display:flex; flex-direction:column; gap:0.8rem; min-height:200px;"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 5: COOPERATIVE IMPACT & CSR METRICS -->
+      <section id="sec-impact" class="admin-section">
+        <div class="action-row">
+          <h3 style="font-family:'Playfair Display', serif; font-size:1.4rem;">Cooperative Social Impact & Heritage Metrics</h3>
+        </div>
+        <div class="metrics-grid" style="margin-bottom:1.5rem;">
+          <div class="metric-card">
+            <span class="metric-label">Direct Revenue Dispersed</span>
+            <span class="metric-value">₹48,25,000</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-label">Energy Saved (Zero-Electricity)</span>
+            <span class="metric-value">18,420 kWh</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-label">Organic Pigments Used</span>
+            <span class="metric-value">420 kg</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-label">Artisan Families Supported</span>
+            <span class="metric-value">64</span>
+          </div>
         </div>
       </section>
 

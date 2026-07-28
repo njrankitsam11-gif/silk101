@@ -16,7 +16,8 @@ export default defineConfig({
       input: {
         main: 'index.html',
         admin: 'admin.html',
-        articles: 'articles.html'
+        articles: 'articles.html',
+        verify: 'verify.html'
       },
       output: {
         manualChunks(id) {

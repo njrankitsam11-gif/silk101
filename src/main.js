@@ -2950,6 +2950,9 @@ function setupShowroomDrape(initialItem, itemsList) {
       const hashElem = document.getElementById('cert-display-hash');
       if (hashElem) hashElem.textContent = hashStr;
 
+      const verifyLink = document.getElementById('cert-verify-link');
+      if (verifyLink) verifyLink.href = `/verify.html?id=${uniqueId}&hash=${encodeURIComponent(hashStr)}`;
+
       // Dynamic Date backdating based on weaving time
       const weaveDays = isCustomMode ? 30 : (activeItem.weaving_time_days || 28);
       const today = new Date();

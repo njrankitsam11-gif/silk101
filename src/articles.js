@@ -17,11 +17,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     detailSection.style.display = 'block';
     
     try {
-      const response = await fetch(`/api/articles/${slug}`);
-      if (!response.ok) {
+      let article = null;
+      try {
+        const response = await fetch(`/api/articles/${slug}`);
+        if (response.ok) {
+          article = await response.json();
+        }
+      } catch (err) {
+        console.warn('Direct article endpoint fetch error, trying list fallback:', err);
+      }
+
+      if (!article) {
+        const listRes = await fetch('/api/articles');
+        if (listRes.ok) {
+          const articlesList = await listRes.json();
+          article = articlesList.find(a => a.slug === slug);
+        }
+      }
+
+      if (!article) {
         throw new Error('Article not found');
       }
-      const article = await response.json();
       
       // Update metadata on page dynamically for crawlers
       document.title = `${article.title} | The Loom of Time`;
@@ -37,7 +53,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Render content
       const detailContent = document.getElementById('article-detail-content');
       detailContent.innerHTML = `
-        <div class="article-card-meta">
+        <div class="article-card-meta" style="color:var(--color-zari, #d4af37); margin-bottom:16px; font-size:0.8rem; font-family:'Outfit', sans-serif;">
           Published on ${new Date(article.created_at).toLocaleDateString()} &nbsp;·&nbsp; Target Locale: ${article.target_locale ? article.target_locale.toUpperCase() : 'GLOBAL'}
         </div>
         ${article.content_html}
@@ -51,7 +67,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const detailContent = document.getElementById('article-detail-content');
       detailContent.innerHTML = `
         <h1 style="color:#ff6b6b; font-family:'Playfair Display', serif;">Article Not Found</h1>
-        <p style="font-family:'Outfit', sans-serif;">The article you are searching for is not available. <a href="/articles.html" style="color:var(--color-zari);">Browse Weaving Journal</a></p>
+        <p style="font-family:'Outfit', sans-serif; color:rgba(255,255,255,0.7);">The article you are searching for is not available. <a href="/articles.html" style="color:var(--color-zari);">Browse Weaving Journal</a></p>
       `;
     }
   } else {

@@ -142,7 +142,24 @@ const MOCK_ARTICLES = [
     meta_description: 'Are you looking to buy authentic Khandua Silk sarees online from USA, UK, Canada or UAE? Read our comprehensive 2026 handloom checklist, price guides, and weaver certificate verification.',
     content_html: `<article>
       <h1>Buy Khandua Silk Sarees Online — A Global Buyer’s Guide</h1>
-      <p class="intro">For the global Indian diaspora, holding a piece of home is a feeling beyond words. The Khandua Silk saree, originating from the ancient village of Nuapatna in Odisha, represents over eight centuries of sacred weaving heritage.</p>
+      <p class="intro">For the global Indian diaspora residing across the USA, UK, Canada, Australia, and the UAE, holding a piece of home is a feeling beyond words. The Khandua Silk saree, originating from the ancient weaving village of Nuapatna in Odisha, represents over eight centuries of sacred weaving heritage.</p>
+      
+      <h2>Why Khandua Silk Holds Sacred Significance</h2>
+      <p>Traditionally woven for the deities of the Jagannath Temple in Puri, Khandua silk incorporates verses from Jayadeva’s <em>Gita Govinda</em> directly into its warp and weft. Known colloquially as the "Loom of Devotion", this fabric uses pure Mulberry silk threads, hand-dyed with organic extracts derived from local turmeric, indigo, and madder root.</p>
+
+      <blockquote>"Each motif tells a story—from the sacred conch representing prosperity to the lotus symbolizing purity and human resilience."</blockquote>
+
+      <h2>2026 Handloom Buyer Verification Checklist</h2>
+      <p>With machine-made duplicates flooding online marketplaces, discerning buyers must verify authentic provenance before committing:</p>
+      <ul>
+        <li><strong>Silk Mark Certification:</strong> Ensure the piece carries an official Silk Mark barcode and hologram confirming 100% pure Mulberry or Tussar silk.</li>
+        <li><strong>Weave Edge Interlock (Phoda Kumbha):</strong> True handloom features manual Kumbha joint spikes along the border, interlocked by shuttle movement rather than printed lines.</li>
+        <li><strong>SHA-256 Digital Provenance Hash:</strong> Verify the digital certificate signature on our public ledger (<a href="/verify.html" style="color:var(--color-zari);">silk101.vercel.app/verify</a>).</li>
+        <li><strong>Weight & Sheen:</strong> Authentic zero-electricity handloom silk is soft, breathable, and lightweight, displaying an iridescent sheen under natural light.</li>
+      </ul>
+
+      <h2>Global Price Guide & Shipping Standards</h2>
+      <p>An authentic Khandua Silk saree requires between 25 to 40 days of painstaking manual weaving on traditional wooden looms. Fair-trade cooperative pricing typically ranges from <strong>₹1,25,000 to ₹2,50,000 ($1,500 – $3,000 USD)</strong>. We provide fully insured global express delivery via DHL & FedEx Express within 5–7 business days to major diaspora hubs worldwide.</p>
     </article>`,
     topic_keyword: 'buy Khandua silk online',
     target_locale: 'global',

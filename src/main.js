@@ -5257,12 +5257,14 @@ function setupCuratorConcierge() {
     panel.style.display = 'flex';
     panel.classList.remove('hidden');
     
-    // Auto-build WhatsApp link query parameters
+    // Auto-build WhatsApp link query parameters with dynamic saree specifications
     const linkWa = document.getElementById('link-wa-concierge');
     if (linkWa) {
-      const activeTitle = document.getElementById('showroom-title').textContent || 'Mulberry Handloom Saree';
-      const textParam = encodeURIComponent(`Namaste Priyadarshini, I am requesting a private consultation for the "${activeTitle}". Let's arrange a callback.`);
-      linkWa.href = `https://wa.me/919999999999?text=${textParam}`;
+      const activeTitle = document.getElementById('showroom-title') ? document.getElementById('showroom-title').textContent : 'Odisha Handloom Saree';
+      const activePrice = document.getElementById('showroom-price-fiat') ? document.getElementById('showroom-price-fiat').textContent : '₹1,85,000';
+      const artisanName = activeItem ? (activeItem.artisan_name || 'Master Weaver') : 'Master Weaver';
+      const textParam = encodeURIComponent(`Namaste Priyadarshini, I am interested in a private styling & purchase consultation for the "${activeTitle}" (${activePrice}) crafted by ${artisanName}. Please share loom timeline and shipping details.`);
+      linkWa.href = `https://wa.me/916712300000?text=${textParam}`;
     }
 
     // Animate panel scale/fade

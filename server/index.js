@@ -78,8 +78,8 @@ const ITEM_VARIATIONS = {
   ]
 };
 
-// GET all inventory
-app.get('/api/inventory', (req, res) => {
+// GET all inventory / products
+app.get(['/api/inventory', '/api/products'], (req, res) => {
   try {
     const stmt = db.prepare(`
       SELECT i.*, a.name AS artisan_name, a.location AS artisan_location, a.experience_years AS artisan_exp, a.bio AS artisan_bio, c.name AS category_name

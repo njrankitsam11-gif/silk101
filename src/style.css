@@ -3026,10 +3026,10 @@ body::before {
   position: relative;
   z-index: 10;
   width: 100%;
-  max-width: 1400px;
+  max-width: 1300px;
   display: grid;
-  grid-template-columns: 180px 1fr 180px;
-  gap: 2rem;
+  grid-template-columns: 160px 1fr 160px;
+  gap: 1.5rem;
   align-items: center;
 }
 @media (max-width: 900px) {
@@ -3089,20 +3089,35 @@ body::before {
 .hm-frame-wrap {
   position: relative;
   will-change: transform;
+  perspective: 1200px;
 }
-.hm-frame {
+
+/* Photo-based frame */
+.hm-photo-frame {
   position: relative;
-  background:
-    linear-gradient(145deg, rgba(22, 14, 8, 0.98), rgba(14, 8, 4, 0.99));
-  border: 2px solid rgba(180, 140, 50, 0.4);
-  border-radius: 6px;
+  border-radius: 10px;
+  overflow: hidden;
   box-shadow:
-    0 0 0 6px rgba(10, 6, 2, 0.9),
-    0 0 0 8px rgba(160, 120, 40, 0.25),
-    0 0 0 9px rgba(10, 6, 2, 0.8),
-    0 40px 80px rgba(0,0,0,0.8),
-    0 0 120px rgba(212, 175, 55, 0.08) inset;
-  padding: 1.5rem 1.5rem 1rem;
+    0 0 0 3px rgba(212, 175, 55, 0.3),
+    0 0 0 5px rgba(10, 6, 2, 0.85),
+    0 50px 100px rgba(0,0,0,0.9),
+    0 0 80px rgba(212, 175, 55, 0.12);
+}
+.hm-photo-container {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+.hm-photo-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  user-select: none;
+  transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.hm-photo-frame:hover .hm-photo-img {
+  transform: scale(1.025);
 }
 
 /* Gold corner brackets */
@@ -3136,21 +3151,12 @@ body::before {
   opacity: 0.85;
 }
 
-/* Map container */
+/* Map / photo container (shared by both canvas and photo approaches) */
 .hm-frame-inner { position: relative; }
 .hm-map-container {
   position: relative;
   width: 100%;
-  aspect-ratio: 600 / 520;
-  background: linear-gradient(135deg, #e8dcc8 0%, #d4c4a0 60%, #c8b890 100%);
-  border-radius: 3px;
   overflow: hidden;
-}
-.hm-map-canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
 }
 .hm-connectors {
   position: absolute;

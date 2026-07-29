@@ -607,6 +607,11 @@ function renderDashboard() {
     <tr>
       <td style="font-family:monospace; color:#86868b;">#${String(item.id).padStart(3, '0')}</td>
       <td style="font-weight:600; color:#fff;">${item.name}</td>
+      <td style="font-size:0.78rem;">
+        <span style="background:rgba(212,175,55,0.1); border:1px solid rgba(212,175,55,0.3); color:#d4af37; border-radius:12px; padding:2px 8px; white-space:nowrap;">
+          ${item.house_name || '—'}
+        </span>
+      </td>
       <td>${item.category_name || '---'}</td>
       <td style="color:var(--color-accent);">${item.artisan_name || '---'}</td>
       <td style="font-family:monospace; font-weight:600;">₹${item.price_fiat.toLocaleString()}</td>

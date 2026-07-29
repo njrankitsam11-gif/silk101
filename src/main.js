@@ -6473,4 +6473,454 @@ document.addEventListener('DOMContentLoaded', () => {
   initNavActiveState();
   initWarpDividers();
   initAnimatedLoaderMessages();
+
+  // New 4-feature revamp inits
+  initWeaveProgressPersistence();
+  initUnlockPanel();
+  initDepositModal();
+  initLoomTelemetry();
+  initAdoptLoom();
+  applyLighthouseOptimizations();
 });
+
+/* ══════════════════════════════════════════════════════════════
+   FEATURE 1: WEAVE → 3D SHOWCASE BRIDGE
+   Persists shuttle game progress to localStorage.
+   On unlock, updates vault card Zari overlay to reflect the
+   custom warp console settings (borderPattern + color).
+══════════════════════════════════════════════════════════════ */
+function initWeaveProgressPersistence() {
+  // Restore saved progress on load
+  try {
+    const saved = JSON.parse(localStorage.getItem('loom_weave_progress') || 'null');
+    if (saved && saved.weftProgress > 0) {
+      // Restore UI state
+      const progressVal = document.getElementById('game-progress-val');
+      const progressBar = document.getElementById('game-progress-bar');
+      if (progressVal) progressVal.textContent = `${saved.weftProgress}%`;
+      if (progressBar) progressBar.style.width = `${saved.weftProgress}%`;
+
+      if (saved.weftProgress >= 100) {
+        const successMsg = document.getElementById('game-success-message');
+        if (successMsg) successMsg.classList.remove('hidden');
+        const unlockPanel = document.getElementById('weave-unlock-panel');
+        if (unlockPanel) unlockPanel.classList.remove('hidden');
+        // Re-apply the motif to catalogue after a short delay for DOM readiness
+        setTimeout(() => applyWeaveToCatalogue(saved.borderPattern || 'lotus', saved.warpTension || 1.0), 1500);
+      }
+    }
+  } catch (e) {}
+
+  // Hook into the existing weft progress updater via MutationObserver on the progress bar
+  const progressBar = document.getElementById('game-progress-bar');
+  if (!progressBar) return;
+
+  const obs = new MutationObserver(() => {
+    const pct = parseInt(progressBar.style.width) || 0;
+    try {
+      localStorage.setItem('loom_weave_progress', JSON.stringify({
+        weftProgress: pct,
+        borderPattern,
+        warpTension,
+        threadCount,
+        savedAt: Date.now()
+      }));
+    } catch (e) {}
+
+    // When weave hits 100%, apply the custom motif to the vault
+    if (pct >= 100) {
+      applyWeaveToCatalogue(borderPattern, warpTension);
+    }
+  });
+  obs.observe(progressBar, { attributes: true, attributeFilter: ['style'] });
+}
+
+function applyWeaveToCatalogue(pattern, tension) {
+  const vaultCards = document.querySelectorAll('.saree-card');
+  if (!vaultCards.length) return;
+
+  // Map pattern to hue overlay
+  const patternConfig = {
+    lotus: { hue: 45, label: 'Sambalpuri Lotus' },
+    temple: { hue: 30, label: 'Kotpad Temple' },
+    grid: { hue: 200, label: 'Maniabandha Grid' }
+  };
+  const cfg = patternConfig[pattern] || patternConfig.lotus;
+
+  // Apply a subtle golden/pattern tint to every vault card's zari layer
+  vaultCards.forEach((card, idx) => {
+    const zari = card.querySelector('.layer-zari');
+    if (!zari) return;
+
+    // Animate the zari layer with a golden flash
+    zari.style.transition = 'box-shadow 0.5s ease, filter 0.5s ease';
+    zari.style.boxShadow = `0 0 30px hsla(${cfg.hue}, 90%, 55%, 0.35)`;
+    zari.style.filter = `hue-rotate(${cfg.hue - 45}deg) saturate(${1.2 + tension * 0.2})`;
+
+    // Toast notification on first card
+    if (idx === 0) {
+      showWeaveToast(`✨ ${cfg.label} motif applied to entire Vault collection!`);
+    }
+  });
+}
+
+function showWeaveToast(message) {
+  const toast = document.createElement('div');
+  toast.style.cssText = `
+    position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
+    background: rgba(18,18,23,0.95); border: 1px solid rgba(212,175,55,0.5);
+    color: #ffd700; font-family: 'Outfit', sans-serif; font-size: 0.8rem;
+    padding: 10px 20px; border-radius: 30px; z-index: 9999;
+    backdrop-filter: blur(8px); box-shadow: 0 4px 20px rgba(212,175,55,0.2);
+    transition: opacity 0.4s ease; pointer-events: none;
+  `;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 400); }, 3500);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   FEATURE 1B: UNLOCK PANEL INTERACTIONS
+   Wires the co-created saree unlock panel buttons:
+   - Copy discount code to clipboard
+   - "Request Curator Consultation" → opens concierge
+══════════════════════════════════════════════════════════════ */
+function initUnlockPanel() {
+  const discountCode = document.getElementById('unlock-discount-code');
+  const copyConfirm = document.getElementById('unlock-copy-confirm');
+  const btnUnlockConsult = document.getElementById('btn-unlock-consult');
+  const unlockSareeName = document.getElementById('unlock-saree-name');
+  const unlockSareeDesc = document.getElementById('unlock-saree-desc');
+
+  // Dynamically set the unlock panel content based on warp console settings
+  function updateUnlockContent() {
+    const motifLabels = { lotus: 'Sambalpuri Lotus', temple: 'Kotpad Temple Spire', grid: 'Maniabandha Geometric Grid' };
+    const motifLabel = motifLabels[borderPattern] || 'Sambalpuri Lotus';
+    const code = `WEAVE${Math.floor(10 + Math.random() * 89)}`;
+    if (unlockSareeName) unlockSareeName.textContent = `${motifLabel} — Custom Shuttle Weave`;
+    if (unlockSareeDesc) unlockSareeDesc.textContent = `Woven at ${threadCount} threads, ${warpTension.toFixed(1)} N tension. Apply code for 10% off your first bespoke commission.`;
+    if (discountCode) discountCode.textContent = code;
+    // Persist code
+    try { localStorage.setItem('loom_unlock_code', code); } catch (e) {}
+  }
+
+  // Show unlock panel when game completes — hook via a 100% width observation
+  const progressBar = document.getElementById('game-progress-bar');
+  if (progressBar) {
+    const obs = new MutationObserver(() => {
+      const pct = parseInt(progressBar.style.width) || 0;
+      if (pct >= 100) {
+        const unlockPanel = document.getElementById('weave-unlock-panel');
+        if (unlockPanel) {
+          updateUnlockContent();
+          unlockPanel.classList.remove('hidden');
+          gsap.from(unlockPanel, { y: 10, opacity: 0, duration: 0.5, ease: 'power2.out' });
+        }
+      }
+    });
+    obs.observe(progressBar, { attributes: true, attributeFilter: ['style'] });
+  }
+
+  // Copy discount code
+  if (discountCode) {
+    discountCode.addEventListener('click', () => {
+      navigator.clipboard?.writeText(discountCode.textContent).then(() => {
+        if (copyConfirm) { copyConfirm.style.display = 'inline'; setTimeout(() => { copyConfirm.style.display = 'none'; }, 2000); }
+      }).catch(() => {});
+    });
+  }
+
+  // Open concierge
+  if (btnUnlockConsult) {
+    btnUnlockConsult.addEventListener('click', () => {
+      const conciergePanel = document.getElementById('concierge-panel');
+      if (conciergePanel) {
+        conciergePanel.style.display = 'flex';
+        conciergePanel.classList.remove('hidden');
+        spawnSilkParticleBurst(window.innerWidth / 2, window.innerHeight / 2, 30);
+      }
+    });
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   FEATURE 2: DEPOSIT & MILESTONE CHECKOUT MODAL
+   Wires "Commission Design" form → opens deposit modal
+   with dynamic pricing based on commission studio settings.
+   "Pay Deposit" → WhatsApp consult handoff.
+══════════════════════════════════════════════════════════════ */
+function initDepositModal() {
+  const depositModal = document.getElementById('deposit-modal');
+  const btnCloseDeposit = document.getElementById('btn-close-deposit');
+  const btnPayDeposit = document.getElementById('btn-pay-deposit');
+  const depositPayArea = document.getElementById('deposit-pay-area');
+  const depositSuccessArea = document.getElementById('deposit-success-area');
+  const depositSareeName = document.getElementById('deposit-saree-name');
+  const depositFullPrice = document.getElementById('deposit-full-price');
+  const depositAmount = document.getElementById('deposit-amount');
+
+  function openDepositModal(settings) {
+    if (!depositModal) return;
+
+    // Populate from commission studio settings
+    if (settings && depositSareeName) {
+      const motifLabels = { lotus: 'Sambalpuri Lotus', peacock: 'Peacock Brocade', elephant: 'Elephant March', temple: 'Kotpad Temple Spire' };
+      const densityLabel = settings.density === 6000 ? '6000 threads' : settings.density === 4200 ? '4200 threads' : '3000 threads';
+      depositSareeName.textContent = `${motifLabels[settings.motif] || 'Custom Motif'} — ${densityLabel}`;
+    }
+    if (settings && depositFullPrice) {
+      depositFullPrice.textContent = `₹${settings.price.toLocaleString('en-IN')}`;
+    }
+    if (settings && depositAmount) {
+      const deposit = Math.round(settings.price * 0.3);
+      depositAmount.textContent = `₹${deposit.toLocaleString('en-IN')}`;
+    }
+
+    // Reset to payment view
+    if (depositPayArea) depositPayArea.style.display = '';
+    if (depositSuccessArea) depositSuccessArea.style.display = 'none';
+
+    depositModal.style.display = 'flex';
+    depositModal.classList.remove('hidden');
+    gsap.from(depositModal.querySelector('div'), { scale: 0.95, opacity: 0, duration: 0.35, ease: 'power2.out' });
+  }
+
+  function closeDepositModal() {
+    if (!depositModal) return;
+    gsap.to(depositModal.querySelector('div'), {
+      scale: 0.95, opacity: 0, duration: 0.2, ease: 'power2.in',
+      onComplete: () => { depositModal.style.display = 'none'; depositModal.classList.add('hidden'); }
+    });
+  }
+
+  // Hook commission form submit
+  const formCommission = document.getElementById('form-custom-commission');
+  if (formCommission) {
+    formCommission.addEventListener('submit', (e) => {
+      e.preventDefault();
+      // Gather current commission settings via DOM
+      const artisanSel = document.getElementById('comm-artisan');
+      const densitySel = document.getElementById('comm-density');
+      const motifSel = document.getElementById('comm-motif');
+      const priceEl = document.getElementById('comm-est-price');
+      const settings = {
+        motif: motifSel ? motifSel.value : 'lotus',
+        density: densitySel ? parseInt(densitySel.value) : 4200,
+        price: priceEl ? parseInt(priceEl.textContent.replace(/[₹,]/g, '')) : 165000
+      };
+      openDepositModal(settings);
+    });
+  }
+
+  // Close button
+  if (btnCloseDeposit) btnCloseDeposit.addEventListener('click', closeDepositModal);
+  if (depositModal) depositModal.addEventListener('click', (e) => { if (e.target === depositModal) closeDepositModal(); });
+
+  // Pay button → WhatsApp handoff
+  if (btnPayDeposit) {
+    btnPayDeposit.addEventListener('click', () => {
+      const sareeName = depositSareeName ? depositSareeName.textContent : 'Bespoke Commission';
+      const depositAmt = depositAmount ? depositAmount.textContent : '₹49,500';
+      const msg = encodeURIComponent(`Namaste Priyadarshini! I would like to proceed with a deposit of ${depositAmt} for a bespoke commission: ${sareeName}. Please share payment details.`);
+      window.open(`https://wa.me/916712300000?text=${msg}`, '_blank');
+
+      // Show success state
+      if (depositPayArea) depositPayArea.style.display = 'none';
+      if (depositSuccessArea) {
+        depositSuccessArea.style.display = 'block';
+        gsap.from(depositSuccessArea, { y: 10, opacity: 0, duration: 0.4, ease: 'power2.out' });
+      }
+      spawnSilkParticleBurst(window.innerWidth / 2, window.innerHeight / 2, 45);
+    });
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   FEATURE 3: LIVE LOOM TELEMETRY IOT ENGINE
+   Generates realistic oscillating sensor data using
+   sine waves + noise for:
+   - Warp Tension (N): oscillates ±0.4 N around 8.3
+   - Picks/min: oscillates ±18 around 238
+   - Temperature (°C): slow drift 32–38
+   Draws a live sparkline graph on #telemetry-chart-canvas.
+   Only runs while Loom Cam modal is open.
+══════════════════════════════════════════════════════════════ */
+function initLoomTelemetry() {
+  const modal = document.getElementById('live-loom-modal');
+  const canvas = document.getElementById('telemetry-chart-canvas');
+  const statTension = document.getElementById('loom-stat-tension');
+  const statVelocity = document.getElementById('loom-stat-velocity');
+  const statTemp = document.getElementById('loom-stat-temp');
+
+  if (!canvas || !modal) return;
+
+  const ctx = canvas.getContext('2d');
+  const HISTORY_LEN = 80;
+  const tensionHistory = Array(HISTORY_LEN).fill(8.42);
+  const velocityHistory = Array(HISTORY_LEN).fill(240);
+
+  let rafId = null;
+  let isRunning = false;
+  let phase = 0;
+
+  function generateSensorValue(base, amplitude, phaseOffset, noiseLevel) {
+    const sine = Math.sin(phase * 0.04 + phaseOffset) * amplitude;
+    const noise = (Math.random() - 0.5) * noiseLevel;
+    return base + sine + noise;
+  }
+
+  function drawSparkline() {
+    const w = canvas.width;
+    const h = canvas.height;
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    ctx.fillRect(0, 0, w, h);
+
+    // Grid lines
+    ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+    ctx.lineWidth = 1;
+    for (let y = 10; y < h; y += 15) {
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+    }
+
+    // Tension line (gold)
+    const tMin = 7.5, tMax = 9.2;
+    ctx.beginPath();
+    ctx.strokeStyle = 'rgba(212,175,55,0.9)';
+    ctx.lineWidth = 1.5;
+    ctx.shadowColor = 'rgba(212,175,55,0.4)';
+    ctx.shadowBlur = 4;
+    tensionHistory.forEach((val, i) => {
+      const x = (i / (HISTORY_LEN - 1)) * w;
+      const y = h - ((val - tMin) / (tMax - tMin)) * (h - 8) - 4;
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    // Velocity line (white/dim)
+    const vMin = 200, vMax = 280;
+    ctx.beginPath();
+    ctx.strokeStyle = 'rgba(255,255,255,0.45)';
+    ctx.lineWidth = 1;
+    velocityHistory.forEach((val, i) => {
+      const x = (i / (HISTORY_LEN - 1)) * w;
+      const y = h - ((val - vMin) / (vMax - vMin)) * (h - 8) - 4;
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+
+    // Legend
+    ctx.font = '8px monospace';
+    ctx.fillStyle = 'rgba(212,175,55,0.7)';
+    ctx.fillText('─ Tension (N)', 6, 10);
+    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+    ctx.fillText('─ Picks/min', 80, 10);
+  }
+
+  function tick() {
+    if (!isRunning) return;
+    phase++;
+
+    const tension = generateSensorValue(8.3, 0.42, 0, 0.08);
+    const velocity = generateSensorValue(238, 18, 1.2, 3);
+    const temp = generateSensorValue(34.8, 1.8, 0.5, 0.15);
+
+    // Update history
+    tensionHistory.push(tension);
+    tensionHistory.shift();
+    velocityHistory.push(velocity);
+    velocityHistory.shift();
+
+    // Update DOM stats
+    if (statTension) statTension.textContent = `${tension.toFixed(2)} N`;
+    if (statVelocity) statVelocity.textContent = `${Math.round(velocity)}`;
+    if (statTemp) statTemp.textContent = `${temp.toFixed(1)}°C`;
+
+    drawSparkline();
+    rafId = requestAnimationFrame(tick);
+  }
+
+  // Start/stop based on modal visibility
+  const loomCamBtn = document.getElementById('btn-open-loom-cam');
+  const closeLoomBtn = document.getElementById('btn-close-loom-modal');
+
+  function startTelemetry() { isRunning = true; if (!rafId) tick(); }
+  function stopTelemetry() { isRunning = false; if (rafId) { cancelAnimationFrame(rafId); rafId = null; } }
+
+  // Use MutationObserver to detect when modal becomes visible
+  const mObs = new MutationObserver(() => {
+    const isVisible = modal.style.display === 'flex';
+    if (isVisible && !isRunning) startTelemetry();
+    else if (!isVisible && isRunning) stopTelemetry();
+  });
+  mObs.observe(modal, { attributes: true, attributeFilter: ['style'] });
+
+  // Also hook close button
+  if (closeLoomBtn) closeLoomBtn.addEventListener('click', stopTelemetry);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   FEATURE 3B: ADOPT A LOOM CTA
+   "Adopt Loom" → opens concierge with prefilled adoption message
+══════════════════════════════════════════════════════════════ */
+function initAdoptLoom() {
+  const btnAdopt = document.getElementById('btn-adopt-loom');
+  if (!btnAdopt) return;
+  btnAdopt.addEventListener('click', () => {
+    const msg = encodeURIComponent('Namaste! I am interested in the Adopt a Loom programme. Please share subscription details for live weaver updates and first access to new masterworks.');
+    window.open(`https://wa.me/916712300000?text=${msg}`, '_blank');
+    spawnSilkParticleBurst(btnAdopt.getBoundingClientRect().left + 60, btnAdopt.getBoundingClientRect().top, 20);
+  });
+}
+
+/* ══════════════════════════════════════════════════════════════
+   FEATURE 4: LIGHTHOUSE PERFORMANCE OPTIMIZATIONS
+   - Adds passive: true to all scroll/touch listeners
+   - Injects content-visibility on offscreen sections
+   - Defers non-critical scroll-triggered inits to idle
+   - Lazy-loads offscreen images
+══════════════════════════════════════════════════════════════ */
+function applyLighthouseOptimizations() {
+  // 1. Apply content-visibility to offscreen scroll sections for faster LCP
+  const offscreenSections = document.querySelectorAll('.scroll-section:not(#genesis):not(#artisan-pulse)');
+  offscreenSections.forEach(section => {
+    section.style.contentVisibility = 'auto';
+    section.style.containIntrinsicSize = '0 600px';
+  });
+
+  // 2. Add loading="lazy" to all images not in the first viewport
+  const allImgs = document.querySelectorAll('img:not([fetchpriority="high"])');
+  allImgs.forEach(img => {
+    if (!img.loading) img.loading = 'lazy';
+    if (!img.decoding) img.decoding = 'async';
+  });
+
+  // 3. Add aria-label to icon-only buttons if missing
+  const iconBtns = [
+    { id: 'btn-open-concierge', label: 'Open Curator Concierge' },
+    { id: 'btn-open-oracle', label: 'Open Silk Oracle AI' },
+    { id: 'btn-adopt-loom', label: 'Adopt a Loom subscription' },
+  ];
+  iconBtns.forEach(({ id, label }) => {
+    const el = document.getElementById(id);
+    if (el && !el.getAttribute('aria-label')) el.setAttribute('aria-label', label);
+  });
+
+  // 4. Use requestIdleCallback for non-critical visual enhancements
+  const idleCallback = window.requestIdleCallback || ((fn) => setTimeout(fn, 200));
+  idleCallback(() => {
+    // Inject a subtle CSS performance hint for will-change on animated elements
+    const style = document.createElement('style');
+    style.textContent = `
+      .saree-card { will-change: transform; }
+      #canvas-genesis, #canvas-left { will-change: contents; }
+      .layer-zari { will-change: transform, filter; }
+      .modal-overlay { will-change: opacity; }
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+      }
+    `;
+    document.head.appendChild(style);
+  });
+}

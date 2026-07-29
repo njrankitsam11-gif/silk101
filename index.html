@@ -271,6 +271,7 @@
         <nav class="site-nav" aria-label="Explore the story">
           <a href="#artisan-pulse">The Weavers</a>
           <a href="#metamorphosis">Living Culture</a>
+          <a href="#houses-of-odisha">Heritage Houses</a>
           <a href="#vault">Collection</a>
         </nav>
         <a class="header-journal" href="/articles.html">Journal <span aria-hidden="true">↗</span></a>
@@ -722,6 +723,44 @@
           <path class="warp-thread-line" d="M0,65 C360,25 720,75 1080,30 C1260,10 1380,45 1440,35" fill="none" stroke="url(#gold-thread-grad)"/>
         </svg>
       </div>
+
+      <!-- SECTION 3B: HOUSES OF ODISHA HANDLOOM (The 20-Piece Master Showcase) -->
+      <section id="houses-of-odisha" class="scroll-section" style="position:relative; padding: 5rem 2rem; background: linear-gradient(180deg, #050508 0%, #0c0905 50%, #050508 100%); border-top: 1px solid rgba(212,175,55,0.15); border-bottom: 1px solid rgba(212,175,55,0.15);">
+        <div class="houses-heading-wrap" style="text-align:center; max-width:900px; margin:0 auto 2.5rem;">
+          <span class="section-label" style="display:block; letter-spacing:3px; color:rgba(212,175,55,0.6); font-size:0.75rem; text-transform:uppercase; margin-bottom:0.5rem;">03 / HERITAGE HOUSES</span>
+          <h2 class="houses-title" style="font-family:'Cormorant Garamond', serif; font-size: clamp(2.2rem, 5vw, 3.6rem); color:#d4af37; font-weight:400; letter-spacing:1px; margin-bottom:0.8rem;">
+            Houses of Odisha Handloom
+          </h2>
+          <p class="houses-subtitle" style="font-family:'Outfit', sans-serif; font-size:0.95rem; color:rgba(255,255,255,0.6); line-height:1.6;">
+            A curated monthly showcase of 20 elite masterpieces across the four ancient weaving houses of Odisha — 
+            <strong>House of Sambalpur</strong>, <strong>House of Khandua</strong>, <strong>House of Bomkai</strong>, and <strong>House of Berhampur</strong>.
+          </p>
+        </div>
+
+        <!-- House Switcher Tabs -->
+        <div class="house-tabs-container" style="display:flex; justify-content:center; flex-wrap:wrap; gap:0.75rem; max-width:1050px; margin:0 auto 3rem;">
+          <button class="house-tab-btn active" data-house="all">
+            <span class="house-tab-icon">🏛️</span> All Houses <span class="house-tab-count">(20)</span>
+          </button>
+          <button class="house-tab-btn" data-house="House of Sambalpur">
+            <span class="house-tab-icon">🌸</span> House of Sambalpur <span class="house-tab-count">(5)</span>
+          </button>
+          <button class="house-tab-btn" data-house="House of Khandua">
+            <span class="house-tab-icon">📜</span> House of Khandua <span class="house-tab-count">(5)</span>
+          </button>
+          <button class="house-tab-btn" data-house="House of Bomkai">
+            <span class="house-tab-icon">🦚</span> House of Bomkai <span class="house-tab-count">(5)</span>
+          </button>
+          <button class="house-tab-btn" data-house="House of Berhampur">
+            <span class="house-tab-icon">👑</span> House of Berhampur <span class="house-tab-count">(5)</span>
+          </button>
+        </div>
+
+        <!-- 20-Piece Saree Grid -->
+        <div class="houses-grid" id="houses-saree-grid">
+          <!-- Dynamically populated folded saree cards -->
+        </div>
+      </section>
 
       <!-- SECTION 4: THE VAULT (1-of-1 Collection Gallery) -->
       <section id="vault" class="scroll-section" style="position:relative;">

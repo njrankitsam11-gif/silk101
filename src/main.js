@@ -1549,30 +1549,67 @@ function setupMetamorphosis() {
 
 
 /* ==========================================================
-   SECTION 4: THE VAULT (Z-Axis Parallax & Gold Shader)
+   SECTION 4: THE VAULT & HOUSES OF ODISHA HANDLOOM
 ========================================================== */
 let sareeCollection = [];
 
 const FALLBACK_INVENTORY = [
+  // ── HOUSE OF SAMBALPUR (1..5) ──
   {
     id: 1,
-    name: 'Nuapatana Khandua Ikat Saree',
+    name: 'Sambalpuri Lotus & Pasapalli Saree',
+    house_name: 'House of Sambalpur',
     category_id: 1,
     category_name: 'Ikat',
-    artisan_id: 1,
-    artisan_name: 'Smt. Sebati Mohanty',
-    artisan_location: 'Nuapatna, Odisha',
-    price_fiat: 150000,
+    artisan_id: 2,
+    artisan_name: 'Shri Ranjan Meher',
+    artisan_location: 'Maniabandha, Odisha',
+    price_fiat: 155000,
     stock_status: 'available',
     material: '100% Pure Mulberry Silk',
     weaving_time_days: 28,
-    description: 'A masterpiece of Nuapatna, tie-dyed with organic crimson and gold. Highlights a stylized geometric gold elephant Zari motif on the Pallu.',
-    color_hue: 0,
-    color_saturation: 1.0
+    description: 'Signature Sambalpuri double-Ikat checkerboard Pasapalli with organic crimson lotus pallu Zari figuring.',
+    color_hue: 340,
+    color_saturation: 1.3
   },
   {
     id: 2,
-    name: 'Sambalpuri Lotus Saree',
+    name: 'Sambalpuri Phulia Lattice Ikat Saree',
+    house_name: 'House of Sambalpur',
+    category_id: 1,
+    category_name: 'Ikat',
+    artisan_id: 2,
+    artisan_name: 'Shri Ranjan Meher',
+    artisan_location: 'Maniabandha, Odisha',
+    price_fiat: 140000,
+    stock_status: 'available',
+    material: 'Mulberry Silk',
+    weaving_time_days: 24,
+    description: 'Intricate violet and emerald geometric lattice woven using mathematical Bandha tie-dye alignment.',
+    color_hue: 280,
+    color_saturation: 1.2
+  },
+  {
+    id: 3,
+    name: 'Sambalpuri Peacock Cascade Saree',
+    house_name: 'House of Sambalpur',
+    category_id: 1,
+    category_name: 'Ikat',
+    artisan_id: 2,
+    artisan_name: 'Shri Ranjan Meher',
+    artisan_location: 'Maniabandha, Odisha',
+    price_fiat: 165000,
+    stock_status: 'available',
+    material: 'Tussar & Mulberry Silk',
+    weaving_time_days: 30,
+    description: 'Deep royal blue body adorned with cascading peacock motifs across the pallu and contrast gold zari border.',
+    color_hue: 210,
+    color_saturation: 1.4
+  },
+  {
+    id: 4,
+    name: 'Sambalpuri Rudraksha Border Saree',
+    house_name: 'House of Sambalpur',
     category_id: 1,
     category_name: 'Ikat',
     artisan_id: 2,
@@ -1580,173 +1617,487 @@ const FALLBACK_INVENTORY = [
     artisan_location: 'Maniabandha, Odisha',
     price_fiat: 135000,
     stock_status: 'available',
-    material: 'Mulberry Silk',
-    weaving_time_days: 24,
-    description: 'Traditional Sambalpuri Lotus. Bold raspberry red background with gold-plated silver thread Zari portraying organic lotus petals.',
-    color_hue: 320,
-    color_saturation: 1.2
-  },
-  {
-    id: 3,
-    name: 'Kotpad Temple Border Saree',
-    category_id: 2,
-    category_name: 'Chanderi',
-    artisan_id: 1,
-    artisan_name: 'Smt. Sebati Mohanty',
-    artisan_location: 'Nuapatna, Odisha',
-    price_fiat: 125000,
-    stock_status: 'available',
-    material: 'Organic Cotton',
-    weaving_time_days: 35,
-    description: 'Kotpad tribal style, featuring deep forest green with ocher oad-tree roots temple borders. Colored using local organic tree barks.',
-    color_hue: 165,
-    color_saturation: 1.2
-  },
-  {
-    id: 4,
-    name: 'Konark Sundial Relic Saree',
-    category_id: 4,
-    category_name: 'Tissue Silk',
-    artisan_id: 2,
-    artisan_name: 'Shri Ranjan Meher',
-    artisan_location: 'Maniabandha, Odisha',
-    price_fiat: 175000,
-    stock_status: 'available',
-    material: 'Tussar Silk',
-    weaving_time_days: 30,
-    description: 'Dedicated to the Sun God of Konark. The Pallu features a highly detailed, procedurally woven stone relief wheel representing time divisions.',
-    color_hue: 260,
-    color_saturation: 1.3
-  },
-  {
-    id: 5,
-    name: 'Lord Jagannath Provenance Saree',
-    category_id: 1,
-    category_name: 'Ikat',
-    artisan_id: 3,
-    artisan_name: 'Shri Kailash Meher',
-    artisan_location: 'Puri, Odisha',
-    price_fiat: 205000,
-    stock_status: 'available',
-    material: 'Khandua Silk',
-    weaving_time_days: 42,
-    description: 'Sacred Khandua style. Features Balabhadra, Subhadra, and Lord Jagannath in holy shrine, with vertical lotus borders. Woven with ocher and vermilion silk.',
-    color_hue: 45,
-    color_saturation: 0.8
-  },
-  {
-    id: 6,
-    name: 'Maniabandha Grid Saree',
-    category_id: 3,
-    category_name: 'Kanjivaram',
-    artisan_id: 3,
-    artisan_name: 'Shri Kailash Meher',
-    artisan_location: 'Puri, Odisha',
-    price_fiat: 185000,
-    stock_status: 'available',
-    material: 'Fine Silk Blend',
-    weaving_time_days: 28,
-    description: 'Classic Maniabandha grid layout. Geometric diamonds and checkerboard squares representing mathematical symmetry in handloom.',
-    color_hue: 30,
+    material: 'Pure Silk',
+    weaving_time_days: 22,
+    description: 'Warm terracotta ground highlighting sacred Rudraksha seed border reliefs and traditional temple Kumbha spires.',
+    color_hue: 25,
     color_saturation: 1.1
   },
   {
-    id: 7,
-    name: 'Bomkai Jamdani Peacock Saree',
-    category_id: 3,
-    category_name: 'Kanjivaram',
-    artisan_id: 1,
-    artisan_name: 'Smt. Sebati Mohanty',
-    artisan_location: 'Nuapatna, Odisha',
-    price_fiat: 215000,
-    stock_status: 'available',
-    material: 'Pure Bomkai Silk',
-    weaving_time_days: 38,
-    description: 'Deep forest violet with gold peacock feather pallu. The Bomkai style features extra-weft figuring — individual peacock tail motifs hand-woven through each section of the pallu border.',
-    color_hue: 285,
-    color_saturation: 1.3
-  },
-  {
-    id: 8,
-    name: 'Tigiria Double-Ikat Pasapalli Saree',
+    id: 5,
+    name: 'Sambalpuri Sacred Temple Grid Saree',
+    house_name: 'House of Sambalpur',
     category_id: 1,
     category_name: 'Ikat',
     artisan_id: 2,
     artisan_name: 'Shri Ranjan Meher',
     artisan_location: 'Maniabandha, Odisha',
+    price_fiat: 170000,
+    stock_status: 'available',
+    material: 'Mulberry Silk',
+    weaving_time_days: 32,
+    description: 'Emerald green ground with gold-plated silver thread Zari portraying organic lotus petals and temple spires.',
+    color_hue: 150,
+    color_saturation: 1.3
+  },
+
+  // ── HOUSE OF KHANDUA (6..10) ──
+  {
+    id: 6,
+    name: 'Nuapatna Khandua Gita Govinda Saree',
+    house_name: 'House of Khandua',
+    category_id: 1,
+    category_name: 'Ikat',
+    artisan_id: 1,
+    artisan_name: 'Smt. Sebati Mohanty',
+    artisan_location: 'Nuapatna, Odisha',
+    price_fiat: 185000,
+    stock_status: 'available',
+    material: '100% Pure Khandua Silk',
+    weaving_time_days: 36,
+    description: 'Sacred Nuapatna Khandua woven with verses of Gita Govinda, tie-dyed with organic turmeric and madder root.',
+    color_hue: 0,
+    color_saturation: 1.5
+  },
+  {
+    id: 7,
+    name: 'Khandua Deula Bhaunri Spire Saree',
+    house_name: 'House of Khandua',
+    category_id: 1,
+    category_name: 'Ikat',
+    artisan_id: 1,
+    artisan_name: 'Smt. Sebati Mohanty',
+    artisan_location: 'Nuapatna, Odisha',
+    price_fiat: 175000,
+    stock_status: 'available',
+    material: 'Khandua Silk',
+    weaving_time_days: 32,
+    description: 'Golden yellow body featuring Jagannath temple spire silhouettes and auspicious elephant-deer pallu bandha.',
+    color_hue: 45,
+    color_saturation: 1.2
+  },
+  {
+    id: 8,
+    name: 'Khandua Radhanagar Crimson Silk',
+    house_name: 'House of Khandua',
+    category_id: 1,
+    category_name: 'Ikat',
+    artisan_id: 1,
+    artisan_name: 'Smt. Sebati Mohanty',
+    artisan_location: 'Nuapatna, Odisha',
     price_fiat: 160000,
     stock_status: 'available',
     material: 'Mulberry Silk',
-    weaving_time_days: 22,
-    description: 'Navy and ivory double-Ikat checkerboard Pasapalli — the signature board-game pattern of Tigiria. The mathematical precision of tie-dye alignment in double-Ikat is considered among the most technically demanding in the world.',
-    color_hue: 220,
+    weaving_time_days: 26,
+    description: 'Radiant crimson silk featuring fine floral ikat weave borders handed down through Radhanagar master weavers.',
+    color_hue: 350,
     color_saturation: 1.4
   },
   {
     id: 9,
-    name: 'Nayagarh Kumbha Spire Saree',
-    category_id: 2,
-    category_name: 'Chanderi',
-    artisan_id: 3,
-    artisan_name: 'Shri Kailash Meher',
-    artisan_location: 'Puri, Odisha',
-    price_fiat: 195000,
-    stock_status: 'available',
-    material: 'Tussar Silk',
-    weaving_time_days: 32,
-    description: 'Turquoise body silk with rising silver Kumbha temple spires along both border edges. The Kumbha (sacred pot / spire form) motif is an ancient Odishan symbol representing divine vessels of prosperity.',
-    color_hue: 185,
-    color_saturation: 1.2
-  },
-  {
-    id: 10,
-    name: 'Sonepur Elephant Procession Saree',
+    name: 'Khandua Elephant March Pallu Saree',
+    house_name: 'House of Khandua',
     category_id: 1,
     category_name: 'Ikat',
-    artisan_id: 2,
-    artisan_name: 'Shri Ranjan Meher',
-    artisan_location: 'Maniabandha, Odisha',
-    price_fiat: 230000,
-    stock_status: 'available',
-    material: '100% Pure Mulberry Silk',
-    weaving_time_days: 44,
-    description: 'Rich amber and saffron ground with a grand procession of nine elephants woven into the pallu using the Bandha technique. Elephants represent the divine chariot vehicles of Jagannath Temple during Rath Yatra.',
-    color_hue: 35,
-    color_saturation: 1.5
-  },
-  {
-    id: 11,
-    name: 'Berhampur Gongdi Silk Saree',
-    category_id: 4,
-    category_name: 'Tissue Silk',
     artisan_id: 1,
     artisan_name: 'Smt. Sebati Mohanty',
     artisan_location: 'Nuapatna, Odisha',
-    price_fiat: 175000,
+    price_fiat: 195000,
     stock_status: 'available',
-    material: 'Gongdi Tissue Silk',
-    weaving_time_days: 26,
-    description: 'Rose-gold gossamer Gongdi tissue silk from Berhampur. Features a peacock fan tail border in silver Zari — the characteristic "Berhampur look" that combines sheer fabric weight with detailed border complexity.',
-    color_hue: 340,
-    color_saturation: 1.1
+    material: 'Khandua Patta Silk',
+    weaving_time_days: 40,
+    description: 'Rich saffron ground with a grand procession of nine royal elephants woven into the pallu using Bandha technique.',
+    color_hue: 35,
+    color_saturation: 1.3
   },
   {
-    id: 12,
-    name: 'Puri Ratha Yatra Patta Silk',
+    id: 10,
+    name: 'Khandua Maniabandha Diamond Ikat',
+    house_name: 'House of Khandua',
+    category_id: 1,
+    category_name: 'Ikat',
+    artisan_id: 1,
+    artisan_name: 'Smt. Sebati Mohanty',
+    artisan_location: 'Nuapatna, Odisha',
+    price_fiat: 150000,
+    stock_status: 'available',
+    material: 'Khandua Silk Blend',
+    weaving_time_days: 25,
+    description: 'Deep cobalt blue body with geometric diamond ikat repeats, representing sacred mathematical proportions in handloom.',
+    color_hue: 220,
+    color_saturation: 1.2
+  },
+
+  // ── HOUSE OF BOMKAI (11..15) ──
+  {
+    id: 11,
+    name: 'Bomkai Sonepur Jamdani Peacock Saree',
+    house_name: 'House of Bomkai',
     category_id: 3,
     category_name: 'Kanjivaram',
     artisan_id: 3,
     artisan_name: 'Shri Kailash Meher',
-    artisan_location: 'Puri, Odisha',
-    price_fiat: 245000,
+    artisan_location: 'Sonepur, Odisha',
+    price_fiat: 215000,
     stock_status: 'available',
-    material: 'Khandua Patta Silk',
-    weaving_time_days: 46,
-    description: 'Deep crimson with a Rath Chariot procession — the iconic Nandighosa chariot of Lord Jagannath woven into the full pallu. A once-in-a-generation masterpiece celebrating the sacred Rath Yatra festival of Puri.',
+    material: 'Pure Bomkai Silk',
+    weaving_time_days: 38,
+    description: 'Deep magenta silk with gold peacock feather pallu. Features extra-weft figuring woven with needle-precision.',
+    color_hue: 295,
+    color_saturation: 1.4
+  },
+  {
+    id: 12,
+    name: 'Bomkai Fish & Lotus Legend Saree',
+    house_name: 'House of Bomkai',
+    category_id: 3,
+    category_name: 'Kanjivaram',
+    artisan_id: 3,
+    artisan_name: 'Shri Kailash Meher',
+    artisan_location: 'Sonepur, Odisha',
+    price_fiat: 190000,
+    stock_status: 'available',
+    material: 'Bomkai Silk',
+    weaving_time_days: 34,
+    description: 'Lush teal body displaying the classic Odia Matsya (sacred fish) and lotus motif figuring along the pallu border.',
+    color_hue: 170,
+    color_saturation: 1.3
+  },
+  {
+    id: 13,
+    name: 'Bomkai Royal Amber Zari Saree',
+    house_name: 'House of Bomkai',
+    category_id: 3,
+    category_name: 'Kanjivaram',
+    artisan_id: 3,
+    artisan_name: 'Shri Kailash Meher',
+    artisan_location: 'Sonepur, Odisha',
+    price_fiat: 225000,
+    stock_status: 'available',
+    material: 'Heavy Bomkai Silk',
+    weaving_time_days: 42,
+    description: 'Warm amber gold silk woven with heavy metallic Zari extra-weft figuring representing southern Odisha royalty.',
+    color_hue: 40,
+    color_saturation: 1.5
+  },
+  {
+    id: 14,
+    name: 'Bomkai Heritage Crimson Border Saree',
+    house_name: 'House of Bomkai',
+    category_id: 3,
+    category_name: 'Kanjivaram',
+    artisan_id: 3,
+    artisan_name: 'Shri Kailash Meher',
+    artisan_location: 'Sonepur, Odisha',
+    price_fiat: 195000,
+    stock_status: 'available',
+    material: 'Bomkai Silk',
+    weaving_time_days: 30,
+    description: 'Vermilion red body with contrasting dark navy border featuring geometric tribal motifs and gold extra-weft brocade.',
     color_hue: 5,
-    color_saturation: 1.6
+    color_saturation: 1.4
+  },
+  {
+    id: 15,
+    name: 'Bomkai Midnight Indigo Brocade Saree',
+    house_name: 'House of Bomkai',
+    category_id: 3,
+    category_name: 'Kanjivaram',
+    artisan_id: 3,
+    artisan_name: 'Shri Kailash Meher',
+    artisan_location: 'Sonepur, Odisha',
+    price_fiat: 210000,
+    stock_status: 'available',
+    material: 'Pure Mulberry Silk',
+    weaving_time_days: 36,
+    description: 'Deep midnight indigo with gold and copper thread extra-weft figuring portraying ancient Odia village mythologies.',
+    color_hue: 245,
+    color_saturation: 1.5
+  },
+
+  // ── HOUSE OF BERHAMPUR (16..20) ──
+  {
+    id: 16,
+    name: 'Berhampur Phoda Kumbha Temple Saree',
+    house_name: 'House of Berhampur',
+    category_id: 4,
+    category_name: 'Tissue Silk',
+    artisan_id: 1,
+    artisan_name: 'Smt. Sebati Mohanty',
+    artisan_location: 'Berhampur, Odisha',
+    price_fiat: 180000,
+    stock_status: 'available',
+    material: 'Berhampur Patta Silk',
+    weaving_time_days: 30,
+    description: 'Famous Berhampur Pata with interlocking Phoda Kumbha temple spires along the border, woven without electricity.',
+    color_hue: 130,
+    color_saturation: 1.2
+  },
+  {
+    id: 17,
+    name: 'Berhampur Gongdi Silk Relic Saree',
+    house_name: 'House of Berhampur',
+    category_id: 4,
+    category_name: 'Tissue Silk',
+    artisan_id: 1,
+    artisan_name: 'Smt. Sebati Mohanty',
+    artisan_location: 'Berhampur, Odisha',
+    price_fiat: 175000,
+    stock_status: 'available',
+    material: 'Gongdi Tissue Silk',
+    weaving_time_days: 26,
+    description: 'Rose-gold gossamer Gongdi tissue silk from Berhampur with peacock fan tail border in pure silver Zari.',
+    color_hue: 330,
+    color_saturation: 1.1
+  },
+  {
+    id: 18,
+    name: 'Berhampur Dual-Tone Patta Joda Saree',
+    house_name: 'House of Berhampur',
+    category_id: 4,
+    category_name: 'Tissue Silk',
+    artisan_id: 1,
+    artisan_name: 'Smt. Sebati Mohanty',
+    artisan_location: 'Berhampur, Odisha',
+    price_fiat: 235000,
+    stock_status: 'available',
+    material: 'Patta Joda Silk',
+    weaving_time_days: 44,
+    description: 'Ceremonial dual-tone gold and marigold silk Patta Joda, traditional attire for auspicious temple rituals in Odisha.',
+    color_hue: 50,
+    color_saturation: 1.3
+  },
+  {
+    id: 19,
+    name: 'Berhampur Golden Canopy Silk Saree',
+    house_name: 'House of Berhampur',
+    category_id: 4,
+    category_name: 'Tissue Silk',
+    artisan_id: 1,
+    artisan_name: 'Smt. Sebati Mohanty',
+    artisan_location: 'Berhampur, Odisha',
+    price_fiat: 205000,
+    stock_status: 'available',
+    material: 'Heavy Tissue Silk',
+    weaving_time_days: 35,
+    description: 'Rich ocher tissue silk with elaborate golden temple canopy borders and subtle metallic luster across the body.',
+    color_hue: 42,
+    color_saturation: 1.4
+  },
+  {
+    id: 20,
+    name: 'Berhampur Sacred Shrine Border Saree',
+    house_name: 'House of Berhampur',
+    category_id: 4,
+    category_name: 'Tissue Silk',
+    artisan_id: 1,
+    artisan_name: 'Smt. Sebati Mohanty',
+    artisan_location: 'Berhampur, Odisha',
+    price_fiat: 195000,
+    stock_status: 'available',
+    material: 'Berhampur Silk',
+    weaving_time_days: 32,
+    description: 'Deep plum body with contrast mustard temple border and hand-interlocked Kumbha spire joins.',
+    color_hue: 300,
+    color_saturation: 1.2
   }
 ];
+
+/* ─── HOUSES OF ODISHA HANDLOOM SHOWCASE ENGINE ───────────────────── */
+function setupHousesOfOdisha() {
+  const grid = document.getElementById('houses-saree-grid');
+  if (!grid) return;
+
+  function renderHousesGrid(selectedHouse = 'all') {
+    grid.innerHTML = '';
+    const inventory = sareeCollection && sareeCollection.length > 0 ? sareeCollection : FALLBACK_INVENTORY;
+
+    const filtered = selectedHouse === 'all'
+      ? inventory
+      : inventory.filter(item => (item.house_name || '') === selectedHouse);
+
+    if (filtered.length === 0) {
+      grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:3rem; color:rgba(255,255,255,0.4); font-family:'Outfit';">No sarees found in ${selectedHouse}.</div>`;
+      return;
+    }
+
+    filtered.forEach(item => {
+      const card = document.createElement('div');
+      card.className = 'folded-saree-card';
+      card.dataset.id = item.id;
+      card.dataset.house = item.house_name || 'House of Sambalpur';
+
+      const houseName = item.house_name || 'House of Sambalpur';
+      const statusLabel = item.stock_status === 'sold' ? 'SOLD' : item.stock_status === 'reserved' ? 'RESERVED' : 'AVAILABLE';
+      const statusClass = item.stock_status === 'sold' ? 'sold' : item.stock_status === 'reserved' ? 'reserved' : '';
+
+      card.innerHTML = `
+        <div class="folded-saree-visual" id="visual-${item.id}">
+          <div class="folded-saree-badge-bar">
+            <span class="house-chip-badge">${houseName}</span>
+            <span class="stock-status-badge ${statusClass}">${statusLabel}</span>
+          </div>
+          <canvas class="folded-saree-body-canvas" id="canvas-house-${item.id}" width="360" height="320"></canvas>
+        </div>
+        <div class="folded-saree-content">
+          <h3 class="folded-saree-title">${item.name}</h3>
+          <p class="folded-saree-artisan">${item.artisan_name || 'Master Weaver'} · ${item.artisan_location || 'Odisha'}</p>
+          <div class="folded-saree-meta-row">
+            <span class="folded-saree-price" data-inr-price="${item.price_fiat}">${formatSareePrice(item.price_fiat)}</span>
+            <span class="folded-saree-days">⏱ ${item.weaving_time_days || 28} Days Weave</span>
+          </div>
+          <div class="folded-saree-actions">
+            <button class="btn-folded-drape" data-action="drape">✦ 3D Drape</button>
+            <button class="btn-folded-consult" data-action="consult">💬 Consultation</button>
+          </div>
+        </div>
+      `;
+
+      grid.appendChild(card);
+
+      // Render the folded saree canvas visual (body weave + folded diagonal Pallu with Zari motifs)
+      setTimeout(() => {
+        const cvs = document.getElementById(`canvas-house-${item.id}`);
+        if (cvs) {
+          drawFoldedSareeCanvas(cvs.getContext('2d'), item);
+        }
+      }, 0);
+
+      // Event listeners
+      const visualEl = card.querySelector('.folded-saree-visual');
+      if (visualEl) {
+        visualEl.addEventListener('click', () => openUnweaveModal(item, sareeCollection));
+      }
+      const drapeBtn = card.querySelector('[data-action="drape"]');
+      if (drapeBtn) {
+        drapeBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          openUnweaveModal(item, sareeCollection);
+        });
+      }
+      const consultBtn = card.querySelector('[data-action="consult"]');
+      if (consultBtn) {
+        consultBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const activePrice = formatSareePrice(item.price_fiat);
+          const msg = encodeURIComponent(`Namaste Priyadarshini, I am interested in a curator consultation for "${item.name}" (${activePrice}) from ${houseName} crafted by ${item.artisan_name}. Please share loom status.`);
+          window.open(`https://wa.me/916712300000?text=${msg}`, '_blank');
+        });
+      }
+    });
+  }
+
+  // Bind House Tab Buttons
+  document.querySelectorAll('.house-tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.house-tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const house = btn.dataset.house;
+      renderHousesGrid(house);
+    });
+  });
+
+  renderHousesGrid('all');
+}
+
+// Procedural Folded Saree Canvas Generator (Folded Pallu + Zari motif + dynamic Hue/Sat)
+function drawFoldedSareeCanvas(ctx, item) {
+  const w = 360;
+  const h = 320;
+  const hue = item.color_hue || 0;
+  const sat = item.color_saturation || 1.0;
+  const satPct = Math.min(100, Math.floor(sat * 80));
+
+  ctx.clearRect(0, 0, w, h);
+
+  // 1. Base Saree Body (Textured Silk Ground)
+  const bodyGrad = ctx.createLinearGradient(0, 0, w, h);
+  bodyGrad.addColorStop(0, `hsl(${hue}, ${satPct}%, 18%)`);
+  bodyGrad.addColorStop(0.5, `hsl(${hue}, ${satPct}%, 26%)`);
+  bodyGrad.addColorStop(1, `hsl(${hue}, ${satPct}%, 15%)`);
+  ctx.fillStyle = bodyGrad;
+  ctx.fillRect(0, 0, w, h);
+
+  // Body Ikat Threads & Pasapalli Grid lines
+  ctx.strokeStyle = `rgba(255, 255, 255, 0.04)`;
+  ctx.lineWidth = 1;
+  for (let x = 0; x < w; x += 12) {
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x + Math.sin(x * 0.1) * 3, h);
+    ctx.stroke();
+  }
+  for (let y = 0; y < h; y += 12) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(w, y + Math.cos(y * 0.1) * 3);
+    ctx.stroke();
+  }
+
+  // Draw Body Motifs (Small dots/stars across body)
+  ctx.fillStyle = `rgba(212, 175, 55, 0.25)`;
+  for (let bx = 20; bx < w; bx += 40) {
+    for (let by = 20; by < h; by += 40) {
+      ctx.beginPath();
+      ctx.arc(bx, by, 2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  // 2. DIAGONAL FOLDED PALLU (Luxury Folded Saree Aesthetic)
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(w * 0.25, 0);
+  ctx.lineTo(w, 0);
+  ctx.lineTo(w, h * 0.85);
+  ctx.closePath();
+
+  // Shadow under fold
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.65)';
+  ctx.shadowBlur = 18;
+  ctx.shadowOffsetX = -6;
+  ctx.shadowOffsetY = 8;
+
+  // Pallu background (contrast shade)
+  const palluHue = (hue + 160) % 360;
+  const palluGrad = ctx.createLinearGradient(w * 0.3, 0, w, h * 0.8);
+  palluGrad.addColorStop(0, `hsl(${palluHue}, ${Math.min(90, satPct + 10)}%, 22%)`);
+  palluGrad.addColorStop(1, `hsl(${palluHue}, ${Math.min(90, satPct + 10)}%, 14%)`);
+  ctx.fillStyle = palluGrad;
+  ctx.fill();
+
+  ctx.shadowColor = 'transparent'; // reset shadow
+
+  // Pallu Zari Brocade & Temple Spire Motifs
+  ctx.strokeStyle = `rgba(212, 175, 55, 0.55)`;
+  ctx.lineWidth = 1.5;
+  for (let px = w * 0.35; px < w; px += 24) {
+    ctx.beginPath();
+    ctx.moveTo(px, 0);
+    ctx.lineTo(px - 40, h * 0.8);
+    ctx.stroke();
+  }
+
+  // Pallu Gold Zari Border Edge
+  ctx.strokeStyle = '#d4af37';
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(w * 0.25, 0);
+  ctx.lineTo(w, h * 0.85);
+  ctx.stroke();
+
+  // Gold Zari Shimmer Dots along fold edge
+  ctx.fillStyle = '#ffd700';
+  for (let t = 0; t <= 1; t += 0.08) {
+    const fx = w * 0.25 + t * (w - w * 0.25);
+    const fy = t * (h * 0.85);
+    ctx.beginPath();
+    ctx.arc(fx, fy, 2.5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  ctx.restore();
+}
 
 const FALLBACK_ARTICLES = [
   {
@@ -2563,6 +2914,7 @@ async function setupVaultTunnel() {
 
   try {
     sareeCollection = await fetchInventory();
+    setupHousesOfOdisha();
     
     stage.innerHTML = ''; // Clear loading indicator
     
@@ -4328,6 +4680,7 @@ window.addEventListener('DOMContentLoaded', () => {
   setupHorizontalPulse();
   setupCustomCommissionStudio();
   setupMetamorphosis();
+  setupHousesOfOdisha();
   setupVaultTunnel();
   setupCustomCursor();
   setupInteractiveExtensions();

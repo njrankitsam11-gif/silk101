@@ -9,9 +9,12 @@ gsap.registerPlugin(ScrollTrigger);
 
 // Global State
 let audioCtx = null;
+let masterGainNode = null;
 let synthNode = null;
 let clackTimer = null;
 let isAudioPlaying = false;
+let masterVolume = parseFloat(localStorage.getItem('loom_audio_volume') || '0.8');
+let isSFXEnabled = localStorage.getItem('loom_audio_sfx') !== 'false';
 let scrollVelocity = 0;
 let lastScrollY = 0;
 const entryAnimation = { scale: 5.0 };
@@ -43,6 +46,9 @@ function initAudio() {
   if (audioCtx) return;
   
   audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  masterGainNode = audioCtx.createGain();
+  masterGainNode.gain.setValueAtTime(isAudioPlaying ? masterVolume : 0, audioCtx.currentTime);
+  masterGainNode.connect(audioCtx.destination);
   
   // 1. Ambient Synth Pad (Low-frequency drone)
   const osc1 = audioCtx.createOscillator();
@@ -54,14 +60,15 @@ function initAudio() {
   osc1.type = 'sawtooth';
   osc2.type = 'triangle';
   
-  osc1.frequency.value = 65.41; // C2
-  osc2.frequency.value = 98.00; // G2
+  const cfg = SOUNDSCAPES[activeSoundscape] || SOUNDSCAPES.loom;
+  osc1.frequency.value = cfg.pitchBase[0];
+  osc2.frequency.value = cfg.pitchBase[1];
   
   filter.type = 'lowpass';
-  filter.frequency.value = 180;
+  filter.frequency.value = cfg.filterFreq;
   filter.Q.value = 5;
   
-  padGain.gain.value = 0.12;
+  padGain.gain.value = isAudioPlaying ? cfg.padGain : 0;
   
   osc1.connect(filter);
   osc2.connect(filter);
@@ -73,7 +80,7 @@ function initAudio() {
     filter.connect(padGain);
   }
   
-  padGain.connect(audioCtx.destination);
+  padGain.connect(masterGainNode);
   
   osc1.start();
   osc2.start();
@@ -91,7 +98,7 @@ function triggerLoomClack() {
   }
   
   // Shuttle clack panning follows mouse coordinate panning or shuttle position
-  playClackSound(mouseXNormalized);
+  if (isSFXEnabled) playClackSound(mouseXNormalized);
   
   // Rhythm interval speeds up with scroll velocity
   const baseInterval = 1200;
@@ -99,14 +106,15 @@ function triggerLoomClack() {
   const nextInterval = Math.max(baseInterval - velocityReduction, 250);
   
   setTimeout(() => {
-    if (isAudioPlaying) playClackSound(mouseXNormalized * -1);
+    if (isAudioPlaying && isSFXEnabled) playClackSound(mouseXNormalized * -1);
   }, nextInterval / 2.5);
   
   clackTimer = setTimeout(triggerLoomClack, nextInterval);
 }
 
 function playClackSound(panValue) {
-  if (!audioCtx) return;
+  if (!audioCtx || !isAudioPlaying || !isSFXEnabled) return;
+  const outNode = masterGainNode || audioCtx.destination;
   
   // 1. Sub-bass heavy wooden frame thud
   const thudOsc = audioCtx.createOscillator();
@@ -157,18 +165,18 @@ function playClackSound(panValue) {
     whirrFilter.connect(whirrGain);
     whirrGain.connect(panner);
     
-    panner.connect(audioCtx.destination);
+    panner.connect(outNode);
   } else {
     thudOsc.connect(thudGain);
-    thudGain.connect(audioCtx.destination);
+    thudGain.connect(outNode);
     
     clickSource.connect(clickFilter);
     clickFilter.connect(clickGain);
-    clickGain.connect(audioCtx.destination);
+    clickGain.connect(outNode);
 
     whirrSource.connect(whirrFilter);
     whirrFilter.connect(whirrGain);
-    whirrGain.connect(audioCtx.destination);
+    whirrGain.connect(outNode);
   }
   
   thudOsc.start();
@@ -182,7 +190,7 @@ function playClackSound(panValue) {
 // Silk Thread Friction Rustle for card drags & 360 rotation
 let lastRustleTime = 0;
 function playSilkRustleSound(intensity = 1.0) {
-  if (!audioCtx || !isAudioPlaying) return;
+  if (!audioCtx || !isAudioPlaying || !isSFXEnabled) return;
   const now = Date.now();
   if (now - lastRustleTime < 80) return; // throttle rustles
   lastRustleTime = now;
@@ -202,9 +210,10 @@ function playSilkRustleSound(intensity = 1.0) {
     gain.gain.setValueAtTime(vol, audioCtx.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.12);
 
+    const outNode = masterGainNode || audioCtx.destination;
     source.connect(filter);
     filter.connect(gain);
-    gain.connect(audioCtx.destination);
+    gain.connect(outNode);
 
     source.start();
     source.stop(audioCtx.currentTime + 0.13);
@@ -213,7 +222,7 @@ function playSilkRustleSound(intensity = 1.0) {
 
 // Weaver Foot-Pedal Thud Sound
 function playPedalThudSound() {
-  if (!audioCtx || !isAudioPlaying) return;
+  if (!audioCtx || !isAudioPlaying || !isSFXEnabled) return;
   try {
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
@@ -222,8 +231,9 @@ function playPedalThudSound() {
     osc.frequency.exponentialRampToValueAtTime(18, audioCtx.currentTime + 0.22);
     gain.gain.setValueAtTime(0.28, audioCtx.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.22);
+    const outNode = masterGainNode || audioCtx.destination;
     osc.connect(gain);
-    gain.connect(audioCtx.destination);
+    gain.connect(outNode);
     osc.start();
     osc.stop(audioCtx.currentTime + 0.23);
   } catch (e) {}
@@ -231,7 +241,7 @@ function playPedalThudSound() {
 
 // Warm Resonant Temple Bell Chime
 function playTempleChimeSound(freq = 528) {
-  if (!audioCtx) return;
+  if (!audioCtx || !isAudioPlaying || !isSFXEnabled) return;
   try {
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
@@ -239,8 +249,9 @@ function playTempleChimeSound(freq = 528) {
     osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
     gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 1.8);
+    const outNode = masterGainNode || audioCtx.destination;
     osc.connect(gain);
-    gain.connect(audioCtx.destination);
+    gain.connect(outNode);
     osc.start();
     osc.stop(audioCtx.currentTime + 1.85);
   } catch (e) {}
@@ -303,21 +314,61 @@ setInterval(() => {
   }
 }, 50);
 
-// Audio Setup Buttons
+// Audio Control Helper
+function setAudioState(enabled) {
+  isAudioPlaying = enabled;
+  if (enabled) {
+    initAudio();
+    if (audioCtx && audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+  }
+  if (audioCtx) {
+    const cfg = SOUNDSCAPES[activeSoundscape] || SOUNDSCAPES.loom;
+    if (synthNode && synthNode.padGain) {
+      synthNode.padGain.gain.setValueAtTime(enabled ? cfg.padGain : 0, audioCtx.currentTime);
+    }
+    if (masterGainNode) {
+      masterGainNode.gain.setValueAtTime(enabled ? masterVolume : 0, audioCtx.currentTime);
+    }
+  }
+  updateAudioUI();
+}
+
+function updateAudioUI() {
+  const toggle = document.getElementById('audio-toggle');
+  if (toggle) {
+    if (isAudioPlaying) {
+      toggle.classList.add('playing');
+      toggle.setAttribute('aria-pressed', 'true');
+      toggle.setAttribute('aria-label', 'Audio control menu (Audio ON)');
+      const textEl = toggle.querySelector('.audio-text');
+      if (textEl) textEl.textContent = 'AUDIO ON';
+    } else {
+      toggle.classList.remove('playing');
+      toggle.setAttribute('aria-pressed', 'false');
+      toggle.setAttribute('aria-label', 'Audio control menu (Audio OFF)');
+      const textEl = toggle.querySelector('.audio-text');
+      if (textEl) textEl.textContent = 'AUDIO OFF';
+    }
+  }
+  const masterBtn = document.getElementById('audio-menu-master-btn');
+  if (masterBtn) {
+    masterBtn.textContent = isAudioPlaying ? '🔊 AUDIO ON' : '🔇 AUDIO OFF';
+    masterBtn.classList.toggle('active', isAudioPlaying);
+  }
+}
+
+// Audio Setup Buttons (Entry Gate)
 const btnGateOn = document.getElementById('btn-gate-on');
 const btnGateOff = document.getElementById('btn-gate-off');
 const entryGate = document.getElementById('entry-gate');
 
 if (btnGateOn) {
   btnGateOn.addEventListener('click', () => {
-    initAudio();
-    isAudioPlaying = true;
     sessionStorage.setItem('loom_gate_dismissed', 'true');
     if (entryGate) entryGate.classList.add('hidden');
-    document.getElementById('audio-toggle').classList.add('playing');
-    document.getElementById('audio-toggle').setAttribute('aria-pressed', 'true');
-    document.getElementById('audio-toggle').setAttribute('aria-label', 'Turn ambient audio off');
-    document.querySelector('#audio-toggle .audio-text').textContent = 'AUDIO ON';
+    setAudioState(true);
   });
 }
 
@@ -325,34 +376,9 @@ if (btnGateOff) {
   btnGateOff.addEventListener('click', () => {
     sessionStorage.setItem('loom_gate_dismissed', 'true');
     if (entryGate) entryGate.classList.add('hidden');
-    document.getElementById('audio-toggle').classList.remove('playing');
-    document.getElementById('audio-toggle').setAttribute('aria-pressed', 'false');
-    document.getElementById('audio-toggle').setAttribute('aria-label', 'Turn ambient audio on');
+    setAudioState(false);
   });
 }
-
-document.getElementById('audio-toggle').addEventListener('click', () => {
-  const toggle = document.getElementById('audio-toggle');
-  if (isAudioPlaying) {
-    isAudioPlaying = false;
-    toggle.classList.remove('playing');
-    toggle.querySelector('.audio-text').textContent = 'AUDIO OFF';
-    toggle.setAttribute('aria-pressed', 'false');
-    toggle.setAttribute('aria-label', 'Turn ambient audio on');
-    if (synthNode) synthNode.padGain.gain.setValueAtTime(0, audioCtx.currentTime);
-  } else {
-    initAudio();
-    if (audioCtx.state === 'suspended') {
-      audioCtx.resume();
-    }
-    isAudioPlaying = true;
-    toggle.classList.add('playing');
-    toggle.querySelector('.audio-text').textContent = 'AUDIO ON';
-    toggle.setAttribute('aria-pressed', 'true');
-    toggle.setAttribute('aria-label', 'Turn ambient audio off');
-    if (synthNode) synthNode.padGain.gain.setValueAtTime(0.12, audioCtx.currentTime);
-  }
-});
 
 
 /* ==========================================================
@@ -2295,28 +2321,28 @@ function initVaultFilters() {
 }
 
 /* ==========================================================
-   FEATURE 4: WEAVER SOUNDSCAPE SELECTOR
+   FEATURE 4: UNIFIED AUDIO & SOUNDSCAPE CONTROLLER
 ========================================================== */
 const SOUNDSCAPES = {
   loom: {
-    label: '☸ Pit Loom Rhythm',
-    description: 'Traditional wooden loom, Nuapatna',
+    label: '☸ Pit Loom Rhythm (Nuapatna)',
+    description: 'Traditional wooden handloom, Nuapatna village',
     pitchBase: [65.41, 98.0],
     filterFreq: 180,
     clackInterval: 1200,
     padGain: 0.12,
   },
   rain: {
-    label: '🌧 Nuapatna Village Rain',
-    description: 'Monsoon ambience, Tigiria block',
+    label: '🌧 Village Rain & Loom (Tigiria Block)',
+    description: 'Soft monsoon rain over Nuapatna weaving cluster',
     pitchBase: [55.0, 82.4],
     filterFreq: 280,
     clackInterval: 1800,
     padGain: 0.08,
   },
   temple: {
-    label: '🔔 Puri Temple Chimes',
-    description: 'Sacred bells, Jagannath Mandir',
+    label: '🔔 Puri Temple Chimes (Jagannath Mandir)',
+    description: 'Sacred temple bell chimes and quiet loom drone',
     pitchBase: [82.4, 130.8],
     filterFreq: 400,
     clackInterval: 2200,
@@ -2333,69 +2359,200 @@ function applySoundscape(key) {
     synthNode.osc1.frequency.setValueAtTime(cfg.pitchBase[0], audioCtx.currentTime);
     synthNode.osc2.frequency.setValueAtTime(cfg.pitchBase[1], audioCtx.currentTime);
     synthNode.filter.frequency.setValueAtTime(cfg.filterFreq, audioCtx.currentTime);
-    synthNode.padGain.gain.setValueAtTime(isAudioPlaying ? cfg.padGain : 0, audioCtx.currentTime);
+    if (isAudioPlaying) {
+      synthNode.padGain.gain.setValueAtTime(cfg.padGain, audioCtx.currentTime);
+    }
   }
-  document.querySelectorAll('.soundscape-btn').forEach(b => b.classList.toggle('active', b.dataset.scape === key));
+  const select = document.getElementById('audio-soundscape-select');
+  if (select) select.value = key;
 }
 
-function initSoundscapeSelector() {
-  if (document.getElementById('soundscape-widget')) return;
+function initUnifiedAudioConsole() {
+  if (document.getElementById('audio-control-panel')) return;
 
-  const widget = document.createElement('div');
-  widget.id = 'soundscape-widget';
-  widget.setAttribute('role', 'group');
-  widget.setAttribute('aria-label', 'Weaver soundscape selector');
-  widget.innerHTML = `
-    <div class="ss-label">🎵 Soundscape</div>
-    <div class="ss-btns">
-      ${Object.entries(SOUNDSCAPES).map(([key, cfg]) => `
-        <button class="soundscape-btn${key === activeSoundscape ? ' active' : ''}" data-scape="${key}" title="${cfg.description}" aria-label="Set soundscape: ${cfg.label}">
-          ${cfg.label}
-        </button>
-      `).join('')}
+  const panel = document.createElement('div');
+  panel.id = 'audio-control-panel';
+  panel.className = 'audio-panel-overlay hidden';
+  panel.innerHTML = `
+    <div class="audio-panel-card">
+      <div class="audio-panel-header">
+        <span class="audio-panel-title">🎵 Audio & Soundscape</span>
+        <button id="audio-panel-close" class="audio-panel-close-btn" aria-label="Close audio menu">✕</button>
+      </div>
+      <div class="audio-panel-body">
+        <div class="audio-panel-row">
+          <span class="audio-panel-label">Master Audio</span>
+          <button id="audio-menu-master-btn" class="audio-panel-toggle-btn ${isAudioPlaying ? 'active' : ''}">
+            ${isAudioPlaying ? '🔊 AUDIO ON' : '🔇 AUDIO OFF'}
+          </button>
+        </div>
+        <div class="audio-panel-row">
+          <label for="audio-soundscape-select" class="audio-panel-label">Soundscape</label>
+          <select id="audio-soundscape-select" class="audio-panel-select" ${!isAudioPlaying ? 'disabled' : ''}>
+            ${Object.entries(SOUNDSCAPES).map(([key, cfg]) => `
+              <option value="${key}" ${key === activeSoundscape ? 'selected' : ''}>${cfg.label}</option>
+            `).join('')}
+          </select>
+        </div>
+        <div class="audio-panel-row">
+          <div class="audio-panel-label-wrap">
+            <label for="audio-volume-slider" class="audio-panel-label">Master Volume</label>
+            <span id="audio-volume-text" class="audio-panel-val">${Math.round(masterVolume * 100)}%</span>
+          </div>
+          <input type="range" id="audio-volume-slider" min="0" max="100" value="${Math.round(masterVolume * 100)}" class="audio-panel-slider" ${!isAudioPlaying ? 'disabled' : ''}>
+        </div>
+        <div class="audio-panel-row checkbox-row">
+          <label class="audio-panel-checkbox-label">
+            <input type="checkbox" id="audio-sfx-checkbox" ${isSFXEnabled ? 'checked' : ''} ${!isAudioPlaying ? 'disabled' : ''}>
+            <span>Tactile Clicks & Weave Rustles</span>
+          </label>
+        </div>
+      </div>
     </div>
   `;
 
   const style = document.createElement('style');
-  style.id = 'soundscape-styles';
+  style.id = 'unified-audio-styles';
   style.textContent = `
-    #soundscape-widget {
-      position: fixed; top: 80px; right: 18px; z-index: 88000;
-      background: rgba(8,6,2,0.82); backdrop-filter: blur(14px);
-      border: 1px solid rgba(212,175,55,0.2);
-      border-radius: 12px; padding: 10px 12px;
-      display: flex; flex-direction: column; gap: 8px;
-      min-width: 170px;
-      box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+    #audio-control-panel {
+      position: fixed; bottom: 85px; right: 2rem; z-index: 99990;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      transform-origin: bottom right;
     }
-    .ss-label {
-      font-family: 'Outfit', sans-serif; font-size: 0.68rem;
-      font-weight: 600; letter-spacing: 1px;
-      color: rgba(212,175,55,0.6); text-transform: uppercase;
+    #audio-control-panel.hidden {
+      opacity: 0; pointer-events: none; transform: scale(0.92) translateY(10px);
     }
-    .ss-btns { display: flex; flex-direction: column; gap: 4px; }
-    .soundscape-btn {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.07);
-      border-radius: 7px; padding: 6px 10px;
-      font-family: 'Outfit', sans-serif; font-size: 0.73rem;
-      color: rgba(255,255,255,0.5); cursor: pointer;
-      text-align: left; transition: all 0.2s;
+    .audio-panel-card {
+      background: linear-gradient(145deg, #120e07 0%, #1a140b 100%);
+      border: 1px solid rgba(212,175,55,0.3);
+      border-radius: 16px; padding: 1.25rem 1.4rem;
+      width: 290px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.7), 0 0 30px rgba(212,175,55,0.08);
+      backdrop-filter: blur(16px);
+      font-family: 'Outfit', sans-serif;
     }
-    .soundscape-btn:hover { border-color: rgba(212,175,55,0.3); color: #d4af37; }
-    .soundscape-btn.active {
-      background: rgba(212,175,55,0.1); border-color: #d4af37;
-      color: #d4af37; font-weight: 600;
+    .audio-panel-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 1rem; border-bottom: 1px solid rgba(212,175,55,0.15);
+      padding-bottom: 0.6rem;
     }
+    .audio-panel-title {
+      font-family: 'Cormorant Garamond', serif; font-size: 1.1rem;
+      color: #d4af37; font-weight: 500; letter-spacing: 0.5px;
+    }
+    .audio-panel-close-btn {
+      background: none; border: none; color: rgba(255,255,255,0.4);
+      font-size: 1rem; cursor: pointer; padding: 2px 6px; transition: color 0.2s;
+    }
+    .audio-panel-close-btn:hover { color: #fff; }
+    .audio-panel-body { display: flex; flex-direction: column; gap: 0.9rem; }
+    .audio-panel-row { display: flex; flex-direction: column; gap: 0.35rem; }
+    .audio-panel-row.checkbox-row { flex-direction: row; align-items: center; margin-top: 0.2rem; }
+    .audio-panel-label {
+      font-size: 0.73rem; text-transform: uppercase; letter-spacing: 0.8px;
+      color: rgba(255,255,255,0.5); font-weight: 600;
+    }
+    .audio-panel-label-wrap { display: flex; justify-content: space-between; align-items: center; }
+    .audio-panel-val { font-size: 0.73rem; color: #d4af37; font-weight: 600; }
+    .audio-panel-toggle-btn {
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px; padding: 8px 12px; color: rgba(255,255,255,0.7);
+      font-family: 'Outfit', sans-serif; font-size: 0.8rem; font-weight: 600;
+      cursor: pointer; transition: all 0.2s; text-align: center;
+    }
+    .audio-panel-toggle-btn.active {
+      background: rgba(212,175,55,0.15); border-color: #d4af37; color: #d4af37;
+    }
+    .audio-panel-select {
+      background: rgba(10,10,14,0.9); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px; padding: 7px 10px; color: #fff;
+      font-family: 'Outfit', sans-serif; font-size: 0.78rem; outline: none;
+      cursor: pointer; transition: border-color 0.2s;
+    }
+    .audio-panel-select:focus { border-color: rgba(212,175,55,0.4); }
+    .audio-panel-select:disabled, .audio-panel-slider:disabled { opacity: 0.4; cursor: not-allowed; }
+    .audio-panel-slider {
+      width: 100%; accent-color: #d4af37; cursor: pointer; height: 4px;
+    }
+    .audio-panel-checkbox-label {
+      display: flex; align-items: center; gap: 8px; font-size: 0.75rem;
+      color: rgba(255,255,255,0.65); cursor: pointer; user-select: none;
+    }
+    .audio-panel-checkbox-label input { accent-color: #d4af37; cursor: pointer; }
     @media (max-width: 768px) {
-      #soundscape-widget { display: none; }
+      #audio-control-panel { right: 1rem; bottom: 75px; }
+      .audio-panel-card { width: 260px; }
     }
   `;
   document.head.appendChild(style);
-  document.body.appendChild(widget);
+  document.body.appendChild(panel);
 
-  widget.querySelectorAll('.soundscape-btn').forEach(btn => {
-    btn.addEventListener('click', () => applySoundscape(btn.dataset.scape));
+  // Close button
+  document.getElementById('audio-panel-close').addEventListener('click', () => {
+    panel.classList.add('hidden');
+  });
+
+  // Soundscape select dropdown
+  const select = document.getElementById('audio-soundscape-select');
+  if (select) {
+    select.addEventListener('change', (e) => {
+      applySoundscape(e.target.value);
+    });
+  }
+
+  // Master Toggle Inside Menu
+  const masterBtn = document.getElementById('audio-menu-master-btn');
+  if (masterBtn) {
+    masterBtn.addEventListener('click', () => {
+      setAudioState(!isAudioPlaying);
+      // enable/disable inputs in menu
+      const isOff = !isAudioPlaying;
+      if (select) select.disabled = isOff;
+      const slider = document.getElementById('audio-volume-slider');
+      if (slider) slider.disabled = isOff;
+      const sfx = document.getElementById('audio-sfx-checkbox');
+      if (sfx) sfx.disabled = isOff;
+    });
+  }
+
+  // Volume slider
+  const slider = document.getElementById('audio-volume-slider');
+  const valText = document.getElementById('audio-volume-text');
+  if (slider) {
+    slider.addEventListener('input', (e) => {
+      const vol = parseInt(e.target.value) / 100;
+      masterVolume = vol;
+      localStorage.setItem('loom_audio_volume', vol.toString());
+      if (valText) valText.textContent = `${Math.round(vol * 100)}%`;
+      if (audioCtx && masterGainNode && isAudioPlaying) {
+        masterGainNode.gain.setValueAtTime(vol, audioCtx.currentTime);
+      }
+    });
+  }
+
+  // SFX checkbox
+  const sfxBox = document.getElementById('audio-sfx-checkbox');
+  if (sfxBox) {
+    sfxBox.addEventListener('change', (e) => {
+      isSFXEnabled = e.target.checked;
+      localStorage.setItem('loom_audio_sfx', isSFXEnabled.toString());
+    });
+  }
+
+  // Hook main toggle button to open dropdown menu
+  const toggleBtn = document.getElementById('audio-toggle');
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      panel.classList.toggle('hidden');
+    });
+  }
+
+  // Close panel on outside click
+  document.addEventListener('click', (e) => {
+    if (!panel.contains(e.target) && (!toggleBtn || !toggleBtn.contains(e.target))) {
+      panel.classList.add('hidden');
+    }
   });
 }
 
@@ -3130,7 +3287,7 @@ function setupShowroomDrape(initialItem, itemsList) {
   }
 
   function playShowroomSound(freq = 440, vol = 0.04, duration = 0.08) {
-    if (!audioCtx || audioCtx.state !== 'running') return;
+    if (!audioCtx || !isAudioPlaying || !isSFXEnabled || audioCtx.state !== 'running') return;
     try {
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
@@ -3138,8 +3295,9 @@ function setupShowroomDrape(initialItem, itemsList) {
       osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
       gain.gain.setValueAtTime(vol, audioCtx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+      const outNode = masterGainNode || audioCtx.destination;
       osc.connect(gain);
-      gain.connect(audioCtx.destination);
+      gain.connect(outNode);
       osc.start();
       osc.stop(audioCtx.currentTime + duration);
     } catch(e) {}
@@ -6948,10 +7106,10 @@ document.addEventListener('DOMContentLoaded', () => {
   initAdoptLoom();
   applyLighthouseOptimizations();
 
-  // Feature batch 2: Region Selector, Vault Filters, Soundscape
+  // Feature batch 2: Region Selector, Vault Filters, Soundscape Console
   initRegionSelector();
   initVaultFilters();
-  initSoundscapeSelector();
+  initUnifiedAudioConsole();
   applyRegionToPage();
 });
 

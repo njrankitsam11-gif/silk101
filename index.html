@@ -271,6 +271,7 @@
         <nav class="site-nav" aria-label="Explore the story">
           <a href="#artisan-pulse">The Weavers</a>
           <a href="#metamorphosis">Living Culture</a>
+          <a href="#handloom-map">Origin Map</a>
           <a href="#houses-of-odisha">Heritage Houses</a>
           <a href="#vault">Collection</a>
         </nav>
@@ -724,7 +725,116 @@
         </svg>
       </div>
 
+      <!-- SECTION 3A: HANDLOOM MAP OF ODISHA (Interactive Parallax Heritage Map) -->
+      <section id="handloom-map" class="scroll-section hm-section">
+        <!-- Layer 0: Deep crimson parallax BG -->
+        <div class="hm-bg-velvet" id="hm-bg-velvet"></div>
+        <!-- Layer 1: Ambient silk-thread particle canvas -->
+        <canvas class="hm-silk-particles" id="hm-silk-particles"></canvas>
+        <!-- Layer 2: Gold scan line overlay -->
+        <div class="hm-scan-overlay"></div>
+
+        <!-- Section Header -->
+        <div class="hm-header" id="hm-header">
+          <span class="section-label hm-label">02 / THE ORIGIN MAP</span>
+          <h2 class="hm-title">Handloom Map of Odisha</h2>
+          <p class="hm-subtitle">Every thread traces back to a village. Hover the clusters to explore the living geography of Indian handloom heritage.</p>
+          <!-- Decorative gold rule -->
+          <div class="hm-gold-rule">
+            <svg viewBox="0 0 800 20" preserveAspectRatio="none"><path d="M0,10 L180,10 M220,10 L580,10 M620,10 L800,10" stroke="#d4af37" stroke-width="0.8" opacity="0.6"/><circle cx="200" cy="10" r="4" fill="none" stroke="#d4af37" stroke-width="1"/><circle cx="600" cy="10" r="4" fill="none" stroke="#d4af37" stroke-width="1"/><circle cx="400" cy="10" r="5" fill="#d4af37" opacity="0.8"/><circle cx="400" cy="10" r="9" fill="none" stroke="#d4af37" stroke-width="0.6" opacity="0.4"/></svg>
+          </div>
+        </div>
+
+        <!-- Main Map Stage -->
+        <div class="hm-stage" id="hm-stage">
+
+          <!-- LEFT SWATCH COLUMN -->
+          <div class="hm-swatch-col hm-swatch-left" id="hm-swatches-left">
+            <div class="hm-swatch-card" data-cluster="sambalpuri">
+              <canvas class="hm-swatch-canvas" data-hue="340" data-sat="1.3" data-label="Sambalpuri Double Ikat"></canvas>
+              <div class="hm-swatch-label">Sambalpuri<br><span>Double Ikat</span></div>
+            </div>
+            <div class="hm-swatch-card" data-cluster="pasapalli">
+              <canvas class="hm-swatch-canvas" data-hue="220" data-sat="1.4" data-label="Pasapalli Bandha"></canvas>
+              <div class="hm-swatch-label">Pasapalli<br><span>Bandha Weave</span></div>
+            </div>
+            <div class="hm-swatch-card" data-cluster="kotpad">
+              <canvas class="hm-swatch-canvas" data-hue="25" data-sat="1.1" data-label="Kotpad Tribal"></canvas>
+              <div class="hm-swatch-label">Kotpad<br><span>Oad Root Dye</span></div>
+            </div>
+          </div>
+
+          <!-- CENTER: The Framed Map -->
+          <div class="hm-frame-wrap" id="hm-frame-wrap">
+            <div class="hm-frame" id="hm-frame">
+              <!-- Gold corner brackets -->
+              <div class="hm-corner hm-corner-tl"></div>
+              <div class="hm-corner hm-corner-tr"></div>
+              <div class="hm-corner hm-corner-bl"></div>
+              <div class="hm-corner hm-corner-br"></div>
+
+              <!-- Map canvas (Odisha drawn procedurally) -->
+              <div class="hm-frame-inner">
+                <div class="hm-frame-title">HANDLOOM MAP OF ODISHA</div>
+                <div class="hm-map-container" id="hm-map-container">
+                  <canvas id="hm-map-canvas" class="hm-map-canvas"></canvas>
+                  <!-- SVG connector lines layer -->
+                  <svg class="hm-connectors" id="hm-connectors" viewBox="0 0 600 520" preserveAspectRatio="xMidYMid meet"></svg>
+                  <!-- Cluster hotspot markers -->
+                  <div class="hm-hotspot" id="hspot-sambalpuri" data-name="Sonpuri / Sambalpuri Saree" data-cluster="sambalpuri" style="top:18%;left:32%"></div>
+                  <div class="hm-hotspot" id="hspot-pasapalli"  data-name="Pasapalli Ikat"             data-cluster="pasapalli"  style="top:30%;left:42%"></div>
+                  <div class="hm-hotspot" id="hspot-khandua"    data-name="Khandua Silk"               data-cluster="khandua"    style="top:35%;left:68%"></div>
+                  <div class="hm-hotspot" id="hspot-bomkai"     data-name="Bomkai"                     data-cluster="bomkai"     style="top:42%;left:26%"></div>
+                  <div class="hm-hotspot" id="hspot-berhampur"  data-name="Berhampuri Pata Joda"       data-cluster="berhampur"  style="top:74%;left:52%"></div>
+                  <div class="hm-hotspot" id="hspot-kotpad"     data-name="Kotpad Tribal"              data-cluster="kotpad"     style="top:62%;left:22%"></div>
+                  <div class="hm-hotspot" id="hspot-puri"       data-name="Puri Patta Silk"            data-cluster="puri"       style="top:48%;left:76%"></div>
+                  <div class="hm-hotspot" id="hspot-tassar"     data-name="Tassar Fabric"              data-cluster="tassar"     style="top:22%;left:74%"></div>
+                </div>
+              </div>
+
+              <!-- GI Badge row -->
+              <div class="hm-gi-bar">
+                <span class="hm-gi-badge">🏛 GI Certified Heritage Clusters</span>
+                <svg viewBox="0 0 40 40" width="32" height="32" style="opacity:0.7"><polygon points="20,4 24,16 38,16 27,24 31,36 20,28 9,36 13,24 2,16 16,16" fill="none" stroke="#d4af37" stroke-width="1.5"/></svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT SWATCH COLUMN -->
+          <div class="hm-swatch-col hm-swatch-right" id="hm-swatches-right">
+            <div class="hm-swatch-card" data-cluster="khandua">
+              <canvas class="hm-swatch-canvas" data-hue="0" data-sat="1.5" data-label="Khandua Silk"></canvas>
+              <div class="hm-swatch-label">Khandua Silk<br><span>Gita Govinda</span></div>
+            </div>
+            <div class="hm-swatch-card" data-cluster="berhampur">
+              <canvas class="hm-swatch-canvas" data-hue="330" data-sat="1.1" data-label="Gopalpur Tussar"></canvas>
+              <div class="hm-swatch-label">Gopalpur<br><span>Tussar Silk</span></div>
+            </div>
+            <div class="hm-swatch-card" data-cluster="bomkai">
+              <canvas class="hm-swatch-canvas" data-hue="285" data-sat="1.4" data-label="Bomkai Jamdani"></canvas>
+              <div class="hm-swatch-label">Bomkai<br><span>Jamdani Weave</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cluster Tooltip -->
+        <div class="hm-tooltip" id="hm-tooltip">
+          <div class="hm-tooltip-name"></div>
+          <div class="hm-tooltip-desc"></div>
+        </div>
+
+        <!-- Bottom gold rule -->
+        <div class="hm-bottom-rule">
+          <svg viewBox="0 0 1200 30" preserveAspectRatio="none" style="width:100%;height:30px;display:block;">
+            <defs><linearGradient id="hm-rule-grad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#d4af37" stop-opacity="0"/><stop offset="20%" stop-color="#d4af37" stop-opacity="0.6"/><stop offset="50%" stop-color="#d4af37" stop-opacity="1"/><stop offset="80%" stop-color="#d4af37" stop-opacity="0.6"/><stop offset="100%" stop-color="#d4af37" stop-opacity="0"/></linearGradient></defs>
+            <line x1="0" y1="15" x2="1200" y2="15" stroke="url(#hm-rule-grad)" stroke-width="1"/>
+            <path d="M580,15 Q590,5 600,15 Q610,25 620,15" fill="none" stroke="#d4af37" stroke-width="1.2" opacity="0.8"/>
+          </svg>
+        </div>
+      </section>
+
       <!-- SECTION 3B: HOUSES OF ODISHA HANDLOOM (The 20-Piece Master Showcase) -->
+
       <section id="houses-of-odisha" class="scroll-section" style="position:relative; padding: 5rem 2rem; background: linear-gradient(180deg, #050508 0%, #0c0905 50%, #050508 100%); border-top: 1px solid rgba(212,175,55,0.15); border-bottom: 1px solid rgba(212,175,55,0.15);">
         <div class="houses-heading-wrap" style="text-align:center; max-width:900px; margin:0 auto 2.5rem;">
           <span class="section-label" style="display:block; letter-spacing:3px; color:rgba(212,175,55,0.6); font-size:0.75rem; text-transform:uppercase; margin-bottom:0.5rem;">03 / HERITAGE HOUSES</span>

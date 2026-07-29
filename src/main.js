@@ -1903,7 +1903,448 @@ const FALLBACK_INVENTORY = [
   }
 ];
 
+/* ─── HANDLOOM MAP OF ODISHA ──────────────────────────────────────── */
+function setupHandloomMap() {
+  const section = document.getElementById('handloom-map');
+  if (!section) return;
+
+  // ── 1. SILK THREAD PARTICLE SYSTEM ──────────────────────────────
+  const pCvs = document.getElementById('hm-silk-particles');
+  if (pCvs) {
+    pCvs.width = window.innerWidth;
+    pCvs.height = section.offsetHeight || 900;
+    const pCtx = pCvs.getContext('2d');
+    const threads = Array.from({ length: 55 }, () => ({
+      x: Math.random() * pCvs.width,
+      y: Math.random() * pCvs.height,
+      vx: (Math.random() - 0.5) * 0.4,
+      vy: Math.random() * 0.25 + 0.1,
+      len: Math.random() * 80 + 40,
+      hue: Math.random() < 0.6 ? 45 : (Math.random() < 0.5 ? 340 : 210),
+      alpha: Math.random() * 0.35 + 0.1,
+      angle: Math.random() * Math.PI * 2
+    }));
+    function animParticles() {
+      pCtx.clearRect(0, 0, pCvs.width, pCvs.height);
+      threads.forEach(t => {
+        t.x += t.vx; t.y += t.vy; t.angle += 0.006;
+        if (t.y > pCvs.height + 20) { t.y = -20; t.x = Math.random() * pCvs.width; }
+        if (t.x < -10 || t.x > pCvs.width + 10) { t.x = Math.random() * pCvs.width; }
+        const dx = Math.cos(t.angle) * t.len;
+        const dy = Math.sin(t.angle) * t.len * 0.35;
+        const grad = pCtx.createLinearGradient(t.x, t.y, t.x + dx, t.y + dy);
+        grad.addColorStop(0, `hsla(${t.hue},80%,55%,0)`);
+        grad.addColorStop(0.5, `hsla(${t.hue},80%,60%,${t.alpha})`);
+        grad.addColorStop(1, `hsla(${t.hue},80%,55%,0)`);
+        pCtx.beginPath();
+        pCtx.moveTo(t.x, t.y);
+        pCtx.lineTo(t.x + dx, t.y + dy);
+        pCtx.strokeStyle = grad;
+        pCtx.lineWidth = 1;
+        pCtx.stroke();
+      });
+      requestAnimationFrame(animParticles);
+    }
+    animParticles();
+  }
+
+  // ── 2. ODISHA MAP CANVAS (procedural shape + cluster glows) ─────
+  const mapCvs = document.getElementById('hm-map-canvas');
+  if (mapCvs) {
+    const W = 600, H = 520;
+    mapCvs.width = W; mapCvs.height = H;
+    const mCtx = mapCvs.getContext('2d');
+
+    // Simplified Odisha silhouette path (normalized 0-600 x 0-520)
+    const odishaPath = [
+      [170,30],[230,20],[310,18],[390,25],[450,40],[510,50],[545,70],
+      [558,100],[560,130],[555,160],[545,185],[555,210],[560,240],
+      [550,270],[540,295],[535,320],[525,340],[520,365],[505,385],
+      [490,400],[480,420],[465,438],[450,455],[430,465],[405,472],
+      [380,475],[360,480],[330,478],[310,470],[290,460],[275,445],
+      [260,430],[240,415],[220,400],[205,382],[188,360],[175,340],
+      [165,315],[155,290],[145,265],[140,240],[135,215],[130,190],
+      [128,165],[125,140],[128,115],[132,90],[145,65],[158,45],[170,30]
+    ];
+
+    // Linen canvas background with texture
+    const linGrad = mCtx.createLinearGradient(0, 0, W, H);
+    linGrad.addColorStop(0, '#ede2c8');
+    linGrad.addColorStop(0.5, '#e0cfae');
+    linGrad.addColorStop(1, '#d4c09a');
+    mCtx.fillStyle = linGrad;
+    mCtx.fillRect(0, 0, W, H);
+
+    // Linen weave texture lines
+    mCtx.strokeStyle = 'rgba(160,130,80,0.12)';
+    mCtx.lineWidth = 1;
+    for (let x = 0; x < W; x += 6) { mCtx.beginPath(); mCtx.moveTo(x, 0); mCtx.lineTo(x, H); mCtx.stroke(); }
+    for (let y = 0; y < H; y += 6) { mCtx.beginPath(); mCtx.moveTo(0, y); mCtx.lineTo(W, y); mCtx.stroke(); }
+
+    // Draw Odisha shape
+    function drawOdisha(fillColor, strokeColor, shadowColor, shadowBlur) {
+      mCtx.beginPath();
+      mCtx.moveTo(odishaPath[0][0], odishaPath[0][1]);
+      odishaPath.forEach(([x, y]) => mCtx.lineTo(x, y));
+      mCtx.closePath();
+      mCtx.shadowColor = shadowColor || 'transparent';
+      mCtx.shadowBlur = shadowBlur || 0;
+      mCtx.fillStyle = fillColor;
+      mCtx.fill();
+      mCtx.shadowBlur = 0;
+      mCtx.strokeStyle = strokeColor;
+      mCtx.lineWidth = 2;
+      mCtx.stroke();
+    }
+
+    // Drop shadow layer
+    drawOdisha('rgba(80,40,10,0.25)', 'transparent', 'rgba(80,40,10,0.3)', 18);
+    // Main shape — patchwork multi-region fill using clip
+    mCtx.save();
+    mCtx.beginPath();
+    mCtx.moveTo(odishaPath[0][0], odishaPath[0][1]);
+    odishaPath.forEach(([x, y]) => mCtx.lineTo(x, y));
+    mCtx.closePath();
+    mCtx.clip();
+
+    // Cluster colour zones (approximate regional patches)
+    const zones = [
+      { cx:250, cy:130, r:110, hue:340, label:'sambalpuri' },
+      { cx:350, cy:200, r:95,  hue:220, label:'pasapalli'  },
+      { cx:460, cy:220, r:85,  hue:0,   label:'khandua'    },
+      { cx:215, cy:260, r:90,  hue:285, label:'bomkai'     },
+      { cx:390, cy:390, r:80,  hue:330, label:'berhampur'  },
+      { cx:195, cy:350, r:75,  hue:25,  label:'kotpad'     },
+      { cx:480, cy:290, r:70,  hue:45,  label:'puri'       },
+      { cx:465, cy:120, r:70,  hue:165, label:'tassar'     },
+    ];
+
+    zones.forEach(z => {
+      const rg = mCtx.createRadialGradient(z.cx, z.cy, 0, z.cx, z.cy, z.r);
+      rg.addColorStop(0, `hsla(${z.hue},55%,38%,0.55)`);
+      rg.addColorStop(0.5, `hsla(${z.hue},45%,30%,0.35)`);
+      rg.addColorStop(1, `hsla(${z.hue},40%,25%,0)`);
+      mCtx.fillStyle = rg;
+      mCtx.fillRect(0, 0, W, H);
+    });
+
+    // Woven thread cross-hatch pattern inside map
+    mCtx.strokeStyle = 'rgba(212,175,55,0.08)';
+    mCtx.lineWidth = 0.8;
+    for (let x = 0; x < W; x += 10) { mCtx.beginPath(); mCtx.moveTo(x, 0); mCtx.lineTo(x, H); mCtx.stroke(); }
+    for (let y = 0; y < H; y += 10) { mCtx.beginPath(); mCtx.moveTo(0, y); mCtx.lineTo(W, y); mCtx.stroke(); }
+
+    mCtx.restore();
+
+    // Outline on top
+    drawOdisha('transparent', '#b8962e', 'rgba(212,175,55,0.4)', 12);
+
+    // Inner gold border shimmer
+    mCtx.strokeStyle = 'rgba(212,175,55,0.25)';
+    mCtx.lineWidth = 1;
+    mCtx.beginPath();
+    mCtx.moveTo(odishaPath[0][0], odishaPath[0][1]);
+    odishaPath.forEach(([x, y]) => mCtx.lineTo(x, y));
+    mCtx.closePath();
+    mCtx.stroke();
+  }
+
+  // ── 3. SWATCH CANVAS RENDERER (fabric textures) ─────────────────
+  document.querySelectorAll('.hm-swatch-canvas').forEach(cvs => {
+    const hue = parseInt(cvs.dataset.hue) || 0;
+    const sat = parseFloat(cvs.dataset.sat) || 1.0;
+    const satPct = Math.min(90, Math.floor(sat * 75));
+    const W = cvs.offsetWidth || 180;
+    const H = 90;
+    cvs.width = W; cvs.height = H;
+    const ctx = cvs.getContext('2d');
+    // Base silk gradient
+    const g = ctx.createLinearGradient(0, 0, W, H);
+    g.addColorStop(0, `hsl(${hue},${satPct}%,22%)`);
+    g.addColorStop(0.5, `hsl(${hue},${satPct}%,30%)`);
+    g.addColorStop(1, `hsl(${hue},${satPct}%,18%)`);
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+    // Ikat warp threads
+    for (let x = 0; x < W; x += 8) {
+      ctx.strokeStyle = `rgba(255,255,255,0.05)`;
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+    }
+    // Gold zari dots
+    ctx.fillStyle = 'rgba(212,175,55,0.4)';
+    for (let bx = 12; bx < W; bx += 20) {
+      for (let by = 12; by < H; by += 18) {
+        ctx.beginPath(); ctx.arc(bx, by, 1.5, 0, Math.PI * 2); ctx.fill();
+      }
+    }
+    // Folded diagonal pallu
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(W * 0.55, 0); ctx.lineTo(W, 0); ctx.lineTo(W, H * 0.8); ctx.closePath();
+    const palluGrad = ctx.createLinearGradient(W * 0.6, 0, W, H * 0.8);
+    palluGrad.addColorStop(0, `hsl(${(hue+160)%360},${satPct}%,25%)`);
+    palluGrad.addColorStop(1, `hsl(${(hue+160)%360},${satPct}%,16%)`);
+    ctx.fillStyle = palluGrad;
+    ctx.fill();
+    ctx.strokeStyle = '#d4af37';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(W * 0.55, 0); ctx.lineTo(W, H * 0.8); ctx.stroke();
+    ctx.restore();
+  });
+
+  // ── 4. SVG GOLD CONNECTOR LINES (animated draw-in) ───────────────
+  const svg = document.getElementById('hm-connectors');
+  if (svg) {
+    // [hotspot-id, label-text, label-x%, label-y%, anchor-side]
+    const connectors = [
+      ['hspot-sambalpuri', 'Sonpuri Saree',     '4%',  '8%',  'left'],
+      ['hspot-pasapalli',  'Pasapalli',          '4%',  '36%', 'left'],
+      ['hspot-khandua',    'Khandua Saree',      '68%', '18%', 'right'],
+      ['hspot-bomkai',     'Bomkai',             '2%',  '56%', 'left'],
+      ['hspot-berhampur',  'Berhampuri Pata',    '48%', '90%', 'below'],
+      ['hspot-kotpad',     'Kotpad',             '2%',  '74%', 'left'],
+      ['hspot-puri',       'Kataki Saree',       '72%', '54%', 'right'],
+      ['hspot-tassar',     'Tassar Fabric',      '72%', '14%', 'right'],
+    ];
+    const mapContainer = document.getElementById('hm-map-container');
+    const cW = mapContainer ? mapContainer.offsetWidth : 600;
+    const cH = mapContainer ? mapContainer.offsetHeight : 520;
+    svg.setAttribute('viewBox', `0 0 ${cW} ${cH}`);
+
+    connectors.forEach(([id, label, lx, ly, side]) => {
+      const hotspot = document.getElementById(id);
+      if (!hotspot) return;
+      const hsRect = hotspot.getBoundingClientRect();
+      const mapRect = (mapContainer || document.body).getBoundingClientRect();
+      const hx = hsRect.left - mapRect.left + 7;
+      const hy = hsRect.top - mapRect.top + 7;
+
+      const lxPx = parseFloat(lx) / 100 * cW;
+      const lyPx = parseFloat(ly) / 100 * cH;
+
+      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      line.setAttribute('x1', hx); line.setAttribute('y1', hy);
+      line.setAttribute('x2', lxPx); line.setAttribute('y2', lyPx);
+      line.setAttribute('stroke', '#d4af37');
+      line.setAttribute('stroke-width', '0.8');
+      line.setAttribute('stroke-opacity', '0.55');
+      line.setAttribute('stroke-dasharray', '2 3');
+
+      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      text.setAttribute('x', lxPx + (side === 'right' ? 6 : side === 'left' ? -4 : 0));
+      text.setAttribute('y', lyPx + (side === 'below' ? 14 : 4));
+      text.setAttribute('text-anchor', side === 'right' ? 'start' : side === 'left' ? 'end' : 'middle');
+      text.setAttribute('font-family', 'Cormorant Garamond, serif');
+      text.setAttribute('font-size', '11');
+      text.setAttribute('fill', '#c8a83a');
+      text.setAttribute('opacity', '0.9');
+      text.textContent = label;
+
+      const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      dot.setAttribute('cx', lxPx); dot.setAttribute('cy', lyPx);
+      dot.setAttribute('r', '2.5');
+      dot.setAttribute('fill', '#d4af37');
+      dot.setAttribute('opacity', '0.7');
+
+      svg.appendChild(line);
+      svg.appendChild(dot);
+      svg.appendChild(text);
+    });
+  }
+
+  // ── 5. HOTSPOT TOOLTIP + ACTIVE SWATCH SYNC ─────────────────────
+  const tooltip = document.getElementById('hm-tooltip');
+  const tooltipName = tooltip ? tooltip.querySelector('.hm-tooltip-name') : null;
+  const tooltipDesc = tooltip ? tooltip.querySelector('.hm-tooltip-desc') : null;
+  const clusterInfo = {
+    sambalpuri: { name: 'Sonpuri / Sambalpuri Saree', desc: 'Double Ikat from Maniabandha — warp & weft tie-dyed simultaneously' },
+    pasapalli:  { name: 'Pasapalli Bandha', desc: 'Sacred checkerboard ikat symbolising the board game of Mahabharata' },
+    khandua:    { name: 'Khandua Silk', desc: 'Sacred temple silk with Gita Govinda verses from Nuapatna' },
+    bomkai:     { name: 'Bomkai / Sonepuri', desc: 'Extra-weft tribal figuring unique to Sonepur in Western Odisha' },
+    berhampur:  { name: 'Berhampuri Pata Joda', desc: 'Ceremonial Phoda Kumbha temple border silk from coastal Berhampur' },
+    kotpad:     { name: 'Kotpad Tribal Saree', desc: 'Organic oad-root dyed cotton by Dharua tribe in Kotpad' },
+    puri:       { name: 'Puri Patta Silk', desc: 'Khandua Patta woven as Rath Yatra chariot offerings for Lord Jagannath' },
+    tassar:     { name: 'Tassar Fabric', desc: 'Wild silkworm Tussar fabric from Jharsuguda & Sambalpur forests' },
+  };
+
+  document.querySelectorAll('.hm-hotspot').forEach(spot => {
+    spot.addEventListener('mouseenter', (e) => {
+      const cluster = spot.dataset.cluster;
+      const info = clusterInfo[cluster] || {};
+      if (tooltipName) tooltipName.textContent = info.name || spot.dataset.name;
+      if (tooltipDesc) tooltipDesc.textContent = info.desc || '';
+      tooltip.classList.add('visible');
+      spot.classList.add('hm-active');
+      // Highlight matching swatch
+      document.querySelectorAll('.hm-swatch-card').forEach(c => {
+        c.classList.toggle('hm-active', c.dataset.cluster === cluster);
+      });
+    });
+    spot.addEventListener('mousemove', (e) => {
+      if (tooltip) {
+        tooltip.style.left = (e.clientX + 16) + 'px';
+        tooltip.style.top  = (e.clientY - 10) + 'px';
+      }
+    });
+    spot.addEventListener('mouseleave', () => {
+      tooltip.classList.remove('visible');
+      spot.classList.remove('hm-active');
+      document.querySelectorAll('.hm-swatch-card').forEach(c => c.classList.remove('hm-active'));
+    });
+  });
+
+  // Swatch → hotspot cross-highlight
+  document.querySelectorAll('.hm-swatch-card').forEach(card => {
+    card.addEventListener('mouseenter', () => {
+      const cluster = card.dataset.cluster;
+      document.querySelectorAll('.hm-hotspot').forEach(h => {
+        h.classList.toggle('hm-active', h.dataset.cluster === cluster);
+      });
+    });
+    card.addEventListener('mouseleave', () => {
+      document.querySelectorAll('.hm-hotspot').forEach(h => h.classList.remove('hm-active'));
+    });
+  });
+
+  // ── 6. GSAP SCROLL-TRIGGERED REVEALS ────────────────────────────
+  if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+    // Header reveal
+    gsap.fromTo('#hm-header', {
+      opacity: 0, y: 50
+    }, {
+      opacity: 1, y: 0,
+      duration: 1,
+      ease: 'power3.out',
+      scrollTrigger: { trigger: '#handloom-map', start: 'top 80%', once: true }
+    });
+
+    // Frame scale-in with 3D perspective
+    gsap.fromTo('#hm-frame-wrap', {
+      opacity: 0, scale: 0.85, rotateX: 12,
+    }, {
+      opacity: 1, scale: 1, rotateX: 0,
+      duration: 1.4,
+      ease: 'power4.out',
+      delay: 0.2,
+      scrollTrigger: { trigger: '#handloom-map', start: 'top 75%', once: true }
+    });
+
+    // Left swatches stagger
+    gsap.fromTo('#hm-swatches-left .hm-swatch-card', {
+      opacity: 0, x: -50, rotateY: 15
+    }, {
+      opacity: 1, x: 0, rotateY: 0,
+      duration: 0.8,
+      stagger: 0.15,
+      ease: 'power3.out',
+      delay: 0.4,
+      scrollTrigger: { trigger: '#handloom-map', start: 'top 70%', once: true }
+    });
+
+    // Right swatches stagger
+    gsap.fromTo('#hm-swatches-right .hm-swatch-card', {
+      opacity: 0, x: 50, rotateY: -15
+    }, {
+      opacity: 1, x: 0, rotateY: 0,
+      duration: 0.8,
+      stagger: 0.15,
+      ease: 'power3.out',
+      delay: 0.4,
+      scrollTrigger: { trigger: '#handloom-map', start: 'top 70%', once: true }
+    });
+
+    // Hotspots pop-in
+    gsap.fromTo('.hm-hotspot', {
+      opacity: 0, scale: 0
+    }, {
+      opacity: 1, scale: 1,
+      duration: 0.5,
+      stagger: 0.08,
+      ease: 'back.out(2)',
+      delay: 0.8,
+      scrollTrigger: { trigger: '#handloom-map', start: 'top 60%', once: true }
+    });
+
+    // Parallax BG layer on scroll
+    gsap.to('#hm-bg-velvet', {
+      yPercent: 20,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: '#handloom-map',
+        start: 'top bottom',
+        end: 'bottom top',
+        scrub: 1.5
+      }
+    });
+
+    // Frame subtle float on scroll (depth)
+    gsap.to('#hm-frame-wrap', {
+      yPercent: -8,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: '#handloom-map',
+        start: 'top bottom',
+        end: 'bottom top',
+        scrub: 2
+      }
+    });
+
+    // Left swatches parallax
+    gsap.to('#hm-swatches-left', {
+      yPercent: -12,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: '#handloom-map',
+        start: 'top bottom',
+        end: 'bottom top',
+        scrub: 2.5
+      }
+    });
+
+    // Right swatches parallax
+    gsap.to('#hm-swatches-right', {
+      yPercent: 12,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: '#handloom-map',
+        start: 'top bottom',
+        end: 'bottom top',
+        scrub: 2.5
+      }
+    });
+  }
+
+  // ── 7. MOUSE-DRIVEN 3D PARALLAX ─────────────────────────────────
+  let rafMouse;
+  let targetMX = 0, targetMY = 0, curMX = 0, curMY = 0;
+  section.addEventListener('mousemove', (e) => {
+    const rect = section.getBoundingClientRect();
+    targetMX = (e.clientX - rect.left - rect.width  / 2) / rect.width;
+    targetMY = (e.clientY - rect.top  - rect.height / 2) / rect.height;
+  });
+  section.addEventListener('mouseleave', () => {
+    targetMX = 0; targetMY = 0;
+  });
+  function tickMouse() {
+    curMX += (targetMX - curMX) * 0.06;
+    curMY += (targetMY - curMY) * 0.06;
+    const bg = document.getElementById('hm-bg-velvet');
+    const frame = document.getElementById('hm-frame-wrap');
+    const swL  = document.getElementById('hm-swatches-left');
+    const swR  = document.getElementById('hm-swatches-right');
+    if (bg)    bg.style.transform    = `translate(${curMX * 22}px, ${curMY * 14}px)`;
+    if (frame) frame.style.transform = `translate(${curMX * -10}px, ${curMY * -8}px) rotateX(${curMY * -3}deg) rotateY(${curMX * 4}deg)`;
+    if (swL)   swL.style.transform   = `translate(${curMX * 14}px, ${curMY * 20}px)`;
+    if (swR)   swR.style.transform   = `translate(${curMX * -14}px, ${curMY * -20}px)`;
+    rafMouse = requestAnimationFrame(tickMouse);
+  }
+  tickMouse();
+}
+
 /* ─── HOUSES OF ODISHA HANDLOOM SHOWCASE ENGINE ───────────────────── */
+
 function setupHousesOfOdisha() {
   const grid = document.getElementById('houses-saree-grid');
   if (!grid) return;
@@ -4680,6 +5121,7 @@ window.addEventListener('DOMContentLoaded', () => {
   setupHorizontalPulse();
   setupCustomCommissionStudio();
   setupMetamorphosis();
+  setupHandloomMap();
   setupHousesOfOdisha();
   setupVaultTunnel();
   setupCustomCursor();

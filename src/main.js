@@ -1908,29 +1908,495 @@ async function fetchInventory() {
   return FALLBACK_INVENTORY;
 }
 
-// Dynamic Currency Conversion Utility
+// ─── Region Config ──────────────────────────────────────────────────────────
+const REGION_CONFIG = {
+  'en-IN': { rate: 1.0,    symbol: '₹',    code: 'INR', flag: '🇮🇳', label: 'India (₹)', shipping: 'Ships in 3–5 business days across India', countryLabel: 'India' },
+  'en-US': { rate: 0.012,  symbol: '$',    code: 'USD', flag: '🇺🇸', label: 'USA ($)',   shipping: 'DHL Express: 5–8 days to USA', countryLabel: 'United States' },
+  'en-GB': { rate: 0.0094, symbol: '£',    code: 'GBP', flag: '🇬🇧', label: 'UK (£)',    shipping: 'DHL Express: 4–6 days to United Kingdom', countryLabel: 'United Kingdom' },
+  'en-CA': { rate: 0.016,  symbol: 'C$',   code: 'CAD', flag: '🇨🇦', label: 'Canada (C$)', shipping: 'FedEx International: 6–9 days to Canada', countryLabel: 'Canada' },
+  'en-AE': { rate: 0.044,  symbol: 'AED ', code: 'AED', flag: '🇦🇪', label: 'UAE (AED)', shipping: 'Aramex Priority: 3–5 days to UAE', countryLabel: 'UAE' },
+  'en-SG': { rate: 0.016,  symbol: 'S$',   code: 'SGD', flag: '🇸🇬', label: 'Singapore (S$)', shipping: 'DHL Express: 4–6 days to Singapore', countryLabel: 'Singapore' },
+  'hi-IN': { rate: 1.0,    symbol: '₹',    code: 'INR', flag: '🇮🇳', label: 'India / हिन्दी', shipping: 'भारत में 3–5 दिन में डिलीवरी', countryLabel: 'India' },
+};
+
+// Dynamic Currency Conversion Utility — reads localStorage override first, then URL param
 function getLocaleDetails() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const lang = urlParams.get('lang') || 'en-IN';
-  
-  const currencies = {
-    'en-US': { rate: 0.012, symbol: '$', code: 'USD' },
-    'en-GB': { rate: 0.0094, symbol: '£', code: 'GBP' },
-    'en-CA': { rate: 0.016, symbol: '$', code: 'CAD' },
-    'en-AU': { rate: 0.018, symbol: '$', code: 'AUD' },
-    'en-AE': { rate: 0.044, symbol: 'AED ', code: 'AED' },
-    'en-SG': { rate: 0.016, symbol: '$', code: 'SGD' },
-    'en-IN': { rate: 1.0, symbol: '₹', code: 'INR' },
-    'hi-IN': { rate: 1.0, symbol: '₹', code: 'INR' }
-  };
-  
-  return currencies[lang] || currencies['en-IN'];
+  let lang = localStorage.getItem('loom_region') || null;
+  if (!lang) {
+    const urlParams = new URLSearchParams(window.location.search);
+    lang = urlParams.get('lang') || 'en-IN';
+  }
+  return REGION_CONFIG[lang] || REGION_CONFIG['en-IN'];
+}
+
+// Apply region to all price elements & shipping estimators on the page
+function applyRegionToPage() {
+  const details = getLocaleDetails();
+  // Update all live price displays
+  document.querySelectorAll('[data-inr-price]').forEach(el => {
+    const inr = parseFloat(el.dataset.inrPrice);
+    if (!isNaN(inr)) {
+      el.textContent = formatSareePrice(inr);
+    }
+  });
+  // Update shipping estimators
+  document.querySelectorAll('.region-shipping-text').forEach(el => {
+    el.textContent = details.shipping;
+  });
+  // Update currency badge in region button
+  const badge = document.getElementById('region-btn-badge');
+  if (badge) badge.textContent = `${details.flag} ${details.code}`;
+  // Update page hreflang meta dynamically
+  const canonical = document.querySelector('link[rel="canonical"]');
+  if (canonical) {
+    const base = 'https://silk101.vercel.app/';
+    const lang = localStorage.getItem('loom_region') || 'en-IN';
+    canonical.href = lang === 'en-IN' ? base : `${base}?lang=${lang}`;
+  }
 }
 
 function formatSareePrice(inrPrice) {
   const details = getLocaleDetails();
   const converted = inrPrice * details.rate;
   return `${details.symbol}${Math.round(converted).toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+}
+
+/* ==========================================================
+   FEATURE 1: NRI REGION SELECTOR WIDGET
+========================================================== */
+function initRegionSelector() {
+  // Inject Region Selector HTML into body if not present
+  if (document.getElementById('region-selector-overlay')) return;
+
+  const overlay = document.createElement('div');
+  overlay.id = 'region-selector-overlay';
+  overlay.setAttribute('role', 'dialog');
+  overlay.setAttribute('aria-modal', 'true');
+  overlay.setAttribute('aria-label', 'Select your region and currency');
+  overlay.innerHTML = `
+    <div class="region-modal-card" id="region-modal-card">
+      <div class="region-modal-header">
+        <span class="region-modal-title">🌐 Select Your Region</span>
+        <button class="region-modal-close" id="region-modal-close" aria-label="Close region selector">✕</button>
+      </div>
+      <p class="region-modal-sub">Prices, shipping estimates, and currency will update instantly.</p>
+      <div class="region-grid" id="region-grid">
+        ${Object.entries(REGION_CONFIG).map(([key, cfg]) => `
+          <button class="region-option" data-lang="${key}" aria-label="Select ${cfg.countryLabel}">
+            <span class="region-flag">${cfg.flag}</span>
+            <span class="region-label">${cfg.label}</span>
+            <span class="region-shipping-mini">${cfg.shipping}</span>
+          </button>
+        `).join('')}
+      </div>
+    </div>
+  `;
+
+  const style = document.createElement('style');
+  style.id = 'region-selector-styles';
+  style.textContent = `
+    #region-selector-overlay {
+      position: fixed; inset: 0; z-index: 90000;
+      background: rgba(3,3,3,0.82); backdrop-filter: blur(18px);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.35s cubic-bezier(0.4,0,0.2,1);
+    }
+    #region-selector-overlay.open {
+      opacity: 1; pointer-events: all;
+    }
+    .region-modal-card {
+      background: linear-gradient(145deg, #0f0f14 0%, #18120a 100%);
+      border: 1px solid rgba(212,175,55,0.25);
+      border-radius: 18px;
+      padding: 2.5rem;
+      width: min(620px, 92vw);
+      box-shadow: 0 40px 100px rgba(0,0,0,0.7), 0 0 60px rgba(212,175,55,0.06);
+      transform: translateY(20px) scale(0.97);
+      transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    #region-selector-overlay.open .region-modal-card {
+      transform: translateY(0) scale(1);
+    }
+    .region-modal-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 0.5rem;
+    }
+    .region-modal-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem; color: #d4af37; font-weight: 400; letter-spacing: 1px;
+    }
+    .region-modal-close {
+      background: none; border: none; color: rgba(255,255,255,0.4);
+      font-size: 1.2rem; cursor: pointer; padding: 4px 8px; border-radius: 4px;
+      transition: color 0.2s;
+    }
+    .region-modal-close:hover { color: #fff; }
+    .region-modal-sub {
+      font-family: 'Outfit', sans-serif; font-size: 0.82rem;
+      color: rgba(255,255,255,0.45); margin-bottom: 1.8rem;
+    }
+    .region-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+      gap: 0.8rem;
+    }
+    .region-option {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 10px; padding: 1rem 0.8rem;
+      cursor: pointer; text-align: left;
+      display: flex; flex-direction: column; gap: 4px;
+      transition: background 0.2s, border-color 0.2s, transform 0.15s;
+    }
+    .region-option:hover, .region-option.active {
+      background: rgba(212,175,55,0.08);
+      border-color: rgba(212,175,55,0.4);
+      transform: translateY(-2px);
+    }
+    .region-option.active { border-color: #d4af37; }
+    .region-flag { font-size: 1.6rem; }
+    .region-label {
+      font-family: 'Outfit', sans-serif; font-size: 0.82rem; font-weight: 600;
+      color: #fff;
+    }
+    .region-shipping-mini {
+      font-family: 'Outfit', sans-serif; font-size: 0.7rem;
+      color: rgba(255,255,255,0.35); line-height: 1.4;
+    }
+    #region-fab {
+      position: fixed; bottom: 28px; left: 28px; z-index: 89000;
+      background: linear-gradient(135deg, #1a1308, #2a1f06);
+      border: 1px solid rgba(212,175,55,0.35);
+      border-radius: 24px; padding: 8px 16px;
+      display: flex; align-items: center; gap: 8px;
+      cursor: pointer; font-family: 'Outfit', sans-serif;
+      font-size: 0.78rem; font-weight: 600;
+      color: #d4af37; letter-spacing: 0.5px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    #region-fab:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(212,175,55,0.2);
+    }
+    #region-fab .region-fab-globe { font-size: 1rem; }
+  `;
+  document.head.appendChild(style);
+  document.body.appendChild(overlay);
+
+  // FAB button
+  const fab = document.createElement('button');
+  fab.id = 'region-fab';
+  fab.setAttribute('aria-label', 'Change currency region');
+  fab.innerHTML = `<span class="region-fab-globe">🌐</span><span id="region-btn-badge">₹ INR</span>`;
+  document.body.appendChild(fab);
+
+  // Set active region
+  function refreshActiveState() {
+    const current = localStorage.getItem('loom_region') || 'en-IN';
+    overlay.querySelectorAll('.region-option').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.lang === current);
+    });
+    const cfg = REGION_CONFIG[current] || REGION_CONFIG['en-IN'];
+    const badge = document.getElementById('region-btn-badge');
+    if (badge) badge.textContent = `${cfg.flag} ${cfg.code}`;
+  }
+  refreshActiveState();
+
+  // Open / close
+  const openOverlay = () => overlay.classList.add('open');
+  const closeOverlay = () => overlay.classList.remove('open');
+
+  fab.addEventListener('click', openOverlay);
+  document.getElementById('region-modal-close').addEventListener('click', closeOverlay);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) closeOverlay(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeOverlay(); });
+
+  // Region selection
+  overlay.querySelectorAll('.region-option').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const lang = btn.dataset.lang;
+      localStorage.setItem('loom_region', lang);
+      // Update URL param too (for SEO hreflang awareness)
+      const url = new URL(window.location.href);
+      if (lang === 'en-IN') url.searchParams.delete('lang');
+      else url.searchParams.set('lang', lang);
+      window.history.replaceState({}, '', url.toString());
+      // Re-render prices & shipping
+      applyRegionToPage();
+      // Re-render vault cards if loaded
+      if (typeof setupVaultTunnel === 'function' && document.querySelectorAll('.saree-card').length > 0) {
+        document.querySelectorAll('.saree-card').forEach(card => {
+          const idNum = parseInt(card.dataset.id);
+          const item = sareeCollection.find(s => s.id === idNum);
+          if (item) {
+            const infoEl = card.querySelector('.saree-info');
+            if (infoEl) {
+              const priceSpan = infoEl.querySelector('.card-price');
+              if (priceSpan) priceSpan.textContent = formatSareePrice(item.price_fiat);
+            }
+          }
+        });
+      }
+      refreshActiveState();
+      closeOverlay();
+    });
+  });
+}
+
+/* ==========================================================
+   FEATURE 2: VAULT MOTIF SEARCH & CATEGORY FILTERS
+========================================================== */
+function initVaultFilters() {
+  const vaultSection = document.getElementById('vault');
+  if (!vaultSection) return;
+  if (document.getElementById('vault-filter-bar')) return;
+
+  const filterBar = document.createElement('div');
+  filterBar.id = 'vault-filter-bar';
+  filterBar.innerHTML = `
+    <div class="vf-inner">
+      <div class="vf-search-wrap">
+        <svg class="vf-search-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M13 13l3.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <input type="search" id="vault-search" placeholder="Search by motif, weaver, or saree name…" aria-label="Search vault collection">
+      </div>
+      <div class="vf-chips" role="group" aria-label="Filter by category">
+        <button class="vf-chip active" data-cat="all">All</button>
+        <button class="vf-chip" data-cat="Ikat">Khandua Ikat</button>
+        <button class="vf-chip" data-cat="Chanderi">Chanderi</button>
+        <button class="vf-chip" data-cat="Kanjivaram">Bomkai / Kanjivaram</button>
+        <button class="vf-chip" data-cat="Tissue Silk">Tissue Silk</button>
+      </div>
+      <span class="vf-count" id="vf-count"></span>
+    </div>
+  `;
+
+  const headingWrap = vaultSection.querySelector('.vault-heading-wrap');
+  if (headingWrap) headingWrap.insertAdjacentElement('afterend', filterBar);
+  else vaultSection.prepend(filterBar);
+
+  // CSS injection
+  const style = document.createElement('style');
+  style.id = 'vault-filter-styles';
+  style.textContent = `
+    #vault-filter-bar {
+      padding: 0 2rem 1.5rem;
+      position: relative; z-index: 10;
+    }
+    .vf-inner {
+      max-width: 900px; margin: 0 auto;
+      display: flex; flex-direction: column; gap: 0.9rem;
+      background: rgba(255,255,255,0.025);
+      border: 1px solid rgba(212,175,55,0.12);
+      border-radius: 14px; padding: 1.2rem 1.5rem;
+      backdrop-filter: blur(10px);
+    }
+    .vf-search-wrap {
+      position: relative;
+    }
+    .vf-search-icon {
+      position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+      width: 16px; height: 16px; color: rgba(212,175,55,0.5); pointer-events: none;
+    }
+    #vault-search {
+      width: 100%; background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px; padding: 0.65rem 1rem 0.65rem 2.4rem;
+      color: #fff; font-family: 'Outfit', sans-serif; font-size: 0.88rem;
+      outline: none; transition: border-color 0.2s;
+      box-sizing: border-box;
+    }
+    #vault-search:focus { border-color: rgba(212,175,55,0.4); }
+    #vault-search::placeholder { color: rgba(255,255,255,0.3); }
+    .vf-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .vf-chip {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px; padding: 5px 14px;
+      font-family: 'Outfit', sans-serif; font-size: 0.75rem; font-weight: 500;
+      color: rgba(255,255,255,0.55); cursor: pointer;
+      transition: all 0.2s;
+    }
+    .vf-chip:hover { border-color: rgba(212,175,55,0.35); color: #d4af37; }
+    .vf-chip.active {
+      background: rgba(212,175,55,0.12);
+      border-color: #d4af37; color: #d4af37;
+    }
+    .vf-count {
+      font-family: 'Outfit', sans-serif; font-size: 0.75rem;
+      color: rgba(255,255,255,0.35); letter-spacing: 0.5px;
+    }
+    .saree-card.filtered-out {
+      display: none !important;
+    }
+  `;
+  document.head.appendChild(style);
+
+  // Filter logic
+  let activeCategory = 'all';
+  let activeSearch = '';
+
+  function applyVaultFilter() {
+    const cards = document.querySelectorAll('.saree-card');
+    let visible = 0;
+    cards.forEach(card => {
+      const id = parseInt(card.dataset.id);
+      const item = sareeCollection.find(s => s.id === id);
+      if (!item) { card.classList.remove('filtered-out'); visible++; return; }
+      const catMatch = activeCategory === 'all' || item.category_name === activeCategory;
+      const searchTerm = activeSearch.toLowerCase();
+      const searchMatch = !searchTerm ||
+        item.name.toLowerCase().includes(searchTerm) ||
+        (item.artisan_name || '').toLowerCase().includes(searchTerm) ||
+        (item.description || '').toLowerCase().includes(searchTerm) ||
+        (item.material || '').toLowerCase().includes(searchTerm);
+      if (catMatch && searchMatch) {
+        card.classList.remove('filtered-out');
+        visible++;
+      } else {
+        card.classList.add('filtered-out');
+      }
+    });
+    const countEl = document.getElementById('vf-count');
+    if (countEl) countEl.textContent = visible === cards.length ? `${cards.length} pieces` : `Showing ${visible} of ${cards.length} pieces`;
+  }
+
+  // Chip clicks
+  filterBar.querySelectorAll('.vf-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      filterBar.querySelectorAll('.vf-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      activeCategory = chip.dataset.cat;
+      applyVaultFilter();
+    });
+  });
+
+  // Search input
+  const searchInput = document.getElementById('vault-search');
+  if (searchInput) {
+    searchInput.addEventListener('input', () => {
+      activeSearch = searchInput.value;
+      applyVaultFilter();
+    });
+  }
+
+  // Re-apply after vault loads (cards are dynamic)
+  const observer = new MutationObserver(() => {
+    applyVaultFilter();
+    const countEl = document.getElementById('vf-count');
+    const cards = document.querySelectorAll('.saree-card');
+    if (countEl && cards.length > 0) countEl.textContent = `${cards.length} pieces`;
+  });
+  const stage = document.getElementById('tunnel-stage');
+  if (stage) observer.observe(stage, { childList: true });
+}
+
+/* ==========================================================
+   FEATURE 4: WEAVER SOUNDSCAPE SELECTOR
+========================================================== */
+const SOUNDSCAPES = {
+  loom: {
+    label: '☸ Pit Loom Rhythm',
+    description: 'Traditional wooden loom, Nuapatna',
+    pitchBase: [65.41, 98.0],
+    filterFreq: 180,
+    clackInterval: 1200,
+    padGain: 0.12,
+  },
+  rain: {
+    label: '🌧 Nuapatna Village Rain',
+    description: 'Monsoon ambience, Tigiria block',
+    pitchBase: [55.0, 82.4],
+    filterFreq: 280,
+    clackInterval: 1800,
+    padGain: 0.08,
+  },
+  temple: {
+    label: '🔔 Puri Temple Chimes',
+    description: 'Sacred bells, Jagannath Mandir',
+    pitchBase: [82.4, 130.8],
+    filterFreq: 400,
+    clackInterval: 2200,
+    padGain: 0.07,
+  }
+};
+let activeSoundscape = localStorage.getItem('loom_soundscape') || 'loom';
+
+function applySoundscape(key) {
+  activeSoundscape = key;
+  localStorage.setItem('loom_soundscape', key);
+  const cfg = SOUNDSCAPES[key] || SOUNDSCAPES.loom;
+  if (synthNode && audioCtx) {
+    synthNode.osc1.frequency.setValueAtTime(cfg.pitchBase[0], audioCtx.currentTime);
+    synthNode.osc2.frequency.setValueAtTime(cfg.pitchBase[1], audioCtx.currentTime);
+    synthNode.filter.frequency.setValueAtTime(cfg.filterFreq, audioCtx.currentTime);
+    synthNode.padGain.gain.setValueAtTime(isAudioPlaying ? cfg.padGain : 0, audioCtx.currentTime);
+  }
+  document.querySelectorAll('.soundscape-btn').forEach(b => b.classList.toggle('active', b.dataset.scape === key));
+}
+
+function initSoundscapeSelector() {
+  if (document.getElementById('soundscape-widget')) return;
+
+  const widget = document.createElement('div');
+  widget.id = 'soundscape-widget';
+  widget.setAttribute('role', 'group');
+  widget.setAttribute('aria-label', 'Weaver soundscape selector');
+  widget.innerHTML = `
+    <div class="ss-label">🎵 Soundscape</div>
+    <div class="ss-btns">
+      ${Object.entries(SOUNDSCAPES).map(([key, cfg]) => `
+        <button class="soundscape-btn${key === activeSoundscape ? ' active' : ''}" data-scape="${key}" title="${cfg.description}" aria-label="Set soundscape: ${cfg.label}">
+          ${cfg.label}
+        </button>
+      `).join('')}
+    </div>
+  `;
+
+  const style = document.createElement('style');
+  style.id = 'soundscape-styles';
+  style.textContent = `
+    #soundscape-widget {
+      position: fixed; top: 80px; right: 18px; z-index: 88000;
+      background: rgba(8,6,2,0.82); backdrop-filter: blur(14px);
+      border: 1px solid rgba(212,175,55,0.2);
+      border-radius: 12px; padding: 10px 12px;
+      display: flex; flex-direction: column; gap: 8px;
+      min-width: 170px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+    }
+    .ss-label {
+      font-family: 'Outfit', sans-serif; font-size: 0.68rem;
+      font-weight: 600; letter-spacing: 1px;
+      color: rgba(212,175,55,0.6); text-transform: uppercase;
+    }
+    .ss-btns { display: flex; flex-direction: column; gap: 4px; }
+    .soundscape-btn {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 7px; padding: 6px 10px;
+      font-family: 'Outfit', sans-serif; font-size: 0.73rem;
+      color: rgba(255,255,255,0.5); cursor: pointer;
+      text-align: left; transition: all 0.2s;
+    }
+    .soundscape-btn:hover { border-color: rgba(212,175,55,0.3); color: #d4af37; }
+    .soundscape-btn.active {
+      background: rgba(212,175,55,0.1); border-color: #d4af37;
+      color: #d4af37; font-weight: 600;
+    }
+    @media (max-width: 768px) {
+      #soundscape-widget { display: none; }
+    }
+  `;
+  document.head.appendChild(style);
+  document.body.appendChild(widget);
+
+  widget.querySelectorAll('.soundscape-btn').forEach(btn => {
+    btn.addEventListener('click', () => applySoundscape(btn.dataset.scape));
+  });
 }
 
 async function setupVaultTunnel() {
@@ -6481,6 +6947,12 @@ document.addEventListener('DOMContentLoaded', () => {
   initLoomTelemetry();
   initAdoptLoom();
   applyLighthouseOptimizations();
+
+  // Feature batch 2: Region Selector, Vault Filters, Soundscape
+  initRegionSelector();
+  initVaultFilters();
+  initSoundscapeSelector();
+  applyRegionToPage();
 });
 
 /* ══════════════════════════════════════════════════════════════

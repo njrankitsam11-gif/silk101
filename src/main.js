@@ -7791,28 +7791,35 @@ function initAnimatedLoaderMessages() {
 
 // ── INITIALIZE ALL SURPRISE FEATURES ────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-  initSilkCursorTrail();
-  initSilkOracle();
-  initGlyphHunt();
-  initCTAParticleBurst();
-  initWeavingCountdown();
-  initNavActiveState();
-  initWarpDividers();
+  const idleCallback = window.requestIdleCallback || ((fn) => setTimeout(fn, 50));
+
+  // Critical features only
   initAnimatedLoaderMessages();
-
-  // New 4-feature revamp inits
-  initWeaveProgressPersistence();
-  initUnlockPanel();
-  initDepositModal();
-  initLoomTelemetry();
-  initAdoptLoom();
   applyLighthouseOptimizations();
-
-  // Feature batch 2: Region Selector, Vault Filters, Soundscape Console
-  initRegionSelector();
-  initVaultFilters();
-  initUnifiedAudioConsole();
   applyRegionToPage();
+  initUnifiedAudioConsole();
+
+  // Defer everything else to free up the main thread (reduces TBT)
+  idleCallback(() => {
+    initSilkCursorTrail();
+    initSilkOracle();
+    initGlyphHunt();
+    initCTAParticleBurst();
+    initWeavingCountdown();
+    initNavActiveState();
+    initWarpDividers();
+
+    // New 4-feature revamp inits
+    initWeaveProgressPersistence();
+    initUnlockPanel();
+    initDepositModal();
+    initLoomTelemetry();
+    initAdoptLoom();
+
+    // Feature batch 2: Region Selector, Vault Filters
+    initRegionSelector();
+    initVaultFilters();
+  });
 });
 
 /* ══════════════════════════════════════════════════════════════

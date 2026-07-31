@@ -739,7 +739,7 @@ function renderArticles() {
       </td>
       <td>
         <div style="display:flex; gap:8px;">
-          <a href="/articles.html?slug=${art.slug}" target="_blank" class="btn-cancel" style="text-decoration:none; padding:0.25rem 0.6rem; font-size:0.75rem; display:inline-block;">View</a>
+          <a href="/articles.html?slug=${art.slug}" target="_blank" rel="noopener noreferrer" class="btn-cancel" style="text-decoration:none; padding:0.25rem 0.6rem; font-size:0.75rem; display:inline-block;">View</a>
           <button class="btn-delete" onclick="deleteArticle(${art.id})">Delete</button>
         </div>
       </td>
@@ -983,7 +983,7 @@ if (genForm) {
     }
 
     if (apiSuccess && apiData) {
-      genStatus.innerHTML = `<span style="color:#2ecc71;">✓ Success! Published: <a href="/articles.html?slug=${apiData.slug}" target="_blank" style="color:#fff;">${apiData.title}</a></span>`;
+      genStatus.innerHTML = `<span style="color:#2ecc71;">✓ Success! Published: <a href="/articles.html?slug=${apiData.slug}" target="_blank" rel="noopener noreferrer" style="color:#fff;">${apiData.title}</a></span>`;
       genForm.reset();
       fetchData();
     } else {
@@ -1014,7 +1014,7 @@ if (genForm) {
       arts.push(newArt);
       localStorage.setItem('saree_articles', JSON.stringify(arts));
       
-      genStatus.innerHTML = `<span style="color:#2ecc71;">✓ Local Success! Created: <a href="/articles.html?slug=${newArt.slug}" target="_blank" style="color:#fff;">${newArt.title}</a></span>`;
+      genStatus.innerHTML = `<span style="color:#2ecc71;">✓ Local Success! Created: <a href="/articles.html?slug=${newArt.slug}" target="_blank" rel="noopener noreferrer" style="color:#fff;">${newArt.title}</a></span>`;
       genForm.reset();
       fetchData();
     }

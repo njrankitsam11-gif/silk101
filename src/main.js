@@ -5022,22 +5022,24 @@ window.addEventListener('DOMContentLoaded', () => {
   setupGenesisCanvas();
   setupHorizontalPulse();
   
-  // Defer non-critical setups to idle time to improve TBT (Total Blocking Time)
-  const idleCallback = window.requestIdleCallback || ((fn) => setTimeout(fn, 50));
-  idleCallback(() => {
-    setupCustomCommissionStudio();
-    setupMetamorphosis();
-    setupHandloomMap();
-    setupHousesOfOdisha();
-    setupVaultTunnel();
-    setupCustomCursor();
-    setupInteractiveExtensions();
-    setupMythosAnimation();
-    setupHeritageSoulSection();
-    setupHeritageMatchmaker();
-    setupCuratorConcierge();
-    setupSilkConstellation();
-    setupCuratorWhisper();
+  // Stagger non-critical setups into separate micro-tasks to prevent long tasks (>50ms) and eliminate TBT
+  const nonCriticalSetups = [
+    setupCustomCommissionStudio,
+    setupMetamorphosis,
+    setupHandloomMap,
+    setupHousesOfOdisha,
+    setupVaultTunnel,
+    setupCustomCursor,
+    setupInteractiveExtensions,
+    setupMythosAnimation,
+    setupHeritageSoulSection,
+    setupHeritageMatchmaker,
+    setupCuratorConcierge,
+    setupSilkConstellation,
+    setupCuratorWhisper
+  ];
+  nonCriticalSetups.forEach((fn, idx) => {
+    setTimeout(fn, 100 + idx * 40);
   });
 
 
@@ -7791,34 +7793,32 @@ function initAnimatedLoaderMessages() {
 
 // ── INITIALIZE ALL SURPRISE FEATURES ────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-  const idleCallback = window.requestIdleCallback || ((fn) => setTimeout(fn, 50));
-
   // Critical features only
   initAnimatedLoaderMessages();
   applyLighthouseOptimizations();
   applyRegionToPage();
   initUnifiedAudioConsole();
 
-  // Defer everything else to free up the main thread (reduces TBT)
-  idleCallback(() => {
-    initSilkCursorTrail();
-    initSilkOracle();
-    initGlyphHunt();
-    initCTAParticleBurst();
-    initWeavingCountdown();
-    initNavActiveState();
-    initWarpDividers();
+  // Stagger non-critical feature inits across multiple distinct event loop ticks (50ms apart)
+  const deferredInits = [
+    initSilkCursorTrail,
+    initSilkOracle,
+    initGlyphHunt,
+    initCTAParticleBurst,
+    initWeavingCountdown,
+    initNavActiveState,
+    initWarpDividers,
+    initWeaveProgressPersistence,
+    initUnlockPanel,
+    initDepositModal,
+    initLoomTelemetry,
+    initAdoptLoom,
+    initRegionSelector,
+    initVaultFilters
+  ];
 
-    // New 4-feature revamp inits
-    initWeaveProgressPersistence();
-    initUnlockPanel();
-    initDepositModal();
-    initLoomTelemetry();
-    initAdoptLoom();
-
-    // Feature batch 2: Region Selector, Vault Filters
-    initRegionSelector();
-    initVaultFilters();
+  deferredInits.forEach((fn, idx) => {
+    setTimeout(fn, 200 + idx * 50);
   });
 });
 

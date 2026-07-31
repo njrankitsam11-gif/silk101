@@ -4975,23 +4975,20 @@ window.addEventListener('DOMContentLoaded', () => {
     const loader = document.getElementById('loader');
     if (loader) loader.classList.add('fade-out');
     
-    // Auto-zoom the wheel down to 1.0 immediately when the loader fades out
+    // Fast zoom animation to unlock viewport instantly
     gsap.to(entryAnimation, {
       scale: 1.0,
-      duration: 2.5,
-      ease: 'power4.out'
+      duration: 0.5,
+      ease: 'power2.out'
     });
     
-    setTimeout(() => {
-      const gate = document.getElementById('entry-gate');
-      // If user has already visited or prefers reduced motion/audio, keep hidden by default
-      if (sessionStorage.getItem('loom_gate_dismissed')) {
-        if (gate) gate.classList.add('hidden');
-      } else if (gate) {
-        gate.classList.remove('hidden');
-      }
-    }, 1200);
-  }, 1800);
+    const gate = document.getElementById('entry-gate');
+    if (sessionStorage.getItem('loom_gate_dismissed')) {
+      if (gate) gate.classList.add('hidden');
+    } else if (gate) {
+      gate.classList.remove('hidden');
+    }
+  }, 100);
   
   // Localized Dynamic SEO Meta Tags injection for global NRI markets
   const urlParams = new URLSearchParams(window.location.search);

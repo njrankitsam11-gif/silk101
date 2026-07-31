@@ -5022,25 +5022,19 @@ window.addEventListener('DOMContentLoaded', () => {
   setupGenesisCanvas();
   setupHorizontalPulse();
   
-  // Stagger non-critical setups into separate micro-tasks to prevent long tasks (>50ms) and eliminate TBT
-  const nonCriticalSetups = [
-    setupCustomCommissionStudio,
-    setupMetamorphosis,
-    setupHandloomMap,
-    setupHousesOfOdisha,
-    setupVaultTunnel,
-    setupCustomCursor,
-    setupInteractiveExtensions,
-    setupMythosAnimation,
-    setupHeritageSoulSection,
-    setupHeritageMatchmaker,
-    setupCuratorConcierge,
-    setupSilkConstellation,
-    setupCuratorWhisper
-  ];
-  nonCriticalSetups.forEach((fn, idx) => {
-    setTimeout(fn, 100 + idx * 40);
-  });
+  setupCustomCommissionStudio();
+  setupMetamorphosis();
+  setupHandloomMap();
+  setupHousesOfOdisha();
+  setupVaultTunnel();
+  setupCustomCursor();
+  setupInteractiveExtensions();
+  setupMythosAnimation();
+  setupHeritageSoulSection();
+  setupHeritageMatchmaker();
+  setupCuratorConcierge();
+  setupSilkConstellation();
+  setupCuratorWhisper();
 
 
   // Weaving & Provenance FAQ Accordion Script
@@ -7795,33 +7789,28 @@ function initAnimatedLoaderMessages() {
 
 // ── INITIALIZE ALL SURPRISE FEATURES ────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-  // Critical features only
+  initSilkCursorTrail();
+  initSilkOracle();
+  initGlyphHunt();
+  initCTAParticleBurst();
+  initWeavingCountdown();
+  initNavActiveState();
+  initWarpDividers();
   initAnimatedLoaderMessages();
+
+  // New 4-feature revamp inits
+  initWeaveProgressPersistence();
+  initUnlockPanel();
+  initDepositModal();
+  initLoomTelemetry();
+  initAdoptLoom();
   applyLighthouseOptimizations();
-  applyRegionToPage();
+
+  // Feature batch 2: Region Selector, Vault Filters, Soundscape Console
+  initRegionSelector();
+  initVaultFilters();
   initUnifiedAudioConsole();
-
-  // Stagger non-critical feature inits across multiple distinct event loop ticks (50ms apart)
-  const deferredInits = [
-    initSilkCursorTrail,
-    initSilkOracle,
-    initGlyphHunt,
-    initCTAParticleBurst,
-    initWeavingCountdown,
-    initNavActiveState,
-    initWarpDividers,
-    initWeaveProgressPersistence,
-    initUnlockPanel,
-    initDepositModal,
-    initLoomTelemetry,
-    initAdoptLoom,
-    initRegionSelector,
-    initVaultFilters
-  ];
-
-  deferredInits.forEach((fn, idx) => {
-    setTimeout(fn, 200 + idx * 50);
-  });
+  applyRegionToPage();
 });
 
 /* ══════════════════════════════════════════════════════════════

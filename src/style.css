@@ -246,7 +246,7 @@ body:has(.saree-card:hover) #cursor-ring {
   display: flex;
   justify-content: center;
   align-items: center;
-  transition: opacity 1.4s var(--ease-silk), visibility 1.4s;
+  transition: opacity 0.3s ease-out, visibility 0.3s;
 }
 .loader-overlay.fade-out {
   opacity: 0;
@@ -486,7 +486,7 @@ body:has(.saree-card:hover) #cursor-ring {
 #artisan-pulse {
   background: 
     linear-gradient(rgba(17,17,17,0.85), rgba(17,17,17,0.85)),
-    url('/images/artisan_blurred_bg.png') no-repeat center center/cover;
+    url('/images/artisan_blurred_bg.webp') no-repeat center center/cover;
 }
 
 #metamorphosis {
@@ -496,7 +496,7 @@ body:has(.saree-card:hover) #cursor-ring {
 #vault {
   background: 
     linear-gradient(rgba(17,17,17,0.85), rgba(17,17,17,0.85)),
-    url('/images/vault_bg.png') no-repeat center center/cover;
+    url('/images/vault_bg.webp') no-repeat center center/cover;
 }
 
 /* ─── Holographic Warp Thread Dividers ────────────────── */
@@ -1842,7 +1842,7 @@ body:has(.saree-card:hover) #cursor-ring {
   padding: 0;
   border: 1px solid rgba(255, 255, 255, .25);
   border-radius: 50%;
-  background-image: url('/avatars/portraits_grid.png');
+  background-image: url('/avatars/portraits_grid.webp');
   background-size: 400% 300%;
   cursor: pointer;
   transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;

@@ -3288,11 +3288,11 @@ async function setupVaultTunnel() {
       
       const modelLook = ((Number(item.id) - 1) % 5) + 1;
       const modelSources = {
-        1: '/avatars/frame_front.png',
-        2: '/avatars/navy_front.png',
-        3: '/avatars/green_front.png',
-        4: '/avatars/purple_front.png',
-        5: '/avatars/golden_front.png'
+        1: '/avatars/frame_front.webp',
+        2: '/avatars/navy_front.webp',
+        3: '/avatars/green_front.webp',
+        4: '/avatars/purple_front.webp',
+        5: '/avatars/golden_front.webp'
       };
       const modelImgSrc = modelSources[modelLook];
       model.style.backgroundImage = `url(${modelImgSrc})`;
@@ -3968,27 +3968,30 @@ function setupShowroomDrape(initialItem, itemsList) {
   let selectedModel = 1;
   let customLightEnv = 'dawn';
 
-  function loadImg(src) { const i = new Image(); i.src = src; return i; }
+  const loadedImgCache = {};
+  function getLoadedImg(src) {
+    if (!loadedImgCache[src]) {
+      const i = new Image();
+      i.src = src;
+      loadedImgCache[src] = i;
+    }
+    return loadedImgCache[src];
+  }
 
-  const avatarCollections = {
-    // Style mappings based on indices
-    1: { frames: [loadImg('/avatars/frame_front.png'), loadImg('/avatars/frame_quarter.png'), loadImg('/avatars/frame_side.png'), loadImg('/avatars/frame_back.png')] },
-    2: { frames: [loadImg('/avatars/navy_front.png'), loadImg('/avatars/navy_front.png'), loadImg('/avatars/navy_side.png'), loadImg('/avatars/navy_side.png')] },
-    3: { frames: [loadImg('/avatars/green_front.png'), loadImg('/avatars/green_front.png'), loadImg('/avatars/green_side.png'), loadImg('/avatars/green_side.png')] },
-    4: { frames: [loadImg('/avatars/purple_front.png'), loadImg('/avatars/purple_front.png'), loadImg('/avatars/purple_side.png'), loadImg('/avatars/purple_side.png')] },
-    5: { frames: [loadImg('/avatars/golden_front.png'), loadImg('/avatars/golden_front.png'), loadImg('/avatars/golden_side.png'), loadImg('/avatars/golden_side.png')] },
-    6: { frames: [loadImg('/avatars/model6_front.png'), loadImg('/avatars/model6_front.png'), loadImg('/avatars/model6_side.png'), loadImg('/avatars/model6_back.png')] },
-    7: { frames: [loadImg('/avatars/model7_front.png'), loadImg('/avatars/model7_front.png'), loadImg('/avatars/model7_side.png'), loadImg('/avatars/model7_back.png')] },
-    8: { frames: [loadImg('/avatars/model8_front.png'), loadImg('/avatars/model8_front.png'), loadImg('/avatars/model8_side.png'), loadImg('/avatars/model8_back.png')] }
+  const avatarPathMap = {
+    1: ['/avatars/frame_front.webp', '/avatars/frame_quarter.webp', '/avatars/frame_side.webp', '/avatars/frame_back.webp'],
+    2: ['/avatars/navy_front.webp', '/avatars/navy_front.webp', '/avatars/navy_side.webp', '/avatars/navy_side.webp'],
+    3: ['/avatars/green_front.webp', '/avatars/green_front.webp', '/avatars/green_side.webp', '/avatars/green_side.webp'],
+    4: ['/avatars/purple_front.webp', '/avatars/purple_front.webp', '/avatars/purple_side.webp', '/avatars/purple_side.webp'],
+    5: ['/avatars/golden_front.webp', '/avatars/golden_front.webp', '/avatars/golden_side.webp', '/avatars/golden_side.webp'],
+    6: ['/avatars/model6_front.webp', '/avatars/model6_front.webp', '/avatars/model6_side.webp', '/avatars/model6_back.webp'],
+    7: ['/avatars/model7_front.webp', '/avatars/model7_front.webp', '/avatars/model7_side.webp', '/avatars/model7_back.webp'],
+    8: ['/avatars/model8_front.webp', '/avatars/model8_front.webp', '/avatars/model8_side.webp', '/avatars/model8_back.webp']
   };
 
-  const baseFrames = [
-    loadImg('/avatars/frame_front.png'), loadImg('/avatars/frame_quarter.png'),
-    loadImg('/avatars/frame_side.png'),  loadImg('/avatars/frame_back.png')
-  ];
-
   function getAvatarFrames() {
-    return { frames: avatarCollections[selectedModel].frames };
+    const paths = avatarPathMap[selectedModel] || avatarPathMap[1];
+    return { frames: paths.map(getLoadedImg) };
   }
 
   function playShowroomSound(freq = 440, vol = 0.04, duration = 0.08) {
@@ -4971,24 +4974,21 @@ window.addEventListener('keydown', (e) => {
    INITIALIZATION
 ========================================================== */
 window.addEventListener('DOMContentLoaded', () => {
-  setTimeout(() => {
-    const loader = document.getElementById('loader');
-    if (loader) loader.classList.add('fade-out');
-    
-    // Fast zoom animation to unlock viewport instantly
-    gsap.to(entryAnimation, {
-      scale: 1.0,
-      duration: 0.5,
-      ease: 'power2.out'
-    });
-    
-    const gate = document.getElementById('entry-gate');
-    if (sessionStorage.getItem('loom_gate_dismissed')) {
-      if (gate) gate.classList.add('hidden');
-    } else if (gate) {
-      gate.classList.remove('hidden');
-    }
-  }, 100);
+  const loader = document.getElementById('loader');
+  if (loader) {
+    loader.classList.add('fade-out');
+    setTimeout(() => { loader.style.display = 'none'; }, 300);
+  }
+  
+  // Fast zoom animation to unlock viewport instantly
+  gsap.to(entryAnimation, {
+    scale: 1.0,
+    duration: 0.4,
+    ease: 'power2.out'
+  });
+  
+  const gate = document.getElementById('entry-gate');
+  if (gate) gate.classList.add('hidden');
   
   // Localized Dynamic SEO Meta Tags injection for global NRI markets
   const urlParams = new URLSearchParams(window.location.search);

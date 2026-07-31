@@ -436,11 +436,16 @@ function init3DSectionReveal() {
 
 // ── INITIALIZE ALL HYPEREFFECTS ─────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-  init3DCardMagneticTilt();
-  initFloating3DHeritageArtifacts();
-  initKinematicSilkCloth();
-  initVolumetricGoldDust();
-  initPrismaticHeadings();
-  initScrollParallaxLayers();
-  init3DSectionReveal();
+  const hyperInits = [
+    init3DCardMagneticTilt,
+    initFloating3DHeritageArtifacts,
+    initKinematicSilkCloth,
+    initVolumetricGoldDust,
+    initPrismaticHeadings,
+    initScrollParallaxLayers,
+    init3DSectionReveal
+  ];
+  hyperInits.forEach((fn, idx) => {
+    setTimeout(fn, 150 + idx * 45);
+  });
 });

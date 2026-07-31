@@ -418,7 +418,17 @@ function setupGenesisCanvas() {
     stagger: 0.1
   });
 
+  let isGenesisVisible = true;
+  const genesisObs = new IntersectionObserver((entries) => {
+    const wasVisible = isGenesisVisible;
+    isGenesisVisible = entries[0].isIntersecting;
+    if (!wasVisible && isGenesisVisible) draw();
+  }, { threshold: 0 });
+  const genesisEl = document.getElementById('genesis');
+  if (genesisEl) genesisObs.observe(genesisEl);
+
   function draw() {
+    if (!isGenesisVisible) return;
     ctx.fillStyle = '#030303';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     

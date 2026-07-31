@@ -211,7 +211,7 @@
       </div>
       <div class="oracle-chat-area" id="oracle-chat-area"></div>
       <form class="oracle-input-row" id="oracle-chat-form" autocomplete="off">
-        <input class="oracle-input" id="oracle-input" type="text"
+        <input class="oracle-input" id="oracle-input" type="text" aria-label="Ask the Silk Oracle"
                placeholder="Ask the Oracle anything about silk..."
                aria-label="Your message to the Oracle" />
         <button type="submit" class="oracle-send" aria-label="Send">↑</button>
@@ -351,12 +351,12 @@
                     <h4 class="controls-title">Warp Console Settings</h4>
                     <div class="control-row">
                       <label for="slider-tension">Warp Tension</label>
-                      <input type="range" id="slider-tension" min="0.2" max="2.0" step="0.1" value="1.0">
+                      <input type="range" id="slider-tension" min="0.2" max="2.0" step="0.1" value="1.0" aria-label="Loom tension slider">
                       <span id="val-tension">1.0</span>
                     </div>
                     <div class="control-row">
                       <label for="slider-density">Thread Count</label>
-                      <input type="range" id="slider-density" min="15" max="95" step="5" value="45">
+                      <input type="range" id="slider-density" min="15" max="95" step="5" value="45" aria-label="Warp density slider">
                       <span id="val-density">45</span>
                     </div>
                     <div class="control-row">
@@ -436,11 +436,11 @@
                       <div class="control-row" style="margin-bottom:12px; display:grid; grid-template-columns:1fr 1fr; gap:10px;">
                         <div>
                           <label for="comm-body-hue" style="font-size:0.8rem; color:#86868b; display:block; margin-bottom:4px;">Body Color Hue</label>
-                          <input type="range" id="comm-body-hue" min="0" max="360" value="340" style="width:100%; padding:0;">
+                          <input type="range" id="comm-body-hue" min="0" max="360" value="340" style="width:100%; padding:0;" aria-label="Body hue adjustment">
                         </div>
                         <div>
                           <label for="comm-border-hue" style="font-size:0.8rem; color:#86868b; display:block; margin-bottom:4px;">Border Color Hue</label>
-                          <input type="range" id="comm-border-hue" min="0" max="360" value="45" style="width:100%; padding:0;">
+                          <input type="range" id="comm-border-hue" min="0" max="360" value="45" style="width:100%; padding:0;" aria-label="Border hue adjustment">
                         </div>
                       </div>
                       <div class="control-row" style="margin-bottom:12px; display:grid; grid-template-columns:1fr 1fr; gap:10px;">
@@ -995,14 +995,14 @@
             <div class="custom-control-group" style="display:flex; flex-direction:column; gap:4px;">
               <label for="custom-saree-hue" style="color:rgba(255,255,255,0.7); font-size:0.75rem;">Saree Hue</label>
               <div style="display:flex; align-items:center; gap:8px;">
-                <input type="range" id="custom-saree-hue" min="0" max="360" value="0" style="flex:1;">
+                <input type="range" id="custom-saree-hue" min="0" max="360" value="0" style="flex:1;" aria-label="Saree hue adjustment">
                 <span id="val-custom-hue" style="min-width:30px; font-size:0.7rem; color:var(--color-zari);">0°</span>
               </div>
             </div>
             <div class="custom-control-group" style="display:flex; flex-direction:column; gap:4px;">
               <label for="custom-saree-sat" style="color:rgba(255,255,255,0.7); font-size:0.75rem;">Saturation</label>
               <div style="display:flex; align-items:center; gap:8px;">
-                <input type="range" id="custom-saree-sat" min="0.5" max="2.0" step="0.1" value="1.0" style="flex:1;">
+                <input type="range" id="custom-saree-sat" min="0.5" max="2.0" step="0.1" value="1.0" style="flex:1;" aria-label="Saree saturation adjustment">
                 <span id="val-custom-sat" style="min-width:30px; font-size:0.7rem; color:var(--color-zari);">1.0x</span>
               </div>
             </div>
@@ -1201,7 +1201,7 @@
             <div class="cert-digital-seal" style="margin-top:12px; border-top:1px dashed rgba(212,175,55,0.3); padding-top:10px; font-size:0.6rem; color:rgba(255,255,255,0.6); text-align:center;">
               <span style="display:block; font-size:0.6rem; color:var(--color-zari); font-weight:600; text-transform:uppercase; margin-bottom:3px;">SHA-256 Master Weave Signature</span>
               <code id="cert-display-hash" style="font-family:monospace; word-break:break-all; color:#ffd700; font-size:0.58rem; background:rgba(0,0,0,0.5); padding:3px 6px; border-radius:3px; display:block; border:1px solid rgba(255,215,0,0.15); margin-bottom:4px;">0x8a92f7c00e199e52ff5dcd702c2f8832a839da49e0c1f191b7d517c5b61fa23e</code>
-              <span style="font-size:0.58rem; color:rgba(255,255,255,0.45);">Verify public record at: <a id="cert-verify-link" href="/verify.html" target="_blank" style="color:var(--color-zari); text-decoration:underline;">silk101.vercel.app/verify</a></span>
+              <span style="font-size:0.58rem; color:rgba(255,255,255,0.45);">Verify public record at: <a id="cert-verify-link" href="/verify.html" target="_blank" rel="noopener noreferrer" style="color:var(--color-zari); text-decoration:underline;">silk101.vercel.app/verify</a></span>
             </div>
           </div>
           <div class="cert-footer" style="display:flex; flex-direction:column; gap:10px; align-items:center; margin-top:10px;">
@@ -1219,7 +1219,7 @@
         <form id="form-loom-booking" style="display:flex; flex-direction:column; gap:12px; text-align:left;">
           <div>
             <label for="book-date" style="font-size:0.7rem; color:#86868b; display:block; margin-bottom:4px;">Date</label>
-            <input type="date" id="book-date" style="width:100%; background:#222; border:1px solid rgba(255,255,255,0.1); color:#fff; padding:6px; border-radius:4px; font-family:'Outfit';" required>
+            <input type="date" id="book-date" style="width:100%; background:#222; border:1px solid rgba(255,255,255,0.1); color:#fff; padding:6px; border-radius:4px; font-family:'Outfit';" required aria-label="Select booking date">
           </div>
           <div>
             <label for="book-time" style="font-size:0.7rem; color:#86868b; display:block; margin-bottom:4px;">Time Slot</label>
@@ -1456,7 +1456,7 @@
 
         <!-- Chat Input Form -->
         <form id="form-concierge-chat" style="display:flex; gap:8px; margin-bottom:15px;" onsubmit="return false;">
-          <input type="text" id="concierge-chat-input" placeholder="Ask about shipping, customization, loom origin..." style="flex:1; background:#222; border:1px solid rgba(255,255,255,0.1); color:#fff; padding:8px; border-radius:6px; font-family:'Outfit'; font-size:0.75rem;" required>
+          <input type="text" id="concierge-chat-input" placeholder="Ask about shipping, customization, loom origin..." style="flex:1; background:#222; border:1px solid rgba(255,255,255,0.1); color:#fff; padding:8px; border-radius:6px; font-family:'Outfit'; font-size:0.75rem;" required aria-label="Concierge chat message input">
           <button type="submit" id="btn-concierge-chat-send" style="background:var(--color-zari); border:none; border-radius:6px; padding:0 14px; font-weight:bold; color:#000; cursor:pointer; font-size:0.85rem;">Send</button>
         </form>
 
@@ -1466,7 +1466,7 @@
             <button id="btn-request-samples" style="background:rgba(255,255,255,0.02); text-align:center; border:1px solid rgba(255,255,255,0.06); padding:8px; border-radius:6px; color:#fff; font-size:0.7rem; cursor:pointer; font-family:'Outfit'; transition:all 0.3s;" onmouseover="this.style.borderColor='var(--color-zari)'; this.style.background='rgba(255,215,0,0.03)';" onmouseout="this.style.borderColor='rgba(255,255,255,0.06)'; this.style.background='rgba(255,255,255,0.02)';">📦 Request Samples</button>
             <button id="btn-concierge-schedule" style="background:rgba(255,255,255,0.02); text-align:center; border:1px solid rgba(255,255,255,0.06); padding:8px; border-radius:6px; color:#fff; font-size:0.7rem; cursor:pointer; font-family:'Outfit'; transition:all 0.3s;" onmouseover="this.style.borderColor='var(--color-zari)'; this.style.background='rgba(255,215,0,0.03)';" onmouseout="this.style.borderColor='rgba(255,255,255,0.06)'; this.style.background='rgba(255,255,255,0.02)';">📅 Direct Callback</button>
           </div>
-          <a id="link-wa-concierge" href="https://wa.me/916712300000?text=Namaste%20Priyadarshini%2C%20I%20am%20interested%20in%20a%20private%20handloom%20consultation." target="_blank" style="text-decoration:none; display:flex; align-items:center; justify-content:center; gap:8px; padding:10px; border-radius:6px; border:1px solid rgba(255,255,255,0.06); background:rgba(255,255,255,0.02); color:#fff; font-size:0.75rem; transition:all 0.3s; font-family:'Outfit';" onmouseover="this.style.borderColor='var(--color-zari)'; this.style.background='rgba(255,215,0,0.03)';" onmouseout="this.style.borderColor='rgba(255,255,255,0.06)'; this.style.background='rgba(255,255,255,0.02)';">
+          <a id="link-wa-concierge" href="https://wa.me/916712300000?text=Namaste%20Priyadarshini%2C%20I%20am%20interested%20in%20a%20private%20handloom%20consultation." target="_blank" rel="noopener noreferrer" style="text-decoration:none; display:flex; align-items:center; justify-content:center; gap:8px; padding:10px; border-radius:6px; border:1px solid rgba(255,255,255,0.06); background:rgba(255,255,255,0.02); color:#fff; font-size:0.75rem; transition:all 0.3s; font-family:'Outfit';" onmouseover="this.style.borderColor='var(--color-zari)'; this.style.background='rgba(255,215,0,0.03)';" onmouseout="this.style.borderColor='rgba(255,255,255,0.06)'; this.style.background='rgba(255,255,255,0.02)';">
             <span>💬 Continue on WhatsApp</span>
             <span style="color:var(--color-zari); font-weight:bold;">→</span>
           </a>

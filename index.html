@@ -44,11 +44,9 @@
     <meta name="twitter:description" content="Explore pure Khandua Ikat & Patta Silk from Odisha. Verified provenance, zero carbon footprint. We deliver to US, UK, Canada, Gulf, & Singapore." />
     <meta name="twitter:image" content="https://silk101.vercel.app/og-social-card.png" />
 
-    <!-- Fonts prefetching & Preload -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Outfit:wght@200;300;400;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" />
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Outfit:wght@200;300;400;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
+    <!-- Fonts: self-hosted WOFF2 — no external request -->
+    <link rel="preload" href="/fonts/CormorantGaramond-Normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/Outfit.woff2" as="font" type="font/woff2" crossorigin />
 
     <!-- Structured Data: Organization & LocalBusiness -->
     <script type="application/ld+json">
@@ -769,13 +767,17 @@
             <!-- The actual GI Handloom Map photograph -->
             <div class="hm-photo-frame" id="hm-frame">
               <div class="hm-photo-container" id="hm-map-container">
-                <img
-                  src="/handloom_map_odisha.jpg"
-                  alt="GI Certified Handloom Map of Odisha — featuring Sambalpuri Ikat, Khandua Silk, Bomkai, Pasapalli, Kotpad, Berhampuri Pata and Tassar Fabric"
-                  class="hm-photo-img"
-                  loading="lazy"
-                  draggable="false"
-                />
+                <picture>
+                  <source srcset="/handloom_map_odisha.webp" type="image/webp" />
+                  <img
+                    src="/handloom_map_odisha.jpg"
+                    alt="GI Certified Handloom Map of Odisha — featuring Sambalpuri Ikat, Khandua Silk, Bomkai, Pasapalli, Kotpad, Berhampuri Pata and Tassar Fabric"
+                    class="hm-photo-img"
+                    loading="lazy"
+                    decoding="async"
+                    draggable="false"
+                  />
+                </picture>
                 <!-- SVG connector lines layer (empty — labels already in photo) -->
                 <svg class="hm-connectors" id="hm-connectors" viewBox="0 0 600 600" preserveAspectRatio="xMidYMid meet"></svg>
                 <!-- Interactive hotspot markers mapped to actual image coordinates -->

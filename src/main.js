@@ -5021,19 +5021,24 @@ window.addEventListener('DOMContentLoaded', () => {
 
   setupGenesisCanvas();
   setupHorizontalPulse();
-  setupCustomCommissionStudio();
-  setupMetamorphosis();
-  setupHandloomMap();
-  setupHousesOfOdisha();
-  setupVaultTunnel();
-  setupCustomCursor();
-  setupInteractiveExtensions();
-  setupMythosAnimation();
-  setupHeritageSoulSection();
-  setupHeritageMatchmaker();
-  setupCuratorConcierge();
-  setupSilkConstellation();
-  setupCuratorWhisper();
+  
+  // Defer non-critical setups to idle time to improve TBT (Total Blocking Time)
+  const idleCallback = window.requestIdleCallback || ((fn) => setTimeout(fn, 50));
+  idleCallback(() => {
+    setupCustomCommissionStudio();
+    setupMetamorphosis();
+    setupHandloomMap();
+    setupHousesOfOdisha();
+    setupVaultTunnel();
+    setupCustomCursor();
+    setupInteractiveExtensions();
+    setupMythosAnimation();
+    setupHeritageSoulSection();
+    setupHeritageMatchmaker();
+    setupCuratorConcierge();
+    setupSilkConstellation();
+    setupCuratorWhisper();
+  });
 
 
   // Weaving & Provenance FAQ Accordion Script

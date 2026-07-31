@@ -678,8 +678,8 @@ body:has(.saree-card:hover) #cursor-ring {
   color: var(--color-text);
   text-shadow: 0 4px 40px rgba(0,0,0,0.8), 0 0 80px rgba(26,42,108,0.2);
   display: block;
-  opacity: 0;
-  transform: translateY(40px);
+  opacity: 1;
+  transform: translateY(0);
 }
 .embroidered-text.accent {
   font-style: italic;

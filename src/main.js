@@ -413,9 +413,9 @@ function setupGenesisCanvas() {
       end: '50% top',
       scrub: true
     },
-    y: 0,
-    opacity: 1,
-    stagger: 0.1
+    y: -35,
+    opacity: 0.2,
+    stagger: 0.05
   });
 
   let isGenesisVisible = true;

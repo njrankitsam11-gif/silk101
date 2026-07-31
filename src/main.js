@@ -5442,6 +5442,7 @@ function setupInteractiveExtensions() {
 }
 
 function setupCustomCursor() {
+  if (window.matchMedia('(pointer: coarse)').matches) return;
   const dot = document.getElementById('cursor-dot');
   const ring = document.getElementById('cursor-ring');
   if (!dot || !ring) return;
@@ -7340,6 +7341,7 @@ function setupCuratorWhisper() {
 
 // ── 1. CUSTOM SILK THREAD CURSOR TRAIL ──────────────────────────
 function initSilkCursorTrail() {
+  if (window.matchMedia('(pointer: coarse)').matches) return;
   const dot  = document.getElementById('cursor-dot');
   const ring = document.getElementById('cursor-ring');
   if (!dot || !ring) return;

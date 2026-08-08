@@ -1021,49 +1021,8 @@ if (genForm) {
   };
 }
 
-// ── Custom Trailing Cursor for Admin Page ──────────────────────────────────
-function setupAdminCursor() {
-  const dot = document.getElementById('cursor-dot');
-  const ring = document.getElementById('cursor-ring');
-  if (!dot || !ring) return;
-
-  let mouseX = window.innerWidth / 2;
-  let mouseY = window.innerHeight / 2;
-  let ringX = mouseX;
-  let ringY = mouseY;
-
-  window.addEventListener('mousemove', (e) => {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-    dot.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%)`;
-  });
-
-  function updateRing() {
-    const dx = mouseX - ringX;
-    const dy = mouseY - ringY;
-    ringX += dx * 0.16;
-    ringY += dy * 0.16;
-    ring.style.transform = `translate3d(${ringX}px, ${ringY}px, 0) translate(-50%, -50%)`;
-    requestAnimationFrame(updateRing);
-  }
-  updateRing();
-
-  const hoverSelectors = 'a, button, select, input, tr';
-  function addHoverListeners() {
-    document.querySelectorAll(hoverSelectors).forEach(el => {
-      el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
-      el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
-    });
-  }
-  addHoverListeners();
-
-  const observer = new MutationObserver(() => addHoverListeners());
-  observer.observe(document.body, { childList: true, subtree: true });
-}
-
 // Initialize
 fetchData();
-setupAdminCursor();
 
 /* ══════════════════════════════════════════════════════════════
    FEATURE 3: DYNAMIC PROVENANCE CERTIFICATE CREATOR

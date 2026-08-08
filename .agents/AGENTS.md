@@ -1,14 +1,10 @@
 # Project Rules: The Loom of Time
 
-Whenever working on this repository, always remember the **Continuous Loop Improvement System (CLIS)** and prioritize these guidelines:
+Full context (brand facts, design tokens, decluttering decision log, performance guardrails, file map, phase status) lives in **[docs/BRAND_SPEC.md](../docs/BRAND_SPEC.md)** — read that first.
 
-## 1. Bespoke Luxury Tone
-* Keep the user experience feeling like a high-touch personal concierge. Showroom call-to-actions should direct users to bespoke human styling consultations ("Request Curator Consultation", WhatsApp, phone callbacks) rather than basic checkout forms.
-* Provide active loom queue scarcity text dynamically calculated per weaver to maintain exclusivity.
+Quick pointers, still true:
+- Concierge-not-checkout: CTAs route to a human (WhatsApp/phone/curator consultation), never a generic self-serve checkout.
+- Retain the alternate regional language and location routing schemas (USA, UK, Canada, UAE, Singapore, India) that dynamically update page metadata and localized shipping estimators.
+- Always verify the build with `npm run build` after modifying visual scripts.
 
-## 2. Interactive Features Stability
-* Do not break the canvas animations, tactile loom minigames, or parallax scroll triggers.
-* Always verify the build with `npm run build` after modifying visual scripts.
-
-## 3. SEO & NRI Geo-Targeting
-* Retain the alternate regional language and location routing schemas (USA, UK, Canada, UAE, Singapore, India) that dynamically update page metadata and localized shipping estimators.
+Feature scope (what's kept vs. cut, including which animations/minigames are intentional and which are deferred cleanup) is tracked in BRAND_SPEC.md's decision log — do not assume a feature must be preserved just because it exists; check there first.

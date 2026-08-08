@@ -134,10 +134,6 @@
     </script>
   </head>
   <body>
-    <!-- Custom Silk Thread Cursor -->
-    <div id="cursor-dot"></div>
-    <div id="cursor-ring"></div>
-
     <a class="skip-link" href="#genesis">Skip to the story</a>
 
     <!-- Konark Chakra Loading Overlay -->
@@ -198,54 +194,6 @@
       <span id="ribbon-queue-text">3 weavers active now</span>
     </div>
 
-    <!-- Silk Oracle Floating Button -->
-    <button id="btn-open-oracle" aria-label="Consult the Silk Oracle" title="Consult the Silk Oracle">🔮</button>
-
-    <!-- Silk Oracle Concierge Panel -->
-    <div id="oracle-panel" role="dialog" aria-label="Silk Oracle" aria-modal="true">
-      <div class="oracle-header">
-        <div class="oracle-avatar">🕯</div>
-        <div>
-          <div class="oracle-name">The Silk Oracle</div>
-          <div class="oracle-status" id="oracle-status-text">✦ Awakening from the weave...</div>
-        </div>
-        <button class="oracle-close" id="btn-close-oracle" aria-label="Close Oracle">×</button>
-      </div>
-      <div class="oracle-chat-area" id="oracle-chat-area"></div>
-      <form class="oracle-input-row" id="oracle-chat-form" autocomplete="off">
-        <input class="oracle-input" id="oracle-input" type="text" aria-label="Ask the Silk Oracle"
-               placeholder="Ask the Oracle anything about silk..."
-               aria-label="Your message to the Oracle" />
-        <button type="submit" class="oracle-send" aria-label="Send">↑</button>
-      </form>
-    </div>
-
-    <!-- Glyph Hunt Counter Badge -->
-    <div id="glyph-counter" aria-live="polite">
-      <div id="glyph-counter-dots">
-        <div class="glyph-dot" data-index="0"></div>
-        <div class="glyph-dot" data-index="1"></div>
-        <div class="glyph-dot" data-index="2"></div>
-        <div class="glyph-dot" data-index="3"></div>
-        <div class="glyph-dot" data-index="4"></div>
-      </div>
-      <span id="glyph-counter-label">0 of 5 Glyphs</span>
-    </div>
-
-    <!-- Secret Vault Panel -->
-    <div id="secret-vault-panel" role="dialog" aria-modal="true" aria-label="Secret Royal Vault">
-      <div class="secret-vault-card">
-        <div style="font-size:2.5rem; margin-bottom:1rem;">🏺</div>
-        <h2>The Royal Pattachitra</h2>
-        <p style="font-family:'Cormorant Garamond', serif; font-size:1.05rem; font-style:italic; color:rgba(247,215,109,0.85); margin-bottom:0.5rem;">
-          "ଶ୍ରୀ ଜଗନ୍ନାଥ ଦ୍ଵାଦଶ ନାମ" — The Twelve Sacred Names
-        </p>
-        <p>A singular Khandua Patta commissioned for the 2024 Ratha Yatra and never offered to the public. Woven over 60 days by Smt. Sebati Mohanty of Nuapatna, this saree carries verses from the Gita Govinda in calligraphic warp-ikat that only a living master weaver can achieve.</p>
-        <p style="font-size:0.8rem; color:rgba(201,162,39,0.7); letter-spacing:0.1em;">NEXT CEREMONIAL RELEASE · RATHA YATRA 2026 · BY INVITATION ONLY</p>
-        <button class="btn-close-secret" id="btn-close-secret">Close the Vault ×</button>
-      </div>
-    </div>
-
     <!-- Spatial Audio Start Screen -->
     <div id="entry-gate" class="entry-gate-overlay hidden">
       <div class="entry-gate-card">
@@ -278,14 +226,6 @@
         <a class="header-journal" href="/articles.html">Journal <span aria-hidden="true">↗</span></a>
       </header>
 
-      <!-- Rhythmic Loom Audio & Synth Controller -->
-      <button id="audio-toggle" class="audio-indicator btn-magnetic" aria-label="Turn ambient audio on" aria-pressed="false">
-        <div class="sound-bars">
-          <span></span><span></span><span></span><span></span>
-        </div>
-        <span class="audio-text">AUDIO OFF</span>
-      </button>
-
       <!-- SECTION 1: THE GENESIS (Hero Drop) -->
       <section id="genesis" class="scroll-section">
         <div class="canvas-container">
@@ -298,15 +238,11 @@
           </h1>
           <svg class="mudra-icon small" viewBox="0 0 48 48" style="margin-bottom:10px; opacity:0.65;" aria-hidden="true"><path d="M24 40c-2.2 0-4-1.8-4-4 0-4-6-6.5-8-12 3 0 5.5 2 7.5 5.5m4.5 10.5c2.2 0 4-1.8 4-4 0-4 6-6.5 8-12-3 0-5.5 2-7.5 5.5M24 36V16c-1.5 1.5-2.5 4.5-2.5 9M21 25c-3-3-4.5-7.5-4.5-12m11 12c3-3 4.5-7.5 4.5-12" /><circle cx="24" cy="40" r="1.5" fill="var(--color-zari)" /></svg>
           <span class="scroll-hint">SCROLL TO WEAVE</span>
-          <!-- Hidden Glyph 1 (Genesis) -->
-          <span class="hidden-glyph" data-glyph="0" title="" style="top:15%; left:8%;" aria-hidden="true">ଓ</span>
         </div>
       </section>
 
       <!-- SECTION 2: THE ARTISAN'S PULSE -->
       <section id="artisan-pulse" class="scroll-section horizontal-trigger" style="position:relative;">
-        <!-- Hidden Glyph 2 (Artisan) -->
-        <span class="hidden-glyph" data-glyph="1" style="top:18%; right:6%; font-size:2rem;" aria-hidden="true">ଙ</span>
         <div class="horizontal-wrapper">
           <div class="horizontal-scroll-section flex-row">
             
@@ -343,11 +279,6 @@
                 <div class="split-right">
                   <div class="digital-loom-matrix">
                     <canvas id="canvas-punchcard"></canvas>
-                    <div class="floating-code-overlay">
-                      <code>LOOM CONSOLE ACTIVE</code>
-                      <code>PATTERN ID: SHA-WOVEN</code>
-                      <code id="console-live-hash" class="hash">THREAD COUNT: 4200+</code>
-                    </div>
                   </div>
                   <div class="loom-controls">
                     <h4 class="controls-title">Warp Console Settings</h4>
@@ -419,7 +350,7 @@
                   <div class="artisan-canvas-wrap" style="position:relative; width:100%; max-width:440px; height:340px; border-radius:8px; border:1px solid rgba(212,175,55,0.15); overflow:hidden;">
                     <canvas id="canvas-custom-saree" style="width:100%; height:100%; display:block;"></canvas>
                   </div>
-                  <span class="caption" style="margin-top:10px; font-size:0.75rem; color:rgba(255,255,255,0.45); text-align:center;">Procedural real-time representation of your custom weave.</span>
+                  <span class="caption" style="margin-top:10px; font-size:0.75rem; color:rgba(255,255,255,0.45); text-align:center;">Procedural preview of your custom weave — updates as you adjust the controls.</span>
                 </div>
                 <!-- Right: Customizer controls and submit -->
                 <div class="split-right" style="display:flex; flex-direction:column; justify-content:center;">
@@ -645,8 +576,6 @@
 
       <!-- SECTION 3: THE METAMORPHOSIS (Physical to Digital Showcase) -->
       <section id="metamorphosis" class="scroll-section" style="position:relative;">
-        <!-- Hidden Glyph 3 (Metamorphosis) -->
-        <span class="hidden-glyph" data-glyph="2" style="bottom:20%; right:8%; font-size:2.2rem;" aria-hidden="true">ଚ</span>
         <div class="canvas-container">
           <canvas id="canvas-meta"></canvas>
         </div>
@@ -670,8 +599,6 @@
 
       <!-- SECTION 3.5: THE SOUL OF ODISHA -->
       <section id="heritage-soul" class="scroll-section flex-center" style="background:#09070b; position:relative; min-height: 100vh; padding: 4rem 10%; box-sizing: border-box;">
-        <!-- Hidden Glyph 4 (Heritage Soul) -->
-        <span class="hidden-glyph" data-glyph="3" style="top:12%; left:50%; font-size:2rem;" aria-hidden="true">ଣ</span>
         <div class="narrative-split" style="display:flex; width:100%; height:100%; max-width:1200px; gap:4%; align-items:center;">
           <!-- Left: Narrative & Toggles -->
           <div class="narrative-col" style="flex:1; display:flex; flex-direction:column; justify-content:center;">
@@ -729,8 +656,6 @@
       <section id="handloom-map" class="scroll-section hm-section">
         <!-- Layer 0: Deep crimson parallax BG -->
         <div class="hm-bg-velvet" id="hm-bg-velvet"></div>
-        <!-- Layer 1: Ambient silk-thread particle canvas -->
-        <canvas class="hm-silk-particles" id="hm-silk-particles"></canvas>
         <!-- Layer 2: Gold scan line overlay -->
         <div class="hm-scan-overlay"></div>
 
@@ -871,8 +796,6 @@
 
       <!-- SECTION 4: THE VAULT (1-of-1 Collection Gallery) -->
       <section id="vault" class="scroll-section" style="position:relative;">
-        <!-- Hidden Glyph 5 (Vault) -->
-        <span class="hidden-glyph" data-glyph="4" style="top:50%; left:5%; font-size:2.2rem;" aria-hidden="true">ଟ</span>
         <div class="vault-heading-wrap">
           <span class="section-label">03 / THE COLLECTION</span>
           <h3 class="vault-title" style="display:flex; align-items:center; justify-content:center; gap:12px;">
@@ -1049,11 +972,11 @@
               
               <div style="font-size:0.65rem; color:rgba(255,255,255,0.4); margin-top:8px; text-align:center;">Hover or tap medallion to explode Pipili applique layers</div>
             </div>
-            
-            <!-- Live Loom Booking System -->
-            <div class="live-loom-booking-panel" style="margin-top:20px; display:flex; flex-direction:column; gap:8px; border-top:1px solid rgba(255,255,255,0.08); padding-top:15px; width:100%;">
+
+            <!-- Loom Visit Scheduler trigger -->
+            <div style="margin-top:20px; display:flex; flex-direction:column; gap:8px; border-top:1px solid rgba(255,255,255,0.08); padding-top:15px; width:100%;">
               <span class="avatar-sidebar-label" style="display:block; font-size:0.7rem; color:rgba(255,255,255,0.4); font-weight:600; text-transform:uppercase; text-align:center; margin-bottom:5px;">Virtual Loom Tour</span>
-              <button id="btn-open-loom-booking" class="btn btn-secondary btn-sm" style="width:100%; font-size:0.75rem; font-family:'Outfit'; padding:5px; border-radius:4px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; cursor:pointer;">Book Live Loom Stream</button>
+              <button id="btn-open-loom-booking" class="btn btn-secondary btn-sm" style="width:100%; font-size:0.75rem; font-family:'Outfit'; padding:5px; border-radius:4px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; cursor:pointer;">Schedule Virtual Loom Visit</button>
             </div>
           </div>
         </div>
@@ -1062,7 +985,6 @@
         <div class="showroom-bottom-bar" id="showroom-bottom-bar">
           <!-- Retractable Toggle Tab -->
           <button id="btn-toggle-controls" style="position:absolute; top:-24px; left:calc(50% - 70px); transform:translateX(-50%); background:rgba(18, 18, 23, 0.85); border:1px solid rgba(255,255,255,0.08); border-bottom:none; color:var(--color-zari); border-radius:8px 8px 0 0; padding:4px 16px; font-size:0.6rem; font-family:'Outfit'; cursor:pointer; letter-spacing:1px; font-weight:600; white-space:nowrap; transition:all 0.3s; backdrop-filter:blur(20px);">▲ HIDE CONTROLS</button>
-          <button id="btn-toggle-ambient-audio" style="position:absolute; top:-24px; left:calc(50% + 70px); transform:translateX(-50%); background:rgba(18, 18, 23, 0.85); border:1px solid rgba(255,255,255,0.08); border-bottom:none; color:var(--color-zari); border-radius:8px 8px 0 0; padding:4px 12px; font-size:0.6rem; font-family:'Outfit'; cursor:pointer; letter-spacing:1px; font-weight:600; white-space:nowrap; transition:all 0.3s; backdrop-filter:blur(20px);">🔊 Loom Sound: Off</button>
 
           <div class="bottom-bar-group">
             <span class="bbar-label">INSPECT</span>
@@ -1096,9 +1018,6 @@
             </div>
           </div>
           <div class="bottom-bar-group bbar-cta">
-            <button class="bbar-btn active" id="btn-ar-drape" style="padding:6px 12px; font-size:0.75rem; background:rgba(212,175,55,0.15); border:1px solid rgba(212,175,55,0.3); color:var(--color-zari); border-radius:4px; margin-right:6px; cursor:pointer;">
-              👓 AR Drape
-            </button>
             <button class="acquire-btn" id="btn-acquire-now">
               <span>Enquire</span>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
@@ -1201,12 +1120,6 @@
               </div>
             </div>
           </div>
-            <!-- Digital Cryptographic Provenance Hash Seal -->
-            <div class="cert-digital-seal" style="margin-top:12px; border-top:1px dashed rgba(212,175,55,0.3); padding-top:10px; font-size:0.6rem; color:rgba(255,255,255,0.6); text-align:center;">
-              <span style="display:block; font-size:0.6rem; color:var(--color-zari); font-weight:600; text-transform:uppercase; margin-bottom:3px;">SHA-256 Master Weave Signature</span>
-              <code id="cert-display-hash" style="font-family:monospace; word-break:break-all; color:#ffd700; font-size:0.58rem; background:rgba(0,0,0,0.5); padding:3px 6px; border-radius:3px; display:block; border:1px solid rgba(255,215,0,0.15); margin-bottom:4px;">0x8a92f7c00e199e52ff5dcd702c2f8832a839da49e0c1f191b7d517c5b61fa23e</code>
-              <span style="font-size:0.58rem; color:rgba(255,255,255,0.45);">Verify public record at: <a id="cert-verify-link" href="/verify.html" target="_blank" rel="noopener noreferrer" style="color:var(--color-zari); text-decoration:underline;">silk101.vercel.app/verify</a></span>
-            </div>
           </div>
           <div class="cert-footer" style="display:flex; flex-direction:column; gap:10px; align-items:center; margin-top:10px;">
             <span style="font-size:0.65rem; font-style:italic; color:rgba(255,255,255,0.5);">Verified Weaver Provenance Seal Applied</span>
@@ -1316,121 +1229,16 @@
       </div>
     </section>
 
-    <!-- Floating Aura Matchmaker Trigger Button -->
-    <button id="btn-open-matchmaker" class="matchmaker-trigger-badge btn-magnetic">
-      <span>✨ Match My Aura</span>
-    </button>
-
-    <!-- Heritage Matchmaker Drawer -->
-    <div id="matchmaker-drawer" class="matchmaker-drawer">
-      <div class="matchmaker-header">
-        <h3>Heritage Matchmaker</h3>
-        <button id="btn-close-matchmaker" class="matchmaker-close">&times;</button>
-      </div>
-
-      <!-- Step dots -->
-      <div class="step-indicator-dots">
-        <span class="step-dot active" data-step="1"></span>
-        <span class="step-dot" data-step="2"></span>
-        <span class="step-dot" data-step="3"></span>
-      </div>
-
-      <!-- Step 1: Occasion -->
-      <div class="matchmaker-step-panel active" data-step="1">
-        <span class="step-label">Step 01 / 03</span>
-        <h4 class="step-title">Select the Occasion</h4>
-        <p style="font-size:0.75rem; color:rgba(255,255,255,0.5); margin:0;">What event does this custom weave target?</p>
-        <div class="options-group">
-          <div class="option-card" data-key="wedding">
-            <span class="radio-circle"></span>
-            <div class="option-details">
-              <strong>Diaspora Wedding / Bridal</strong>
-              <span>Luxury family heirloom drapes</span>
-            </div>
-          </div>
-          <div class="option-card" data-key="offering">
-            <span class="radio-circle"></span>
-            <div class="option-details">
-              <strong>Sacred Offering / Temple</strong>
-              <span>Khandua scriptural heritage prints</span>
-            </div>
-          </div>
-          <div class="option-card" data-key="gala">
-            <span class="radio-circle"></span>
-            <div class="option-details">
-              <strong>Cocktail / High-Fashion Gala</strong>
-              <span>Modern experimental aesthetics</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Step 2: Color Aura -->
-      <div class="matchmaker-step-panel" data-step="2">
-        <span class="step-label">Step 02 / 03</span>
-        <h4 class="step-title">Choose Your Color Aura</h4>
-        <p style="font-size:0.75rem; color:rgba(255,255,255,0.5); margin:0;">Which pigment group reflects your energy?</p>
-        <div class="options-group">
-          <div class="option-card" data-key="crimson">
-            <span class="radio-circle"></span>
-            <div class="option-details">
-              <strong>Crimson Red & Ochre</strong>
-              <span>Sacred temple pigments</span>
-            </div>
-          </div>
-          <div class="option-card" data-key="earth">
-            <span class="radio-circle"></span>
-            <div class="option-details">
-              <strong>Tribal Green & Ochre Root</strong>
-              <span>Naturally sourced tree-bark tones</span>
-            </div>
-          </div>
-          <div class="option-card" data-key="gold">
-            <span class="radio-circle"></span>
-            <div class="option-details">
-              <strong>Gilded Gold Tissue</strong>
-              <span>Pure gold-plated metallic warp thread</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Step 3: Weaving Time / Collector Grade -->
-      <div class="matchmaker-step-panel" data-step="3">
-        <span class="step-label">Step 03 / 03</span>
-        <h4 class="step-title">Select Handloom Class</h4>
-        <p style="font-size:0.75rem; color:rgba(255,255,255,0.5); margin:0;">What level of detail do you require?</p>
-        <div class="options-group">
-          <div class="option-card" data-key="collector">
-            <span class="radio-circle"></span>
-            <div class="option-details">
-              <strong>Collector Relic Grade</strong>
-              <span>Weaving duration: 35-50 days</span>
-            </div>
-          </div>
-          <div class="option-card" data-key="classic">
-            <span class="radio-circle"></span>
-            <div class="option-details">
-              <strong>Weaver Signature Classic</strong>
-              <span>Weaving duration: 20-30 days</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Footer navigation buttons -->
-      <div class="matchmaker-nav">
-        <button id="btn-matchmaker-prev" class="btn btn-secondary btn-sm" style="display:none; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.05); color:#fff; border-radius:4px; padding:6px 12px; cursor:pointer;">Back</button>
-        <div style="flex:1;"></div>
-        <button id="btn-matchmaker-next" class="btn btn-primary btn-sm" style="font-weight:600; padding:6px 16px; font-size:0.75rem; background:var(--color-zari); color:#000; border:none; border-radius:4px; cursor:pointer;">Next Step</button>
-      </div>
-    </div>
-
     <!-- Floating Curator Concierge Trigger Button -->
     <button id="btn-open-concierge" class="btn-magnetic" style="position:fixed; bottom:24px; right:24px; z-index:1002; width:48px; height:48px; border-radius:50%; background:#121217; border:1px solid var(--color-zari); box-shadow:0 4px 15px rgba(255,215,0,0.25); display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:1.3rem; transition:transform 0.3s ease;">
       👑
       <!-- Pulse halo -->
       <span class="pulse-dot" style="position:absolute; width:100%; height:100%; border-radius:50%; border:1px solid var(--color-zari); opacity:0.6; pointer-events:none;"></span>
+    </button>
+
+    <!-- Adopt a Loom CTA -->
+    <button id="btn-adopt-loom" class="btn-magnetic" title="Adopt a Loom — subscribe for live weaver updates &amp; first access" aria-label="Adopt a Loom subscription" style="position:fixed; bottom:84px; right:24px; z-index:1002; width:48px; height:48px; border-radius:50%; background:#121217; border:1px solid var(--color-zari); box-shadow:0 4px 15px rgba(255,215,0,0.25); display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:1.3rem; transition:transform 0.3s ease;">
+      🏺
     </button>
 
     <!-- Curator Concierge Drawer/Modal -->
@@ -1482,59 +1290,6 @@
       </div>
     </div>
 
-    <!-- Live Loom Cam Feed Modal -->
-    <div id="live-loom-modal" class="modal-overlay hidden" style="z-index:4600; display:none; align-items:center; justify-content:center; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); backdrop-filter:blur(10px);">
-      <div class="cert-card" style="width:480px; max-width:92%; background:#121217; padding:24px; border:1px solid var(--color-zari); border-radius:12px; font-family:'Outfit'; text-align:left; position:relative;">
-        <button id="btn-close-loom-modal" style="position:absolute; top:15px; right:15px; background:transparent; border:none; color:rgba(255,255,255,0.5); font-size:1.5rem; cursor:pointer;">&times;</button>
-        
-        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:10px;">
-          <div>
-            <h3 style="font-family:'Playfair Display'; font-size:1.2rem; color:var(--color-zari); margin:0;">Maniabandha Live Loom Cam</h3>
-            <span style="font-size:0.6rem; color:#2ecc71; text-transform:uppercase; letter-spacing:1px; display:inline-flex; align-items:center; gap:6px;">
-              <span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:#2ecc71; animation:pulse-ring 1.5s infinite;"></span>
-              Live Feed • Shuttle #3
-            </span>
-          </div>
-        </div>
-
-        <!-- Video Stream Player Container -->
-        <div style="width:100%; height:240px; background:#000; border-radius:6px; border:1px solid rgba(255,255,255,0.1); position:relative; overflow:hidden; margin-bottom:15px;">
-          <!-- Simulated Live Stream using a high-quality video loop -->
-          <video autoplay loop muted playsinline style="width:100%; height:100%; object-fit:cover; opacity:0.8;">
-            <source src="https://assets.mixkit.co/videos/preview/mixkit-hand-weaving-fabric-on-a-loom-40899-large.mp4" type="video/mp4">
-          </video>
-          <div style="position:absolute; top:10px; left:10px; background:rgba(0,0,0,0.6); padding:4px 8px; border-radius:4px; font-size:0.6rem; color:#fff; font-family:monospace; border:1px solid rgba(255,255,255,0.1);">
-            SIMULATED SENSOR FEED • FPS: 60 • ISO: 400
-          </div>
-        </div>
-
-        <!-- Live Telemetry Sparkline Canvas -->
-        <canvas id="telemetry-chart-canvas" width="432" height="60" style="width:100%; height:60px; border-radius:4px; background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.06); display:block; margin-bottom:10px;"></canvas>
-        <!-- Gauges and stats grid -->
-        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; background:rgba(255,255,255,0.02); padding:12px; border-radius:6px; border:1px solid rgba(255,255,255,0.05); font-size:0.7rem; font-family:monospace;">
-          <div>
-            <span style="color:rgba(255,255,255,0.4); display:block; font-size:0.6rem; text-transform:uppercase;">Warp Tension</span>
-            <strong id="loom-stat-tension" style="color:var(--color-zari); font-size:0.85rem;">8.42 N</strong>
-          </div>
-          <div>
-            <span style="color:rgba(255,255,255,0.4); display:block; font-size:0.6rem; text-transform:uppercase;">Picks/min</span>
-            <strong id="loom-stat-velocity" style="color:#fff; font-size:0.85rem;">240</strong>
-          </div>
-          <div>
-            <span style="color:rgba(255,255,255,0.4); display:block; font-size:0.6rem; text-transform:uppercase;">Loom Temp</span>
-            <strong id="loom-stat-temp" style="color:#7ecfff; font-size:0.85rem;">34.2°C</strong>
-          </div>
-        </div>
-        <!-- Adopt a Loom CTA -->
-        <div style="margin-top:12px; padding:10px; background:rgba(212,175,55,0.05); border:1px solid rgba(212,175,55,0.2); border-radius:6px; display:flex; align-items:center; justify-content:space-between; gap:8px;">
-          <div>
-            <div style="font-size:0.7rem; color:var(--color-zari); font-weight:600;">🏺 Adopt This Loom</div>
-            <div style="font-size:0.65rem; color:rgba(255,255,255,0.5);">Subscribe for live weaver updates &amp; first access</div>
-          </div>
-          <button id="btn-adopt-loom" style="background:var(--color-zari); color:#000; border:none; border-radius:4px; padding:6px 12px; font-family:'Outfit'; font-weight:600; font-size:0.7rem; cursor:pointer; white-space:nowrap;">Adopt Loom →</button>
-        </div>
-      </div>
-    </div>
 
     <!-- ═══════════════════════════════════════════════════════════
          DEPOSIT & MILESTONE CHECKOUT MODAL
@@ -1594,14 +1349,14 @@
               <div style="width:20px; height:20px; border-radius:50%; border:1px solid rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:0.6rem; color:rgba(255,255,255,0.4);">3</div>
               <div>
                 <div style="font-size:0.8rem; color:rgba(255,255,255,0.7);">Active Weaving on Loom</div>
-                <div style="font-size:0.65rem; color:rgba(255,255,255,0.4);">Day 10–35 • Live cam access unlocked</div>
+                <div style="font-size:0.65rem; color:rgba(255,255,255,0.4);">Day 10–35 • Progress photo updates via WhatsApp</div>
               </div>
             </div>
             <div style="width:1px; height:20px; background:rgba(255,255,255,0.1); margin-left:10px;"></div>
             <div class="milestone-step" data-milestone="3" style="display:flex; gap:12px; align-items:flex-start; padding:8px 0;">
               <div style="width:20px; height:20px; border-radius:50%; border:1px solid rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:0.6rem; color:rgba(255,255,255,0.4);">4</div>
               <div>
-                <div style="font-size:0.8rem; color:rgba(255,255,255,0.7);">Quality Inspection &amp; SHA-256 Cert</div>
+                <div style="font-size:0.8rem; color:rgba(255,255,255,0.7);">Quality Inspection &amp; Provenance Certificate</div>
                 <div style="font-size:0.65rem; color:rgba(255,255,255,0.4);">Day 36–40 • Final 70% balance due</div>
               </div>
             </div>
@@ -1621,7 +1376,7 @@
           <button id="btn-pay-deposit" style="width:100%; padding:14px; background:var(--color-zari); color:#000; border:none; border-radius:8px; font-family:'Outfit'; font-weight:700; font-size:1rem; cursor:pointer; letter-spacing:0.5px; transition:opacity 0.2s;">
             🔒 Pay Deposit via WhatsApp Consultation
           </button>
-          <p style="font-size:0.65rem; color:rgba(255,255,255,0.35); text-align:center; margin-top:8px;">Secure SSL · Full refund within 7 days if commission is declined · No auto-billing</p>
+          <p style="font-size:0.65rem; color:rgba(255,255,255,0.35); text-align:center; margin-top:8px;">Payment arranged directly with your curator · Full refund within 7 days if commission is declined · No auto-billing</p>
         </div>
         <div id="deposit-success-area" style="display:none; text-align:center; padding:16px;">
           <div style="font-size:2rem; margin-bottom:8px;">🎉</div>
@@ -1630,40 +1385,6 @@
         </div>
       </div>
     </div>
-
-    <!-- WebXR AR Drape Camera Try-On Modal -->
-    <div id="ar-drape-modal" class="modal-overlay hidden" style="z-index:4800; display:none; align-items:center; justify-content:center; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); backdrop-filter:blur(15px);">
-      <div class="cert-card" style="width:420px; max-width:92%; background:#121217; padding:24px; border:1px solid var(--color-zari); border-radius:12px; font-family:'Outfit'; text-align:center; position:relative;">
-        <button id="btn-close-ar-modal" style="position:absolute; top:15px; right:15px; background:transparent; border:none; color:rgba(255,255,255,0.5); font-size:1.5rem; cursor:pointer;">&times;</button>
-        
-        <div style="margin-bottom:12px;">
-          <h3 style="font-family:'Playfair Display'; font-size:1.2rem; color:var(--color-zari); margin:0 0 4px 0;">AR Handloom Drape Simulation</h3>
-          <span style="font-size:0.65rem; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:1px;">WebXR Camera & Mannequin Mapping</span>
-        </div>
-
-        <div id="ar-viewport-border" style="width:100%; height:260px; background:#000; border-radius:8px; border:1px solid rgba(212,175,55,0.3); position:relative; overflow:hidden; margin-bottom:12px;">
-          <!-- Live Camera Video element -->
-          <video id="ar-camera-feed" autoplay playsinline style="width:100%; height:100%; object-fit:cover; display:none;"></video>
-          <!-- Mannequin Fallback Stage -->
-          <div id="ar-mannequin-stage" style="width:100%; height:100%; background:url('/avatars/frame_front.webp') no-repeat center center/contain; opacity:0.85; transition:filter 0.3s ease;"></div>
-          <!-- AR Canvas Drape Overlay -->
-          <canvas id="ar-canvas-overlay" style="position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:5;"></canvas>
-          
-          <div style="position:absolute; bottom:10px; left:10px; right:10px; background:rgba(0,0,0,0.7); padding:6px; border-radius:4px; font-size:0.65rem; color:#ffd700; border:1px solid rgba(255,215,0,0.2);">
-            ✨ Real-time Silk Sheen Overlay: <span id="ar-drape-spec">Crimson Mulberry · Lotus Pallu</span>
-          </div>
-        </div>
-
-        <div style="display:flex; gap:8px; justify-content:center;">
-          <button id="btn-toggle-camera" class="btn btn-secondary btn-sm" style="flex:1; font-size:0.75rem; font-family:'Outfit';">📷 Start Camera</button>
-          <button id="btn-capture-ar" class="btn btn-primary btn-sm" style="flex:1; font-size:0.75rem; font-family:'Outfit'; background:var(--color-zari); color:#000; font-weight:600; border:none;">📸 Snapshot</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Custom Cursor -->
-    <div class="custom-cursor-dot" id="cursor-dot"></div>
-    <div class="custom-cursor-ring" id="cursor-ring"></div>
 
     <!-- Script Entrypoint -->
     <script type="module" src="/src/main.js"></script>

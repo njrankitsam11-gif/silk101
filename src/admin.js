@@ -1146,6 +1146,23 @@ function renderCertLedger() {
   `).join('');
 }
 
+window.generateProvenanceHash = function(sareeName) {
+  document.querySelectorAll('.admin-nav-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+  document.querySelector('.admin-nav-btn[data-target="sec-certificates"]')?.classList.add('active');
+  document.getElementById('sec-certificates')?.classList.add('active');
+
+  const sel = document.getElementById('cert-saree-id');
+  if (sel) {
+    const match = [...sel.options].find(opt => opt.textContent.includes(sareeName));
+    if (match) {
+      sel.value = match.value;
+      sel.dispatchEvent(new Event('change'));
+    }
+  }
+  document.getElementById('sec-certificates')?.scrollIntoView({ behavior: 'smooth' });
+};
+
 window.viewCertFromLedger = function(certId) {
   const certs = JSON.parse(localStorage.getItem('loom_certificates') || '[]');
   const cert = certs.find(c => c.cert_id === certId);

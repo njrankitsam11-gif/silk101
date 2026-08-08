@@ -1,5 +1,4 @@
 import './style.css';
-import './matchmaker.css';
 import './hyper3d.css';
 import './hypereffects.js';
 import { gsap } from 'gsap';
@@ -11,106 +10,22 @@ gsap.registerPlugin(ScrollTrigger);
 let audioCtx = null;
 let masterGainNode = null;
 let synthNode = null;
-let clackTimer = null;
 let isAudioPlaying = false;
 let masterVolume = parseFloat(localStorage.getItem('loom_audio_volume') || '0.8');
 let isSFXEnabled = localStorage.getItem('loom_audio_sfx') !== 'false';
 let scrollVelocity = 0;
 let lastScrollY = 0;
+let activeItem = null;
 const entryAnimation = { scale: 5.0 };
 
 // Loom Console Parameters
 let warpTension = 1.0;
 let threadCount = 45;
 let borderPattern = 'lotus';
-let liveHash = '0x8a92f7c00e199e52ff5dcd702c2f8832a839da49e0c1f191b7d517c5b61fa23e';
 
 // Mouse spatial state
 let mouseXNormalized = 0; // -1 to 1
 let mouseYNormalized = 0; // 0 to 1
-
-// Mock hashing helper
-function generateMockHash(tension, density, pattern) {
-  const input = `${tension}-${density}-${pattern}-${Date.now()}`;
-  let hash = 0;
-  for (let i = 0; i < input.length; i++) {
-    hash = (hash << 5) - hash + input.charCodeAt(i);
-    hash |= 0;
-  }
-  const hex = Math.abs(hash).toString(16).padStart(8, '0');
-  return `0x${hex}f7c00e199e52ff5dcd702c2f8832a${hex}`;
-}
-
-// Spatial Audio Engine (Web Audio API Synthesizers)
-function initAudio() {
-  if (audioCtx) return;
-  
-  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  masterGainNode = audioCtx.createGain();
-  masterGainNode.gain.setValueAtTime(isAudioPlaying ? masterVolume : 0, audioCtx.currentTime);
-  masterGainNode.connect(audioCtx.destination);
-  
-  // 1. Ambient Synth Pad (Low-frequency drone)
-  const osc1 = audioCtx.createOscillator();
-  const osc2 = audioCtx.createOscillator();
-  const filter = audioCtx.createBiquadFilter();
-  const padGain = audioCtx.createGain();
-  const spatialPanner = audioCtx.createStereoPanner ? audioCtx.createStereoPanner() : null;
-  
-  osc1.type = 'sawtooth';
-  osc2.type = 'triangle';
-  
-  const cfg = SOUNDSCAPES[activeSoundscape] || SOUNDSCAPES.loom;
-  osc1.frequency.value = cfg.pitchBase[0];
-  osc2.frequency.value = cfg.pitchBase[1];
-  
-  filter.type = 'lowpass';
-  filter.frequency.value = cfg.filterFreq;
-  filter.Q.value = 5;
-  
-  padGain.gain.value = isAudioPlaying ? cfg.padGain : 0;
-  
-  osc1.connect(filter);
-  osc2.connect(filter);
-  
-  if (spatialPanner) {
-    filter.connect(spatialPanner);
-    spatialPanner.connect(padGain);
-  } else {
-    filter.connect(padGain);
-  }
-  
-  padGain.connect(masterGainNode);
-  
-  osc1.start();
-  osc2.start();
-  
-  synthNode = { osc1, osc2, padGain, filter, panner: spatialPanner };
-  
-  // 2. Loom Rhythmic Clack-Clack
-  triggerLoomClack();
-}
-
-function triggerLoomClack() {
-  if (!audioCtx || !isAudioPlaying) {
-    clackTimer = setTimeout(triggerLoomClack, 1000);
-    return;
-  }
-  
-  // Shuttle clack panning follows mouse coordinate panning or shuttle position
-  if (isSFXEnabled) playClackSound(mouseXNormalized);
-  
-  // Rhythm interval speeds up with scroll velocity
-  const baseInterval = 1200;
-  const velocityReduction = Math.min(scrollVelocity * 8, 800);
-  const nextInterval = Math.max(baseInterval - velocityReduction, 250);
-  
-  setTimeout(() => {
-    if (isAudioPlaying && isSFXEnabled) playClackSound(mouseXNormalized * -1);
-  }, nextInterval / 2.5);
-  
-  clackTimer = setTimeout(triggerLoomClack, nextInterval);
-}
 
 function playClackSound(panValue) {
   if (!audioCtx || !isAudioPlaying || !isSFXEnabled) return;
@@ -257,6 +172,23 @@ function playTempleChimeSound(freq = 528) {
   } catch (e) {}
 }
 
+function playShowroomSound(freq = 440, vol = 0.04, duration = 0.08) {
+  if (!audioCtx || !isAudioPlaying || !isSFXEnabled || audioCtx.state !== 'running') return;
+  try {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+    const outNode = masterGainNode || audioCtx.destination;
+    osc.connect(gain);
+    gain.connect(outNode);
+    osc.start();
+    osc.stop(audioCtx.currentTime + duration);
+  } catch(e) {}
+}
+
 function createNoiseBuffer() {
   const bufferSize = audioCtx.sampleRate * 0.08;
   const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
@@ -313,73 +245,6 @@ setInterval(() => {
     scrollVelocity = 0;
   }
 }, 50);
-
-// Audio Control Helper
-function setAudioState(enabled) {
-  isAudioPlaying = enabled;
-  if (enabled) {
-    initAudio();
-    if (audioCtx && audioCtx.state === 'suspended') {
-      audioCtx.resume();
-    }
-  }
-  if (audioCtx) {
-    const cfg = SOUNDSCAPES[activeSoundscape] || SOUNDSCAPES.loom;
-    if (synthNode && synthNode.padGain) {
-      synthNode.padGain.gain.setValueAtTime(enabled ? cfg.padGain : 0, audioCtx.currentTime);
-    }
-    if (masterGainNode) {
-      masterGainNode.gain.setValueAtTime(enabled ? masterVolume : 0, audioCtx.currentTime);
-    }
-  }
-  updateAudioUI();
-}
-
-function updateAudioUI() {
-  const toggle = document.getElementById('audio-toggle');
-  if (toggle) {
-    if (isAudioPlaying) {
-      toggle.classList.add('playing');
-      toggle.setAttribute('aria-pressed', 'true');
-      toggle.setAttribute('aria-label', 'Audio control menu (Audio ON)');
-      const textEl = toggle.querySelector('.audio-text');
-      if (textEl) textEl.textContent = 'AUDIO ON';
-    } else {
-      toggle.classList.remove('playing');
-      toggle.setAttribute('aria-pressed', 'false');
-      toggle.setAttribute('aria-label', 'Audio control menu (Audio OFF)');
-      const textEl = toggle.querySelector('.audio-text');
-      if (textEl) textEl.textContent = 'AUDIO OFF';
-    }
-  }
-  const masterBtn = document.getElementById('audio-menu-master-btn');
-  if (masterBtn) {
-    masterBtn.textContent = isAudioPlaying ? '🔊 AUDIO ON' : '🔇 AUDIO OFF';
-    masterBtn.classList.toggle('active', isAudioPlaying);
-  }
-}
-
-// Audio Setup Buttons (Entry Gate)
-const btnGateOn = document.getElementById('btn-gate-on');
-const btnGateOff = document.getElementById('btn-gate-off');
-const entryGate = document.getElementById('entry-gate');
-
-if (btnGateOn) {
-  btnGateOn.addEventListener('click', () => {
-    sessionStorage.setItem('loom_gate_dismissed', 'true');
-    if (entryGate) entryGate.classList.add('hidden');
-    setAudioState(true);
-  });
-}
-
-if (btnGateOff) {
-  btnGateOff.addEventListener('click', () => {
-    sessionStorage.setItem('loom_gate_dismissed', 'true');
-    if (entryGate) entryGate.classList.add('hidden');
-    setAudioState(false);
-  });
-}
-
 
 /* ==========================================================
    CANVAS 1: GENESIS (Hero Drop)
@@ -1041,20 +906,15 @@ function setupHorizontalPulse() {
   const sliderTension = document.getElementById('slider-tension');
   const sliderDensity = document.getElementById('slider-density');
   const selectPattern = document.getElementById('select-pattern');
-  const liveHashEl = document.getElementById('console-live-hash');
-  
+
   function updateConsoleSettings() {
     warpTension = parseFloat(sliderTension.value);
     threadCount = parseInt(sliderDensity.value);
     borderPattern = selectPattern.value;
-    
+
     document.getElementById('val-tension').textContent = warpTension.toFixed(1);
     document.getElementById('val-density').textContent = threadCount;
-    
-    // Regenerate blockchain integrity hash
-    liveHash = generateMockHash(warpTension, threadCount, borderPattern);
-    liveHashEl.textContent = liveHash.substring(0, 10) + '...';
-    
+
     // Re-render sarees in the Vault with the updated motif patterns!
     const vaultCards = document.querySelectorAll('.saree-card');
     vaultCards.forEach(card => {
@@ -1088,7 +948,7 @@ function setupCustomCommissionStudio() {
     canvas.width = canvas.parentElement.clientWidth;
     canvas.height = canvas.parentElement.clientHeight;
   }
-  window.addEventListener('resize', resize);
+  window.addEventListener('resize', () => { resize(); draw(); });
   resize();
 
   const selectArtisan = document.getElementById('comm-artisan');
@@ -1133,6 +993,7 @@ function setupCustomCommissionStudio() {
     const settings = getSettings();
     if (elEstTime) elEstTime.textContent = `${settings.time} Days`;
     if (elEstPrice) elEstPrice.textContent = `₹${settings.price.toLocaleString('en-IN')}`;
+    draw();
   }
 
   function draw() {
@@ -1250,7 +1111,6 @@ function setupCustomCommissionStudio() {
     }
 
     ctx.restore();
-    requestAnimationFrame(draw);
   }
 
   if (selectArtisan) {
@@ -1300,7 +1160,6 @@ function setupCustomCommissionStudio() {
   }
 
   updateEstimates();
-  draw();
 }
 
 
@@ -1918,49 +1777,6 @@ function setupHandloomMap() {
   const section = document.getElementById('handloom-map');
   if (!section) return;
 
-  // ── 1. SILK THREAD PARTICLE SYSTEM ──────────────────────────────
-  const pCvs = document.getElementById('hm-silk-particles');
-  if (pCvs) {
-    pCvs.width = window.innerWidth;
-    pCvs.height = section.offsetHeight || 900;
-    const pCtx = pCvs.getContext('2d');
-    const threads = Array.from({ length: 55 }, () => ({
-      x: Math.random() * pCvs.width,
-      y: Math.random() * pCvs.height,
-      vx: (Math.random() - 0.5) * 0.4,
-      vy: Math.random() * 0.25 + 0.1,
-      len: Math.random() * 80 + 40,
-      hue: Math.random() < 0.6 ? 45 : (Math.random() < 0.5 ? 340 : 210),
-      alpha: Math.random() * 0.35 + 0.1,
-      angle: Math.random() * Math.PI * 2
-    }));
-    function animParticles() {
-      pCtx.clearRect(0, 0, pCvs.width, pCvs.height);
-      threads.forEach(t => {
-        t.x += t.vx; t.y += t.vy; t.angle += 0.006;
-        if (t.y > pCvs.height + 20) { t.y = -20; t.x = Math.random() * pCvs.width; }
-        if (t.x < -10 || t.x > pCvs.width + 10) { t.x = Math.random() * pCvs.width; }
-        const dx = Math.cos(t.angle) * t.len;
-        const dy = Math.sin(t.angle) * t.len * 0.35;
-        const grad = pCtx.createLinearGradient(t.x, t.y, t.x + dx, t.y + dy);
-        grad.addColorStop(0, `hsla(${t.hue},80%,55%,0)`);
-        grad.addColorStop(0.5, `hsla(${t.hue},80%,60%,${t.alpha})`);
-        grad.addColorStop(1, `hsla(${t.hue},80%,55%,0)`);
-        pCtx.beginPath();
-        pCtx.moveTo(t.x, t.y);
-        pCtx.lineTo(t.x + dx, t.y + dy);
-        pCtx.strokeStyle = grad;
-        pCtx.lineWidth = 1;
-        pCtx.stroke();
-      });
-      requestAnimationFrame(animParticles);
-    }
-    animParticles();
-  }
-
-
-  // ── 2. (Map now uses photo — no canvas drawing needed) ───────────
-
   // ── 3. SWATCH CANVAS RENDERER (fabric textures) ─────────────────
   document.querySelectorAll('.hm-swatch-canvas').forEach(cvs => {
     const hue = parseInt(cvs.dataset.hue) || 0;
@@ -2228,31 +2044,6 @@ function setupHandloomMap() {
     });
   }
 
-  // ── 7. MOUSE-DRIVEN 3D PARALLAX ─────────────────────────────────
-  let rafMouse;
-  let targetMX = 0, targetMY = 0, curMX = 0, curMY = 0;
-  section.addEventListener('mousemove', (e) => {
-    const rect = section.getBoundingClientRect();
-    targetMX = (e.clientX - rect.left - rect.width  / 2) / rect.width;
-    targetMY = (e.clientY - rect.top  - rect.height / 2) / rect.height;
-  });
-  section.addEventListener('mouseleave', () => {
-    targetMX = 0; targetMY = 0;
-  });
-  function tickMouse() {
-    curMX += (targetMX - curMX) * 0.06;
-    curMY += (targetMY - curMY) * 0.06;
-    const bg = document.getElementById('hm-bg-velvet');
-    const frame = document.getElementById('hm-frame-wrap');
-    const swL  = document.getElementById('hm-swatches-left');
-    const swR  = document.getElementById('hm-swatches-right');
-    if (bg)    bg.style.transform    = `translate(${curMX * 22}px, ${curMY * 14}px)`;
-    if (frame) frame.style.transform = `translate(${curMX * -10}px, ${curMY * -8}px) rotateX(${curMY * -3}deg) rotateY(${curMX * 4}deg)`;
-    if (swL)   swL.style.transform   = `translate(${curMX * 14}px, ${curMY * 20}px)`;
-    if (swR)   swR.style.transform   = `translate(${curMX * -14}px, ${curMY * -20}px)`;
-    rafMouse = requestAnimationFrame(tickMouse);
-  }
-  tickMouse();
 }
 
 /* ─── HOUSES OF ODISHA HANDLOOM SHOWCASE ENGINE ───────────────────── */
@@ -3024,242 +2815,6 @@ function initVaultFilters() {
   if (stage) observer.observe(stage, { childList: true });
 }
 
-/* ==========================================================
-   FEATURE 4: UNIFIED AUDIO & SOUNDSCAPE CONTROLLER
-========================================================== */
-const SOUNDSCAPES = {
-  loom: {
-    label: '☸ Pit Loom Rhythm (Nuapatna)',
-    description: 'Traditional wooden handloom, Nuapatna village',
-    pitchBase: [65.41, 98.0],
-    filterFreq: 180,
-    clackInterval: 1200,
-    padGain: 0.12,
-  },
-  rain: {
-    label: '🌧 Village Rain & Loom (Tigiria Block)',
-    description: 'Soft monsoon rain over Nuapatna weaving cluster',
-    pitchBase: [55.0, 82.4],
-    filterFreq: 280,
-    clackInterval: 1800,
-    padGain: 0.08,
-  },
-  temple: {
-    label: '🔔 Puri Temple Chimes (Jagannath Mandir)',
-    description: 'Sacred temple bell chimes and quiet loom drone',
-    pitchBase: [82.4, 130.8],
-    filterFreq: 400,
-    clackInterval: 2200,
-    padGain: 0.07,
-  }
-};
-let activeSoundscape = localStorage.getItem('loom_soundscape') || 'loom';
-
-function applySoundscape(key) {
-  activeSoundscape = key;
-  localStorage.setItem('loom_soundscape', key);
-  const cfg = SOUNDSCAPES[key] || SOUNDSCAPES.loom;
-  if (synthNode && audioCtx) {
-    synthNode.osc1.frequency.setValueAtTime(cfg.pitchBase[0], audioCtx.currentTime);
-    synthNode.osc2.frequency.setValueAtTime(cfg.pitchBase[1], audioCtx.currentTime);
-    synthNode.filter.frequency.setValueAtTime(cfg.filterFreq, audioCtx.currentTime);
-    if (isAudioPlaying) {
-      synthNode.padGain.gain.setValueAtTime(cfg.padGain, audioCtx.currentTime);
-    }
-  }
-  const select = document.getElementById('audio-soundscape-select');
-  if (select) select.value = key;
-}
-
-function initUnifiedAudioConsole() {
-  if (document.getElementById('audio-control-panel')) return;
-
-  const panel = document.createElement('div');
-  panel.id = 'audio-control-panel';
-  panel.className = 'audio-panel-overlay hidden';
-  panel.innerHTML = `
-    <div class="audio-panel-card">
-      <div class="audio-panel-header">
-        <span class="audio-panel-title">🎵 Audio & Soundscape</span>
-        <button id="audio-panel-close" class="audio-panel-close-btn" aria-label="Close audio menu">✕</button>
-      </div>
-      <div class="audio-panel-body">
-        <div class="audio-panel-row">
-          <span class="audio-panel-label">Master Audio</span>
-          <button id="audio-menu-master-btn" class="audio-panel-toggle-btn ${isAudioPlaying ? 'active' : ''}">
-            ${isAudioPlaying ? '🔊 AUDIO ON' : '🔇 AUDIO OFF'}
-          </button>
-        </div>
-        <div class="audio-panel-row">
-          <label for="audio-soundscape-select" class="audio-panel-label">Soundscape</label>
-          <select id="audio-soundscape-select" class="audio-panel-select" ${!isAudioPlaying ? 'disabled' : ''}>
-            ${Object.entries(SOUNDSCAPES).map(([key, cfg]) => `
-              <option value="${key}" ${key === activeSoundscape ? 'selected' : ''}>${cfg.label}</option>
-            `).join('')}
-          </select>
-        </div>
-        <div class="audio-panel-row">
-          <div class="audio-panel-label-wrap">
-            <label for="audio-volume-slider" class="audio-panel-label">Master Volume</label>
-            <span id="audio-volume-text" class="audio-panel-val">${Math.round(masterVolume * 100)}%</span>
-          </div>
-          <input type="range" id="audio-volume-slider" min="0" max="100" value="${Math.round(masterVolume * 100)}" class="audio-panel-slider" ${!isAudioPlaying ? 'disabled' : ''}>
-        </div>
-        <div class="audio-panel-row checkbox-row">
-          <label class="audio-panel-checkbox-label">
-            <input type="checkbox" id="audio-sfx-checkbox" ${isSFXEnabled ? 'checked' : ''} ${!isAudioPlaying ? 'disabled' : ''}>
-            <span>Tactile Clicks & Weave Rustles</span>
-          </label>
-        </div>
-      </div>
-    </div>
-  `;
-
-  const style = document.createElement('style');
-  style.id = 'unified-audio-styles';
-  style.textContent = `
-    #audio-control-panel {
-      position: fixed; bottom: 85px; right: 2rem; z-index: 99990;
-      transition: opacity 0.25s ease, transform 0.25s ease;
-      transform-origin: bottom right;
-    }
-    #audio-control-panel.hidden {
-      opacity: 0; pointer-events: none; transform: scale(0.92) translateY(10px);
-    }
-    .audio-panel-card {
-      background: linear-gradient(145deg, #120e07 0%, #1a140b 100%);
-      border: 1px solid rgba(212,175,55,0.3);
-      border-radius: 16px; padding: 1.25rem 1.4rem;
-      width: 290px;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.7), 0 0 30px rgba(212,175,55,0.08);
-      backdrop-filter: blur(16px);
-      font-family: 'Outfit', sans-serif;
-    }
-    .audio-panel-header {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 1rem; border-bottom: 1px solid rgba(212,175,55,0.15);
-      padding-bottom: 0.6rem;
-    }
-    .audio-panel-title {
-      font-family: 'Cormorant Garamond', serif; font-size: 1.1rem;
-      color: #d4af37; font-weight: 500; letter-spacing: 0.5px;
-    }
-    .audio-panel-close-btn {
-      background: none; border: none; color: rgba(255,255,255,0.4);
-      font-size: 1rem; cursor: pointer; padding: 2px 6px; transition: color 0.2s;
-    }
-    .audio-panel-close-btn:hover { color: #fff; }
-    .audio-panel-body { display: flex; flex-direction: column; gap: 0.9rem; }
-    .audio-panel-row { display: flex; flex-direction: column; gap: 0.35rem; }
-    .audio-panel-row.checkbox-row { flex-direction: row; align-items: center; margin-top: 0.2rem; }
-    .audio-panel-label {
-      font-size: 0.73rem; text-transform: uppercase; letter-spacing: 0.8px;
-      color: rgba(255,255,255,0.5); font-weight: 600;
-    }
-    .audio-panel-label-wrap { display: flex; justify-content: space-between; align-items: center; }
-    .audio-panel-val { font-size: 0.73rem; color: #d4af37; font-weight: 600; }
-    .audio-panel-toggle-btn {
-      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 8px; padding: 8px 12px; color: rgba(255,255,255,0.7);
-      font-family: 'Outfit', sans-serif; font-size: 0.8rem; font-weight: 600;
-      cursor: pointer; transition: all 0.2s; text-align: center;
-    }
-    .audio-panel-toggle-btn.active {
-      background: rgba(212,175,55,0.15); border-color: #d4af37; color: #d4af37;
-    }
-    .audio-panel-select {
-      background: rgba(10,10,14,0.9); border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 8px; padding: 7px 10px; color: #fff;
-      font-family: 'Outfit', sans-serif; font-size: 0.78rem; outline: none;
-      cursor: pointer; transition: border-color 0.2s;
-    }
-    .audio-panel-select:focus { border-color: rgba(212,175,55,0.4); }
-    .audio-panel-select:disabled, .audio-panel-slider:disabled { opacity: 0.4; cursor: not-allowed; }
-    .audio-panel-slider {
-      width: 100%; accent-color: #d4af37; cursor: pointer; height: 4px;
-    }
-    .audio-panel-checkbox-label {
-      display: flex; align-items: center; gap: 8px; font-size: 0.75rem;
-      color: rgba(255,255,255,0.65); cursor: pointer; user-select: none;
-    }
-    .audio-panel-checkbox-label input { accent-color: #d4af37; cursor: pointer; }
-    @media (max-width: 768px) {
-      #audio-control-panel { right: 1rem; bottom: 75px; }
-      .audio-panel-card { width: 260px; }
-    }
-  `;
-  document.head.appendChild(style);
-  document.body.appendChild(panel);
-
-  // Close button
-  document.getElementById('audio-panel-close').addEventListener('click', () => {
-    panel.classList.add('hidden');
-  });
-
-  // Soundscape select dropdown
-  const select = document.getElementById('audio-soundscape-select');
-  if (select) {
-    select.addEventListener('change', (e) => {
-      applySoundscape(e.target.value);
-    });
-  }
-
-  // Master Toggle Inside Menu
-  const masterBtn = document.getElementById('audio-menu-master-btn');
-  if (masterBtn) {
-    masterBtn.addEventListener('click', () => {
-      setAudioState(!isAudioPlaying);
-      // enable/disable inputs in menu
-      const isOff = !isAudioPlaying;
-      if (select) select.disabled = isOff;
-      const slider = document.getElementById('audio-volume-slider');
-      if (slider) slider.disabled = isOff;
-      const sfx = document.getElementById('audio-sfx-checkbox');
-      if (sfx) sfx.disabled = isOff;
-    });
-  }
-
-  // Volume slider
-  const slider = document.getElementById('audio-volume-slider');
-  const valText = document.getElementById('audio-volume-text');
-  if (slider) {
-    slider.addEventListener('input', (e) => {
-      const vol = parseInt(e.target.value) / 100;
-      masterVolume = vol;
-      localStorage.setItem('loom_audio_volume', vol.toString());
-      if (valText) valText.textContent = `${Math.round(vol * 100)}%`;
-      if (audioCtx && masterGainNode && isAudioPlaying) {
-        masterGainNode.gain.setValueAtTime(vol, audioCtx.currentTime);
-      }
-    });
-  }
-
-  // SFX checkbox
-  const sfxBox = document.getElementById('audio-sfx-checkbox');
-  if (sfxBox) {
-    sfxBox.addEventListener('change', (e) => {
-      isSFXEnabled = e.target.checked;
-      localStorage.setItem('loom_audio_sfx', isSFXEnabled.toString());
-    });
-  }
-
-  // Hook main toggle button to open dropdown menu
-  const toggleBtn = document.getElementById('audio-toggle');
-  if (toggleBtn) {
-    toggleBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      panel.classList.toggle('hidden');
-    });
-  }
-
-  // Close panel on outside click
-  document.addEventListener('click', (e) => {
-    if (!panel.contains(e.target) && (!toggleBtn || !toggleBtn.contains(e.target))) {
-      panel.classList.add('hidden');
-    }
-  });
-}
-
 async function setupVaultTunnel() {
   const stage = document.getElementById('tunnel-stage');
   if (!stage) return;
@@ -3957,7 +3512,7 @@ function setupShowroomDrape(initialItem, itemsList) {
   canvas.width = canvas.parentElement.clientWidth || 450;
   canvas.height = canvas.parentElement.clientHeight || 420;
   
-  let activeItem = initialItem;
+  activeItem = initialItem;
   let mx = canvas.width / 2;
   let my = canvas.height / 2;
   let isHovered = false;
@@ -3992,23 +3547,6 @@ function setupShowroomDrape(initialItem, itemsList) {
   function getAvatarFrames() {
     const paths = avatarPathMap[selectedModel] || avatarPathMap[1];
     return { frames: paths.map(getLoadedImg) };
-  }
-
-  function playShowroomSound(freq = 440, vol = 0.04, duration = 0.08) {
-    if (!audioCtx || !isAudioPlaying || !isSFXEnabled || audioCtx.state !== 'running') return;
-    try {
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-      gain.gain.setValueAtTime(vol, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
-      const outNode = masterGainNode || audioCtx.destination;
-      osc.connect(gain);
-      gain.connect(outNode);
-      osc.start();
-      osc.stop(audioCtx.currentTime + duration);
-    } catch(e) {}
   }
 
   const drapeBtns = document.querySelectorAll('.drape-btn');
@@ -4278,14 +3816,6 @@ function setupShowroomDrape(initialItem, itemsList) {
       
       const uniqueId = `LOM-2026-${Math.floor(1000 + Math.random() * 9000)}`;
       document.getElementById('cert-display-id').textContent = `CERTIFICATE #${uniqueId}`;
-
-      // Generate dynamic SHA-256 style signature hash
-      const hashStr = generateMockHash(hueVal, satVal, patternVal);
-      const hashElem = document.getElementById('cert-display-hash');
-      if (hashElem) hashElem.textContent = hashStr;
-
-      const verifyLink = document.getElementById('cert-verify-link');
-      if (verifyLink) verifyLink.href = `/verify.html?id=${uniqueId}&hash=${encodeURIComponent(hashStr)}`;
 
       // Dynamic Date backdating based on weaving time
       const weaveDays = isCustomMode ? 30 : (activeItem.weaving_time_days || 28);
@@ -4689,8 +4219,7 @@ function setupShowroomDrape(initialItem, itemsList) {
       const dx = (cw - dw) / 2;
       const dy = (ch - dh) / 2 + ch * 0.01 + breatheOffset;
       
-      const activeFilter = (avatarCollections[selectedModel] && avatarCollections[selectedModel].filter) || 'none';
-      ctx.filter = activeFilter;
+      ctx.filter = 'none';
 
       ctx.globalAlpha = 1 - blendT;
       ctx.drawImage(currentFrame, dx, dy, dw, dh);
@@ -4764,7 +4293,7 @@ function setupShowroomDrape(initialItem, itemsList) {
       // ── Silk reflection strip ─────────────────────────────────────
       const reflectHeight = dh * 0.18;
       ctx.save();
-      ctx.filter = activeFilter;
+      ctx.filter = 'none';
       ctx.globalAlpha = 0.18 * (1 - blendT);
       ctx.translate(dx, dy + dh);
       ctx.scale(1, -1);
@@ -5034,14 +4563,11 @@ window.addEventListener('DOMContentLoaded', () => {
   setupHandloomMap();
   setupHousesOfOdisha();
   setupVaultTunnel();
-  setupCustomCursor();
   setupInteractiveExtensions();
   setupMythosAnimation();
   setupHeritageSoulSection();
-  setupHeritageMatchmaker();
   setupCuratorConcierge();
   setupSilkConstellation();
-  setupCuratorWhisper();
 
 
   // Weaving & Provenance FAQ Accordion Script
@@ -5438,112 +4964,6 @@ function setupInteractiveExtensions() {
         activateMarker();
         playOralAudio(clusterKey);
       }
-    });
-  });
-}
-
-function setupCustomCursor() {
-  if (window.matchMedia('(pointer: coarse)').matches) return;
-  const dot = document.getElementById('cursor-dot');
-  const ring = document.getElementById('cursor-ring');
-  if (!dot || !ring) return;
-
-  let mouseX = window.innerWidth / 2;
-  let mouseY = window.innerHeight / 2;
-  let ringX = mouseX;
-  let ringY = mouseY;
-
-  window.addEventListener('mousemove', (e) => {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-    dot.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%)`;
-  });
-
-  // Smooth trail spring interpolation
-  function updateRing() {
-    const dx = mouseX - ringX;
-    const dy = mouseY - ringY;
-    ringX += dx * 0.16; // lag/damping factor
-    ringY += dy * 0.16;
-    ring.style.transform = `translate3d(${ringX}px, ${ringY}px, 0) translate(-50%, -50%)`;
-    requestAnimationFrame(updateRing);
-  }
-  updateRing();
-
-  // Premium Magnetic Buttons Interaction
-  const magneticEls = document.querySelectorAll('.btn-magnetic');
-  magneticEls.forEach(el => {
-    el.addEventListener('mousemove', (e) => {
-      const bound = el.getBoundingClientRect();
-      const elX = bound.left + bound.width / 2;
-      const elY = bound.top + bound.height / 2;
-      
-      const mX = e.clientX;
-      const mY = e.clientY;
-      
-      // Calculate elastic pull offset
-      const pullX = (mX - elX) * 0.35;
-      const pullY = (mY - elY) * 0.35;
-      
-      gsap.to(el, {
-        x: pullX,
-        y: pullY,
-        duration: 0.3,
-        ease: 'power2.out'
-      });
-      
-      // Expand and box the cursor ring to warp the button
-      gsap.to(ring, {
-        width: bound.width + 16,
-        height: bound.height + 16,
-        borderRadius: '30px',
-        duration: 0.3
-      });
-    });
-    
-    el.addEventListener('mouseleave', () => {
-      gsap.to(el, {
-        x: 0,
-        y: 0,
-        duration: 0.6,
-        ease: 'elastic.out(1.1, 0.4)'
-      });
-      
-      gsap.to(ring, {
-        width: 32,
-        height: 32,
-        borderRadius: '50%',
-        duration: 0.3
-      });
-    });
-  });
-
-  // Hover states on interactive elements
-  const hoverSelectors = 'a, button, select, input, .avatar-thumb, .card-interactive, .view-btn, .close-modal, .modal-close-btn';
-  
-  function addHoverListeners() {
-    document.querySelectorAll(hoverSelectors).forEach(el => {
-      // Use pointer events so hover states work on touch-capable devices too
-      el.addEventListener('pointerenter', () => document.body.classList.add('cursor-hover'));
-      el.addEventListener('pointerleave', () => document.body.classList.remove('cursor-hover'));
-    });
-  }
-  addHoverListeners();
-
-  // Re-run listener attachment since content is dynamic
-  const observer = new MutationObserver(() => addHoverListeners());
-  observer.observe(document.body, { childList: true, subtree: true });
-
-  // Drag states specifically for canvases
-  const dragCanvases = document.querySelectorAll('canvas');
-  dragCanvases.forEach(canvas => {
-    canvas.addEventListener('mouseenter', () => {
-      if (canvas.id === 'canvas-drape') {
-        document.body.classList.add('cursor-drag');
-      }
-    });
-    canvas.addEventListener('mouseleave', () => {
-      document.body.classList.remove('cursor-drag');
     });
   });
 }
@@ -6371,217 +5791,6 @@ function setupHeritageSoulSection() {
   draw();
 }
 
-function setupHeritageMatchmaker() {
-  const drawer = document.getElementById('matchmaker-drawer');
-  const btnOpen = document.getElementById('btn-open-matchmaker');
-  const btnClose = document.getElementById('btn-close-matchmaker');
-
-  if (!drawer || !btnOpen || !btnClose) return;
-
-  // Open/Close Toggles
-  btnOpen.onclick = () => {
-    drawer.classList.add('active');
-    gsap.fromTo(drawer, { right: -420 }, { right: 0, duration: 0.6, ease: 'power3.out' });
-  };
-
-  btnClose.onclick = () => {
-    gsap.to(drawer, {
-      right: -420,
-      duration: 0.5,
-      ease: 'power3.in',
-      onComplete: () => drawer.classList.remove('active')
-    });
-  };
-
-  // Step Navigations
-  let currentStep = 1;
-  const totalSteps = 3;
-  const btnPrev = document.getElementById('btn-matchmaker-prev');
-  const btnNext = document.getElementById('btn-matchmaker-next');
-
-  // Answers State
-  const answers = {
-    occasion: null,
-    color: null,
-    complexity: null
-  };
-
-  // Select Option bindings
-  const stepsData = {
-    1: 'occasion',
-    2: 'color',
-    3: 'complexity'
-  };
-
-  document.querySelectorAll('.matchmaker-step-panel').forEach((panel, pIdx) => {
-    const step = pIdx + 1;
-    const cards = panel.querySelectorAll('.option-card');
-    cards.forEach(card => {
-      card.onclick = () => {
-        cards.forEach(c => c.classList.remove('selected'));
-        card.classList.add('selected');
-        answers[stepsData[step]] = card.dataset.key;
-        playShowroomSound(700, 0.04, 0.05);
-      };
-    });
-  });
-
-  function updateStepUI() {
-    // Show/Hide Step panels
-    document.querySelectorAll('.matchmaker-step-panel').forEach(panel => {
-      const step = parseInt(panel.dataset.step);
-      panel.classList.toggle('active', step === currentStep);
-    });
-
-    // Update Dots
-    document.querySelectorAll('.step-dot').forEach(dot => {
-      const step = parseInt(dot.dataset.step);
-      dot.classList.toggle('active', step === currentStep);
-    });
-
-    // Update Nav Buttons
-    if (btnPrev) btnPrev.style.display = currentStep > 1 ? 'block' : 'none';
-    if (btnNext) {
-      if (currentStep === totalSteps) {
-        btnNext.textContent = "Reveal My Match";
-      } else {
-        btnNext.textContent = "Next Step";
-      }
-    }
-  }
-
-  if (btnPrev) {
-    btnPrev.onclick = () => {
-      if (currentStep > 1) {
-        currentStep--;
-        updateStepUI();
-        playShowroomSound(440, 0.03, 0.05);
-      }
-    };
-  }
-
-  if (btnNext) {
-    btnNext.onclick = () => {
-      // Validate option is selected for current step
-      const currentKey = stepsData[currentStep];
-      if (!answers[currentKey]) {
-        // Simple shake animation on current active step
-        const activePanel = document.querySelector(`.matchmaker-step-panel[data-step="${currentStep}"]`);
-        if (activePanel) {
-          gsap.to(activePanel, { x: '+=6', yoyo: true, repeat: 5, duration: 0.04, onComplete: () => gsap.set(activePanel, { x: 0 }) });
-        }
-        playShowroomSound(220, 0.08, 0.1);
-        return;
-      }
-
-      if (currentStep < totalSteps) {
-        currentStep++;
-        updateStepUI();
-        playShowroomSound(550, 0.04, 0.06);
-      } else {
-        // Calculate match and select!
-        revealSareeMatch();
-      }
-    };
-  }
-
-  function revealSareeMatch() {
-    // Intelligent predictive matching algorithm
-    let matchedId = 2; // Default Sambalpuri Lotus
-
-    // Calculate aura score based on occasion, color, class, and local storage interest
-    let scoreMap = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0 };
-
-    if (answers.occasion === 'wedding') {
-      scoreMap[5] += 50; // Jagannath Provenance
-      scoreMap[1] += 40; // Nuapatana Khandua
-      scoreMap[4] += 30; // Konark Sundial
-    } else if (answers.occasion === 'offering') {
-      scoreMap[1] += 50; // Khandua Sacred Weave
-      scoreMap[6] += 40; // Maniabandha Grid
-    } else if (answers.occasion === 'gala') {
-      scoreMap[3] += 50; // Kotpad Temple
-      scoreMap[4] += 45; // Konark Gold Tissue
-    } else {
-      scoreMap[2] += 40; // Sambalpuri Lotus
-    }
-
-    if (answers.color === 'crimson') {
-      scoreMap[1] += 30; scoreMap[5] += 30; scoreMap[2] += 20;
-    } else if (answers.color === 'gold') {
-      scoreMap[4] += 40; scoreMap[8] += 30;
-    } else if (answers.color === 'indigo') {
-      scoreMap[6] += 30; scoreMap[7] += 30;
-    } else if (answers.color === 'earth') {
-      scoreMap[3] += 40;
-    }
-
-    if (answers.complexity === 'collector') {
-      scoreMap[5] += 30; scoreMap[4] += 30; scoreMap[1] += 20;
-    }
-
-    // Pick top scoring saree ID
-    let maxScore = -1;
-    for (const [idStr, score] of Object.entries(scoreMap)) {
-      if (score > maxScore) {
-        maxScore = score;
-        matchedId = parseInt(idStr);
-      }
-    }
-
-    // Dynamic navigate and select item
-    const showroomDrapeStage = document.getElementById('showroom-modal');
-    if (showroomDrapeStage) {
-      // Open showroom modal if closed
-      const modal = document.getElementById('showroom-modal');
-      if (modal && modal.classList.contains('hidden')) {
-        modal.style.display = 'flex';
-        modal.classList.remove('hidden');
-      }
-
-      // Find the matched item from collection
-      // Look up global inventory
-      const matchedItem = sareeCollection.find(i => i.id === matchedId);
-      if (matchedItem) {
-        // Fetch update active item logic
-        // Wait, setupShowroomDrape returns the updateActiveItem, but wait! How do we call it?
-        // We can just query the avatar thumbnail inside the showroom and dispatch a click event!
-        // This is incredibly clean, simple, and avoids having to export internal variables!
-        const matchThumb = document.querySelector(`.avatar-thumb[data-id="${matchedId}"]`);
-        if (matchThumb) {
-          matchThumb.click();
-          
-          // Flash a gorgeous recommendation banner
-          const titleStrip = document.querySelector('.showroom-title-left');
-          const recBadge = document.createElement('div');
-          recBadge.id = 'matchmaker-aura-badge';
-          recBadge.innerHTML = `✨ Matched to your Custom Aura Quiz`;
-          recBadge.style.cssText = "font-size:0.65rem; color:#ffd700; font-weight:bold; text-transform:uppercase; letter-spacing:1px; margin-bottom:4px; animation:pulse 1.5s infinite;";
-          
-          // Remove existing badge if any
-          const oldBadge = document.getElementById('matchmaker-aura-badge');
-          if (oldBadge) oldBadge.remove();
-          
-          if (titleStrip) titleStrip.prepend(recBadge);
-        }
-      }
-    }
-
-    // Close Matchmaker Drawer with transition
-    btnClose.click();
-
-    // Success Fanfare sound
-    if (audioCtx) {
-      const notes = [330, 440, 550, 660];
-      notes.forEach((freq, idx) => {
-        setTimeout(() => {
-          playShowroomSound(freq, 0.05, 0.12);
-        }, idx * 100);
-      });
-    }
-  }
-}
-
 function setupCuratorConcierge() {
   const panel = document.getElementById('concierge-panel');
   const btnOpen = document.getElementById('btn-open-concierge');
@@ -6694,282 +5903,6 @@ function setupCuratorConcierge() {
       const isRetracted = showroomBottomBar.classList.toggle('retracted');
       btnToggleControls.textContent = isRetracted ? "▼ SHOW CONTROLS" : "▲ HIDE CONTROLS";
       playShowroomSound(isRetracted ? 440 : 880, 0.04, 0.08);
-    };
-  }
-
-  // --- WEAVING LOOM AMBIENT SYNTHESIZER ---
-  let audioCtx = null;
-  let ambientSynthInterval = null;
-  let isAmbientAudioPlaying = false;
-
-  function createNoiseBuffer() {
-    const bufferSize = 2 * (audioCtx ? audioCtx.sampleRate : 44100);
-    const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-    const output = noiseBuffer.getChannelData(0);
-    for (let i = 0; i < bufferSize; i++) {
-      output[i] = Math.random() * 2 - 1;
-    }
-    return noiseBuffer;
-  }
-
-  function playShuttleSound(time) {
-    if (!audioCtx) return;
-    
-    // Rhythmic Click Node (wood clicking)
-    const clickOsc = audioCtx.createOscillator();
-    const clickGain = audioCtx.createGain();
-    clickOsc.type = 'triangle';
-    clickOsc.frequency.setValueAtTime(80, time);
-    clickOsc.frequency.exponentialRampToValueAtTime(10, time + 0.05);
-    
-    clickGain.gain.setValueAtTime(0.04, time);
-    clickGain.gain.exponentialRampToValueAtTime(0.001, time + 0.05);
-    
-    clickOsc.connect(clickGain);
-    clickGain.connect(audioCtx.destination);
-    
-    clickOsc.start(time);
-    clickOsc.stop(time + 0.06);
-
-    // Sliding Shuttle Woosh (white noise sliding reed)
-    const noiseSource = audioCtx.createBufferSource();
-    noiseSource.buffer = createNoiseBuffer();
-    
-    const noiseFilter = audioCtx.createBiquadFilter();
-    noiseFilter.type = 'bandpass';
-    noiseFilter.frequency.setValueAtTime(600, time + 0.05);
-    noiseFilter.frequency.exponentialRampToValueAtTime(300, time + 0.35);
-    noiseFilter.Q.setValueAtTime(3.0, time);
-    
-    const noiseGain = audioCtx.createGain();
-    noiseGain.gain.setValueAtTime(0.0, time);
-    noiseGain.gain.linearRampToValueAtTime(0.02, time + 0.1);
-    noiseGain.gain.exponentialRampToValueAtTime(0.001, time + 0.38);
-    
-    noiseSource.connect(noiseFilter);
-    noiseFilter.connect(noiseGain);
-    noiseGain.connect(audioCtx.destination);
-    
-    noiseSource.start(time);
-    noiseSource.stop(time + 0.4);
-  }
-
-  function startAmbientLoomAudio() {
-    stopAmbientLoomAudio();
-    if (!audioCtx) {
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    }
-    if (audioCtx.state === 'suspended') {
-      audioCtx.resume();
-    }
-    isAmbientAudioPlaying = true;
-    
-    // Play rhythmic weave sounds (click-clack slide pattern every 0.8 seconds)
-    let nextPlayTime = audioCtx.currentTime;
-    ambientSynthInterval = setInterval(() => {
-      const now = audioCtx.currentTime;
-      if (nextPlayTime < now + 0.1) {
-        playShuttleSound(nextPlayTime);
-        // Play another accent wood click shortly after for double-shuttle rhythm
-        playShuttleSound(nextPlayTime + 0.35);
-        nextPlayTime += 0.8;
-      }
-    }, 200);
-  }
-
-  function stopAmbientLoomAudio() {
-    isAmbientAudioPlaying = false;
-    if (ambientSynthInterval) {
-      clearInterval(ambientSynthInterval);
-      ambientSynthInterval = null;
-    }
-  }
-
-  const btnToggleAmbientAudio = document.getElementById('btn-toggle-ambient-audio');
-  if (btnToggleAmbientAudio) {
-    btnToggleAmbientAudio.onclick = () => {
-      if (isAmbientAudioPlaying) {
-        stopAmbientLoomAudio();
-        btnToggleAmbientAudio.textContent = "🔊 Loom Sound: Off";
-        btnToggleAmbientAudio.style.color = "var(--color-zari)";
-      } else {
-        startAmbientLoomAudio();
-        btnToggleAmbientAudio.textContent = "🔊 Loom Sound: On";
-        btnToggleAmbientAudio.style.color = "#2ecc71";
-      }
-    };
-  }
-
-  // --- LIVE LOOM STREAM MODAL ---
-  const btnOpenLoomBooking = document.getElementById('btn-open-loom-booking');
-  const liveLoomModal = document.getElementById('live-loom-modal');
-  const btnCloseLoomModal = document.getElementById('btn-close-loom-modal');
-  let loomStatsInterval = null;
-
-  if (btnOpenLoomBooking && liveLoomModal) {
-    btnOpenLoomBooking.onclick = () => {
-      liveLoomModal.style.display = 'flex';
-      playShowroomSound(580, 0.05, 0.1);
-      
-      loomStatsInterval = setInterval(() => {
-        const tension = (7.8 + Math.random() * 1.2).toFixed(2);
-        const velocity = Math.floor(220 + Math.random() * 40);
-        document.getElementById('loom-stat-tension').textContent = `${tension} N`;
-        document.getElementById('loom-stat-velocity').textContent = `${velocity} picks/min`;
-        
-        // Sonify pick velocity into loom rhythmic shuttle clicks
-        if (audioCtx) {
-          playShuttleSound(audioCtx.currentTime);
-        }
-      }, 1000);
-    };
-  }
-
-  if (btnCloseLoomModal && liveLoomModal) {
-    btnCloseLoomModal.onclick = () => {
-      liveLoomModal.style.display = 'none';
-      if (loomStatsInterval) {
-        clearInterval(loomStatsInterval);
-        loomStatsInterval = null;
-      }
-      playShowroomSound(440, 0.05, 0.1);
-    };
-  }
-
-  // --- WEBXR AR DRAPE TRY-ON MODAL ---
-  const btnArDrape = document.getElementById('btn-ar-drape');
-  const arDrapeModal = document.getElementById('ar-drape-modal');
-  const btnCloseArModal = document.getElementById('btn-close-ar-modal');
-  const btnToggleCamera = document.getElementById('btn-toggle-camera');
-  const btnCaptureAr = document.getElementById('btn-capture-ar');
-  const arCameraFeed = document.getElementById('ar-camera-feed');
-  const arMannequinStage = document.getElementById('ar-mannequin-stage');
-  const arDrapeSpec = document.getElementById('ar-drape-spec');
-  const arCanvasOverlay = document.getElementById('ar-canvas-overlay');
-  let arCameraStream = null;
-  let arAnimId = null;
-
-  function renderArSilkSheen() {
-    if (!arCanvasOverlay) return;
-    const ctx = arCanvasOverlay.getContext('2d');
-    const w = arCanvasOverlay.width = arCanvasOverlay.clientWidth || 380;
-    const h = arCanvasOverlay.height = arCanvasOverlay.clientHeight || 260;
-
-    let time = 0;
-    function drawSheen() {
-      time += 0.04;
-      ctx.clearRect(0, 0, w, h);
-
-      // Render flowing silk shimmer drape lines across mannequin chest
-      const hue = isCustomMode ? customHue : (activeItem ? (activeItem.color_hue || 0) : 0);
-      const sat = isCustomMode ? customSat : (activeItem ? (activeItem.color_saturation || 1) : 1);
-      
-      ctx.save();
-      ctx.globalCompositeOperation = 'screen';
-      
-      const grad = ctx.createLinearGradient(0, 0, w, h);
-      grad.addColorStop(0, `hsla(${hue}, ${Math.floor(sat * 70)}%, 50%, 0.15)`);
-      grad.addColorStop(0.5, `hsla(${(hue + 30) % 360}, 90%, 65%, 0.35)`);
-      grad.addColorStop(1, `hsla(${hue}, ${Math.floor(sat * 70)}%, 50%, 0.15)`);
-      
-      ctx.fillStyle = grad;
-      ctx.beginPath();
-      ctx.moveTo(0, h * 0.3);
-      for (let x = 0; x <= w; x += 20) {
-        const y = h * 0.4 + Math.sin(x * 0.015 + time) * 18 + Math.cos(time * 0.8) * 10;
-        ctx.lineTo(x, y);
-      }
-      ctx.lineTo(w, h);
-      ctx.lineTo(0, h);
-      ctx.closePath();
-      ctx.fill();
-
-      // Zari border golden highlights
-      ctx.strokeStyle = `rgba(255, 215, 0, ${0.4 + Math.sin(time * 2) * 0.2})`;
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      for (let x = 0; x <= w; x += 15) {
-        const y = h * 0.38 + Math.sin(x * 0.015 + time) * 18 + Math.cos(time * 0.8) * 10;
-        if (x === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
-      ctx.stroke();
-      ctx.restore();
-
-      arAnimId = requestAnimationFrame(drawSheen);
-    }
-    if (arAnimId) cancelAnimationFrame(arAnimId);
-    drawSheen();
-  }
-
-  if (btnArDrape && arDrapeModal) {
-    btnArDrape.onclick = () => {
-      arDrapeModal.style.display = 'flex';
-      arDrapeModal.classList.remove('hidden');
-      if (arDrapeSpec) {
-        const name = isCustomMode ? `Custom ${customPattern} Weave` : (activeItem ? activeItem.name : 'Nuapatana Khandua Ikat Saree');
-        const cat = isCustomMode ? `${customHue}° HSL` : (activeItem ? (activeItem.category_name || 'Mulberry Silk') : 'Pure Silk');
-        arDrapeSpec.textContent = `${name} · ${cat}`;
-      }
-      renderArSilkSheen();
-      playShowroomSound(720, 0.05, 0.1);
-    };
-  }
-
-  const stopArCamera = () => {
-    if (arCameraStream) {
-      arCameraStream.getTracks().forEach(track => track.stop());
-      arCameraStream = null;
-    }
-    if (arCameraFeed) arCameraFeed.style.display = 'none';
-    if (arMannequinStage) arMannequinStage.style.display = 'block';
-    if (btnToggleCamera) btnToggleCamera.textContent = '📷 Start Camera';
-    if (arAnimId) {
-      cancelAnimationFrame(arAnimId);
-      arAnimId = null;
-    }
-  };
-
-  if (btnCloseArModal && arDrapeModal) {
-    btnCloseArModal.onclick = () => {
-      arDrapeModal.style.display = 'none';
-      arDrapeModal.classList.add('hidden');
-      stopArCamera();
-      playShowroomSound(440, 0.04, 0.08);
-    };
-  }
-
-  if (btnToggleCamera) {
-    btnToggleCamera.onclick = async () => {
-      if (arCameraStream) {
-        stopArCamera();
-        renderArSilkSheen();
-      } else {
-        try {
-          if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-            throw new Error('Camera API unavailable');
-          }
-          arCameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
-          if (arCameraFeed) {
-            arCameraFeed.srcObject = arCameraStream;
-            arCameraFeed.style.display = 'block';
-          }
-          if (arMannequinStage) arMannequinStage.style.display = 'none';
-          btnToggleCamera.textContent = '⏹ Stop Camera';
-          renderArSilkSheen();
-          playShowroomSound(880, 0.06, 0.12);
-        } catch (err) {
-          console.warn('Camera access unavailable:', err);
-          alert('Camera access permissions required for live video feed. Rendering mannequin silk drape simulation overlay.');
-        }
-      }
-    };
-  }
-
-  if (btnCaptureAr) {
-    btnCaptureAr.onclick = () => {
-      playShowroomSound(980, 0.08, 0.15);
-      alert('📸 AR Drape Snapshot captured! Saved to your luxury heritage showroom portfolio.');
     };
   }
 
@@ -7224,413 +6157,9 @@ function setupSilkConstellation() {
 }
 
 
-/* ==========================================================
-   SURPRISE FEATURE: CURATOR WHISPER EASTER EGG
-   Hold the brand logo for 3 seconds to hear a sacred shloka
-   typed across the screen, then gracefully fade away
-========================================================== */
-function setupCuratorWhisper() {
-  const brand = document.querySelector('.brand-lockup');
-  if (!brand) return;
-
-  const SHLOKAS = [
-    "ଓ ଜଗନ୍ନାଥ ସ୍ୱାମୀ ନୟନ ପଥ ଗାମୀ ଭବତୁ ମେ",
-    "ललित लवङ्ग लता परिशीलन कोमल मलयसमीरे",
-    "ସୂତ ବୁଣୁ ସୂତ — ଧାଗା ପ୍ରତ୍ୟେକ ଇତିହାସ",
-    "Every thread is a prayer. Every loom a temple."
-  ];
-
-  let holdTimer = null;
-  let overlay = null;
-  let typeIdx = 0;
-  let typeTimer = null;
-
-  function clearWhisper() {
-    if (overlay) {
-      overlay.style.opacity = '0';
-      setTimeout(() => { if (overlay) { overlay.remove(); overlay = null; } }, 700);
-    }
-    if (typeTimer) { clearInterval(typeTimer); typeTimer = null; }
-  }
-
-  function triggerWhisper() {
-    const shloka = SHLOKAS[Math.floor(Math.random() * SHLOKAS.length)];
-    clearWhisper();
-
-    overlay = document.createElement('div');
-    overlay.id = 'curator-whisper-overlay';
-    overlay.style.cssText = `
-      position: fixed; inset: 0; z-index: 9998; display: flex;
-      align-items: center; justify-content: center;
-      pointer-events: none; background: rgba(0,0,0,0.01);
-      transition: opacity 0.7s ease;
-      opacity: 0;
-    `;
-
-    const txt = document.createElement('div');
-    txt.style.cssText = `
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(1.1rem, 3vw, 2.2rem);
-      font-style: italic;
-      color: rgba(212, 175, 55, 0.92);
-      text-align: center;
-      max-width: 70vw;
-      letter-spacing: 0.06em;
-      line-height: 1.6;
-      text-shadow: 0 0 40px rgba(212, 175, 55, 0.4), 0 0 80px rgba(212, 175, 55, 0.15);
-      border-bottom: 1px solid rgba(212, 175, 55, 0.25);
-      padding-bottom: 0.5em;
-    `;
-    overlay.appendChild(txt);
-    document.body.appendChild(overlay);
-
-    requestAnimationFrame(() => { overlay.style.opacity = '1'; });
-
-    // Play gentle chime
-    if (audioCtx && audioCtx.state === 'running') {
-      try {
-        [330, 440, 550].forEach((freq, i) => {
-          setTimeout(() => {
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 1.2);
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.start(); osc.stop(audioCtx.currentTime + 1.2);
-          }, i * 220);
-        });
-      } catch(e) {}
-    }
-
-    // Typewriter effect
-    typeIdx = 0;
-    txt.textContent = '';
-    typeTimer = setInterval(() => {
-      if (typeIdx < shloka.length) {
-        txt.textContent += shloka[typeIdx];
-        typeIdx++;
-      } else {
-        clearInterval(typeTimer);
-        typeTimer = null;
-        // Auto-dismiss after 4s
-        setTimeout(clearWhisper, 4200);
-      }
-    }, 48);
-  }
-
-  // Support both mouse and touch (pointer events cover both)
-  const startHold = () => { holdTimer = setTimeout(() => { triggerWhisper(); holdTimer = null; }, 3000); };
-  const cancelHold = () => { if (holdTimer) { clearTimeout(holdTimer); holdTimer = null; } };
-
-  brand.addEventListener('mousedown', startHold);
-  brand.addEventListener('pointerdown', startHold);
-  brand.addEventListener('mouseup', cancelHold);
-  brand.addEventListener('pointerup', cancelHold);
-  brand.addEventListener('mouseleave', cancelHold);
-  brand.addEventListener('pointerleave', cancelHold);
-  brand.addEventListener('touchstart', (e) => { e.preventDefault(); startHold(); }, { passive: false });
-  brand.addEventListener('touchend', cancelHold);
-
-  brand.setAttribute('title', 'Hold for 3 seconds...');
-}
-
 // ═══════════════════════════════════════════════════════════════
 //   TOP-OF-THE-WORLD SURPRISE FEATURES  —  v4.0 ULTIMATE EDITION
 // ═══════════════════════════════════════════════════════════════
-
-// ── 1. CUSTOM SILK THREAD CURSOR TRAIL ──────────────────────────
-function initSilkCursorTrail() {
-  if (window.matchMedia('(pointer: coarse)').matches) return;
-  const dot  = document.getElementById('cursor-dot');
-  const ring = document.getElementById('cursor-ring');
-  if (!dot || !ring) return;
-
-  let cursorX = -200, cursorY = -200;
-  let ringX = -200, ringY = -200;
-  let lastTrailTime = 0;
-  const TRAIL_INTERVAL = 30; // ms between trail particles
-
-  document.addEventListener('mousemove', (e) => {
-    cursorX = e.clientX;
-    cursorY = e.clientY;
-
-    dot.style.left  = cursorX + 'px';
-    dot.style.top   = cursorY + 'px';
-
-    // Emit silk thread trail particle
-    const now = Date.now();
-    if (now - lastTrailTime > TRAIL_INTERVAL) {
-      lastTrailTime = now;
-      spawnCursorTrail(cursorX, cursorY);
-    }
-  });
-
-  // Smooth ring lag
-  function animateRing() {
-    ringX += (cursorX - ringX) * 0.12;
-    ringY += (cursorY - ringY) * 0.12;
-    ring.style.left = ringX + 'px';
-    ring.style.top  = ringY + 'px';
-    requestAnimationFrame(animateRing);
-  }
-  animateRing();
-
-  // Cursor scale on interactive element hover
-  document.addEventListener('mouseenter', (e) => {
-    if (e.target.matches('a,button,.btn,.saree-card,[role="button"],.hidden-glyph')) {
-      dot.style.width  = '16px';
-      dot.style.height = '16px';
-    }
-  }, true);
-  document.addEventListener('mouseleave', (e) => {
-    if (e.target.matches('a,button,.btn,.saree-card,[role="button"],.hidden-glyph')) {
-      dot.style.width  = '8px';
-      dot.style.height = '8px';
-    }
-  }, true);
-}
-
-function spawnCursorTrail(x, y) {
-  const el = document.createElement('div');
-  el.className = 'cursor-trail-particle';
-  const size = 2 + Math.random() * 5;
-  el.style.cssText = `
-    left: ${x}px; top: ${y}px;
-    width: ${size}px; height: ${size}px;
-    animation-duration: ${0.5 + Math.random() * 0.4}s;
-  `;
-  document.body.appendChild(el);
-  el.addEventListener('animationend', () => el.remove());
-}
-
-// ── 2. SILK ORACLE MYSTICAL CONCIERGE ───────────────────────────
-const ORACLE_PERSONA = {
-  greetings: [
-    "🕯 *The weave stirs...* I am the Silk Oracle — the spirit woven into every thread by master hands in Nuapatna. <em>What whispers do you bring to the loom?</em>",
-    "✦ \"ଯସ୍ୟ ସ୍ମୃତ୍ୟା ଚ ନାମୋକ୍ତ୍ୟା...\" — I awaken. The threads of eight centuries pulse beneath us. Ask, and the weave shall answer.",
-    "🔮 The shuttle has crossed. The pattern holds. <em>Speak your question into the weave, and I shall reveal what the silk knows.</em>"
-  ],
-  responses: {
-    ship: ["✈ The sacred cloth travels swiftly — insured express via DHL and FedEx, arriving in USA, UK & UAE within 3–6 days, packed in ceremonial wooden chests lined with muslin."],
-    delivery: ["✈ The sacred cloth travels swiftly — insured express via DHL and FedEx, arriving in USA, UK & UAE within 3–6 days, packed in ceremonial wooden chests lined with muslin."],
-    price: ["💫 *The Oracle cannot assign gold to devotion.* Yet — our curated pieces begin at ₹1,85,000 for a ceremonial Khandua Patta and ₹85,000 for a Sambalpuri weave. Request a consultation for an exact estimation."],
-    cost: ["💫 *The Oracle cannot assign gold to devotion.* Yet — our curated pieces begin at ₹1,85,000 for a ceremonial Khandua Patta and ₹85,000 for a Sambalpuri weave. Request a consultation for an exact estimation."],
-    authentic: ["⚗ Every saree is woven on zero-electricity wooden handlooms, with Silk Mark India certification. Each thread carries a provenance hash — try our <em>Unweave</em> feature to see its molecular DNA."],
-    real: ["⚗ Every saree is woven on zero-electricity wooden handlooms, with Silk Mark India certification. Each thread carries a provenance hash — try our <em>Unweave</em> feature to see its molecular DNA."],
-    handloom: ["⚗ Every saree is woven on zero-electricity wooden handlooms, with Silk Mark India certification. Each thread carries a provenance hash — try our <em>Unweave</em> feature to see its molecular DNA."],
-    weave: ["🌀 \"ତନ୍ତୁ ବ ସ୍ନ...\" — The weavers of Nuapatna and Maniabandha have mastered the tie-dye Ikat technique across generations. Each motif — peacock, lotus, Konark wheel — takes 30–45 days to materialize."],
-    khandua: ["🌀 The Khandua Patta is the most sacred of our silks. Woven specifically to adorn Lord Jagannath at Puri each morning. The calligraphic warp-ikat carries Sanskrit shlokas visible only in direct sunlight."],
-    jagannath: ["🙏 The Khandua Silk has clothed Lord Jagannath of Puri for 800 years. Our weavers continue that sacred lineage — each piece offered to our patrons carries that divine thread of connection."],
-    custom: ["✍ A commission is a sacred agreement between patron and weaver. We offer fully bespoke weaves — choose your master artisan, body color, motif system, and thread count. Begin with our <em>Commission Studio</em> above."],
-    secret: ["🗝 *The Oracle feels your curiosity about hidden things...* Look carefully at the corners of each section — there are 5 ancient Odia glyphs hidden in plain sight. Find them all, and the vault opens."],
-    glyph: ["🗝 *The Oracle feels your curiosity about hidden things...* Look carefully at the corners of each section — there are 5 ancient Odia glyphs hidden in plain sight. Find them all, and the vault opens."],
-    ratha: ["🎪 Ratha Yatra — the grand Chariot Festival of Puri — is the most sacred occasion in Odia life. The Lord's chariot is festooned with our Khandua silk. The next ceremonial release coincides with Ratha Yatra 2026."],
-    odissi: ["💃 Odissi, the classical dance of Odisha, mirrors the Tribhangi posture carved in stone at Konark. Our Sambalpuri sarees are designed for the sweeping movements of Odissi performance — wide borders, deep pleats."],
-    default: [
-      "✦ *The silk whispers...* Your question reaches me across threads. May I suggest consulting our human curators at Priyadarshini Silk House? They hold the answers that live beyond the weave.",
-      "🌿 The Oracle contemplates your words. Each answer is woven slowly, like silk — with care. Try asking about our collections, authentication, weaving time, or our secret vault.",
-      "🕯 \"ଯଥା ଶ୍ରୀ ଜଗନ୍ନାଥ...\" — The weave contemplates your question. Ask about specific sarees, shipping, or the hidden secrets of this loom."
-    ]
-  }
-};
-
-function initSilkOracle() {
-  const btnOpen   = document.getElementById('btn-open-oracle');
-  const panel     = document.getElementById('oracle-panel');
-  const btnClose  = document.getElementById('btn-close-oracle');
-  const chatArea  = document.getElementById('oracle-chat-area');
-  const form      = document.getElementById('oracle-chat-form');
-  const input     = document.getElementById('oracle-input');
-  const statusTxt = document.getElementById('oracle-status-text');
-
-  if (!btnOpen || !panel || !chatArea) return;
-
-  function openOracle() {
-    panel.classList.add('open');
-    panel.setAttribute('aria-hidden', 'false');
-    btnOpen.classList.add('oracle-open');
-    btnOpen.setAttribute('aria-expanded', 'true');
-    document.body.style.overflow = 'hidden';
-    setTimeout(() => input && input.focus(), 50);
-
-    // Awaken sequence
-    if (chatArea.children.length === 0) {
-      setTimeout(() => {
-        if (statusTxt) {
-          statusTxt.textContent = '✦ The Oracle speaks...';
-        }
-        const greeting = ORACLE_PERSONA.greetings[Math.floor(Math.random() * ORACLE_PERSONA.greetings.length)];
-        showTypingThenMessage(greeting, 1200);
-      }, 600);
-    }
-    if (isAudioPlaying) playTempleChimeSound();
-  }
-
-  function closeOracle() {
-    panel.classList.remove('open');
-    panel.setAttribute('aria-hidden', 'true');
-    btnOpen.classList.remove('oracle-open');
-    btnOpen.setAttribute('aria-expanded', 'false');
-    document.body.style.overflow = '';
-    btnOpen.focus();
-  }
-
-  btnOpen.addEventListener('click', openOracle);
-  if (btnClose) btnClose.addEventListener('click', closeOracle);
-
-  // Escape key closes oracle
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && panel.classList.contains('open')) closeOracle();
-  });
-
-  // Focus trap inside oracle panel
-  panel.addEventListener('keydown', (e) => {
-    if (e.key !== 'Tab' || !panel.classList.contains('open')) return;
-    const focusable = [...panel.querySelectorAll('button, input, textarea, [tabindex]:not([tabindex="-1"])')].filter(el => !el.disabled);
-    if (!focusable.length) { e.preventDefault(); return; }
-    const first = focusable[0], last = focusable[focusable.length - 1];
-    if (e.shiftKey ? document.activeElement === first : document.activeElement === last) {
-      e.preventDefault();
-      (e.shiftKey ? last : first).focus();
-    }
-  });
-
-  // Close on outside click
-  document.addEventListener('click', (e) => {
-    if (panel.classList.contains('open') &&
-        !panel.contains(e.target) &&
-        e.target !== btnOpen) {
-      closeOracle();
-    }
-  });
-
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const msg = input.value.trim();
-    if (!msg) return;
-    input.value = '';
-
-    // User bubble
-    addBubble(msg, 'user');
-
-    // Show typing
-    const typing = addTypingIndicator();
-    const lower = msg.toLowerCase();
-
-    // Find matching response
-    let reply = null;
-    for (const [keyword, replies] of Object.entries(ORACLE_PERSONA.responses)) {
-      if (keyword !== 'default' && lower.includes(keyword)) {
-        reply = replies[Math.floor(Math.random() * replies.length)];
-        break;
-      }
-    }
-    if (!reply) {
-      const defaults = ORACLE_PERSONA.responses.default;
-      reply = defaults[Math.floor(Math.random() * defaults.length)];
-    }
-
-    const delay = 900 + Math.random() * 600;
-    setTimeout(() => {
-      typing.remove();
-      addBubble(reply, 'oracle');
-      if (isAudioPlaying) playShowroomSound(440, 0.03, 0.08);
-    }, delay);
-  });
-
-  function addBubble(html, type) {
-    const bubble = document.createElement('div');
-    bubble.className = `oracle-bubble ${type}`;
-    bubble.innerHTML = html;
-    chatArea.appendChild(bubble);
-    chatArea.scrollTop = chatArea.scrollHeight;
-    return bubble;
-  }
-
-  function addTypingIndicator() {
-    const el = document.createElement('div');
-    el.className = 'oracle-typing';
-    el.innerHTML = `<div class="oracle-typing-dot"></div><div class="oracle-typing-dot"></div><div class="oracle-typing-dot"></div>`;
-    chatArea.appendChild(el);
-    chatArea.scrollTop = chatArea.scrollHeight;
-    return el;
-  }
-
-  function showTypingThenMessage(html, delay) {
-    const typing = addTypingIndicator();
-    setTimeout(() => {
-      typing.remove();
-      addBubble(html, 'oracle');
-      if (statusTxt) statusTxt.textContent = '✦ Listening...';
-    }, delay);
-  }
-}
-
-// ── 3. ODIA GLYPH EASTER EGG TREASURE HUNT ──────────────────────
-function initGlyphHunt() {
-  const glyphs = Array.from(document.querySelectorAll('.hidden-glyph'));
-  const counter = document.getElementById('glyph-counter');
-  const counterLabel = document.getElementById('glyph-counter-label');
-  const dots = Array.from(document.querySelectorAll('.glyph-dot'));
-  const secretVault = document.getElementById('secret-vault-panel');
-  const btnCloseSecret = document.getElementById('btn-close-secret');
-  const foundSet = new Set();
-
-  if (!glyphs.length) return;
-
-  // Show counter on hover (desktop) or first touch (mobile)
-  glyphs.forEach(glyph => {
-    glyph.addEventListener('pointerenter', () => {
-      if (counter) counter.classList.add('visible');
-    });
-  });
-
-  glyphs.forEach(glyph => {
-    glyph.addEventListener('click', () => {
-      const idx = parseInt(glyph.dataset.glyph);
-      if (foundSet.has(idx)) return;
-
-      foundSet.add(idx);
-      glyph.classList.add('found');
-
-      // Update dots
-      if (dots[idx]) dots[idx].classList.add('found');
-      if (counterLabel) counterLabel.textContent = `${foundSet.size} of 5 Glyphs`;
-      if (counter) counter.classList.add('visible');
-
-      // Chime
-      if (isAudioPlaying) playTempleChimeSound();
-
-      // Spawn mini silk particle burst from glyph
-      const rect = glyph.getBoundingClientRect();
-      spawnSilkParticleBurst(rect.left + rect.width / 2, rect.top + rect.height / 2, 12);
-
-      // All 5 found — unlock secret vault
-      if (foundSet.size === 5) {
-        setTimeout(() => {
-          if (secretVault) {
-            secretVault.classList.add('active');
-            if (isAudioPlaying) {
-              playTempleChimeSound();
-              setTimeout(playTempleChimeSound, 400);
-              setTimeout(playTempleChimeSound, 800);
-            }
-            // Grand burst
-            spawnSilkParticleBurst(window.innerWidth / 2, window.innerHeight / 2, 80);
-          }
-        }, 600);
-      }
-    });
-  });
-
-  if (btnCloseSecret) {
-    btnCloseSecret.addEventListener('click', () => {
-      if (secretVault) secretVault.classList.remove('active');
-    });
-  }
-}
 
 // ── 4. SILK PARTICLE BURST (CTA CLICK) ──────────────────────────
 function spawnSilkParticleBurst(x, y, count = 60) {
@@ -7664,7 +6193,7 @@ function spawnSilkParticleBurst(x, y, count = 60) {
 
 function initCTAParticleBurst() {
   // Hook onto the "Request Curator Consultation" button and other CTAs
-  const ctaSelectors = ['#btn-open-concierge', '#btn-acquire-now', '#btn-open-oracle', '[id^="btn-request"]'];
+  const ctaSelectors = ['#btn-open-concierge', '#btn-acquire-now', '[id^="btn-request"]'];
   ctaSelectors.forEach(sel => {
     const el = document.querySelector(sel);
     if (!el) return;
@@ -7796,9 +6325,6 @@ function initAnimatedLoaderMessages() {
 
 // ── INITIALIZE ALL SURPRISE FEATURES ────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-  initSilkCursorTrail();
-  initSilkOracle();
-  initGlyphHunt();
   initCTAParticleBurst();
   initWeavingCountdown();
   initNavActiveState();
@@ -7809,14 +6335,12 @@ document.addEventListener('DOMContentLoaded', () => {
   initWeaveProgressPersistence();
   initUnlockPanel();
   initDepositModal();
-  initLoomTelemetry();
   initAdoptLoom();
   applyLighthouseOptimizations();
 
-  // Feature batch 2: Region Selector, Vault Filters, Soundscape Console
+  // Feature batch 2: Region Selector, Vault Filters
   initRegionSelector();
   initVaultFilters();
-  initUnifiedAudioConsole();
   applyRegionToPage();
 });
 
@@ -8073,131 +6597,6 @@ function initDepositModal() {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   FEATURE 3: LIVE LOOM TELEMETRY IOT ENGINE
-   Generates realistic oscillating sensor data using
-   sine waves + noise for:
-   - Warp Tension (N): oscillates ±0.4 N around 8.3
-   - Picks/min: oscillates ±18 around 238
-   - Temperature (°C): slow drift 32–38
-   Draws a live sparkline graph on #telemetry-chart-canvas.
-   Only runs while Loom Cam modal is open.
-══════════════════════════════════════════════════════════════ */
-function initLoomTelemetry() {
-  const modal = document.getElementById('live-loom-modal');
-  const canvas = document.getElementById('telemetry-chart-canvas');
-  const statTension = document.getElementById('loom-stat-tension');
-  const statVelocity = document.getElementById('loom-stat-velocity');
-  const statTemp = document.getElementById('loom-stat-temp');
-
-  if (!canvas || !modal) return;
-
-  const ctx = canvas.getContext('2d');
-  const HISTORY_LEN = 80;
-  const tensionHistory = Array(HISTORY_LEN).fill(8.42);
-  const velocityHistory = Array(HISTORY_LEN).fill(240);
-
-  let rafId = null;
-  let isRunning = false;
-  let phase = 0;
-
-  function generateSensorValue(base, amplitude, phaseOffset, noiseLevel) {
-    const sine = Math.sin(phase * 0.04 + phaseOffset) * amplitude;
-    const noise = (Math.random() - 0.5) * noiseLevel;
-    return base + sine + noise;
-  }
-
-  function drawSparkline() {
-    const w = canvas.width;
-    const h = canvas.height;
-    ctx.clearRect(0, 0, w, h);
-    ctx.fillStyle = 'rgba(0,0,0,0.3)';
-    ctx.fillRect(0, 0, w, h);
-
-    // Grid lines
-    ctx.strokeStyle = 'rgba(255,255,255,0.04)';
-    ctx.lineWidth = 1;
-    for (let y = 10; y < h; y += 15) {
-      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
-    }
-
-    // Tension line (gold)
-    const tMin = 7.5, tMax = 9.2;
-    ctx.beginPath();
-    ctx.strokeStyle = 'rgba(212,175,55,0.9)';
-    ctx.lineWidth = 1.5;
-    ctx.shadowColor = 'rgba(212,175,55,0.4)';
-    ctx.shadowBlur = 4;
-    tensionHistory.forEach((val, i) => {
-      const x = (i / (HISTORY_LEN - 1)) * w;
-      const y = h - ((val - tMin) / (tMax - tMin)) * (h - 8) - 4;
-      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-    });
-    ctx.stroke();
-    ctx.shadowBlur = 0;
-
-    // Velocity line (white/dim)
-    const vMin = 200, vMax = 280;
-    ctx.beginPath();
-    ctx.strokeStyle = 'rgba(255,255,255,0.45)';
-    ctx.lineWidth = 1;
-    velocityHistory.forEach((val, i) => {
-      const x = (i / (HISTORY_LEN - 1)) * w;
-      const y = h - ((val - vMin) / (vMax - vMin)) * (h - 8) - 4;
-      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-    });
-    ctx.stroke();
-
-    // Legend
-    ctx.font = '8px monospace';
-    ctx.fillStyle = 'rgba(212,175,55,0.7)';
-    ctx.fillText('─ Tension (N)', 6, 10);
-    ctx.fillStyle = 'rgba(255,255,255,0.4)';
-    ctx.fillText('─ Picks/min', 80, 10);
-  }
-
-  function tick() {
-    if (!isRunning) return;
-    phase++;
-
-    const tension = generateSensorValue(8.3, 0.42, 0, 0.08);
-    const velocity = generateSensorValue(238, 18, 1.2, 3);
-    const temp = generateSensorValue(34.8, 1.8, 0.5, 0.15);
-
-    // Update history
-    tensionHistory.push(tension);
-    tensionHistory.shift();
-    velocityHistory.push(velocity);
-    velocityHistory.shift();
-
-    // Update DOM stats
-    if (statTension) statTension.textContent = `${tension.toFixed(2)} N`;
-    if (statVelocity) statVelocity.textContent = `${Math.round(velocity)}`;
-    if (statTemp) statTemp.textContent = `${temp.toFixed(1)}°C`;
-
-    drawSparkline();
-    rafId = requestAnimationFrame(tick);
-  }
-
-  // Start/stop based on modal visibility
-  const loomCamBtn = document.getElementById('btn-open-loom-cam');
-  const closeLoomBtn = document.getElementById('btn-close-loom-modal');
-
-  function startTelemetry() { isRunning = true; if (!rafId) tick(); }
-  function stopTelemetry() { isRunning = false; if (rafId) { cancelAnimationFrame(rafId); rafId = null; } }
-
-  // Use MutationObserver to detect when modal becomes visible
-  const mObs = new MutationObserver(() => {
-    const isVisible = modal.style.display === 'flex';
-    if (isVisible && !isRunning) startTelemetry();
-    else if (!isVisible && isRunning) stopTelemetry();
-  });
-  mObs.observe(modal, { attributes: true, attributeFilter: ['style'] });
-
-  // Also hook close button
-  if (closeLoomBtn) closeLoomBtn.addEventListener('click', stopTelemetry);
-}
-
-/* ══════════════════════════════════════════════════════════════
    FEATURE 3B: ADOPT A LOOM CTA
    "Adopt Loom" → opens concierge with prefilled adoption message
 ══════════════════════════════════════════════════════════════ */
@@ -8236,7 +6635,6 @@ function applyLighthouseOptimizations() {
   // 3. Add aria-label to icon-only buttons if missing
   const iconBtns = [
     { id: 'btn-open-concierge', label: 'Open Curator Concierge' },
-    { id: 'btn-open-oracle', label: 'Open Silk Oracle AI' },
     { id: 'btn-adopt-loom', label: 'Adopt a Loom subscription' },
   ];
   iconBtns.forEach(({ id, label }) => {

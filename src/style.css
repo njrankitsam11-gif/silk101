@@ -76,10 +76,10 @@
     background: #fff !important;
     color: #000 !important;
   }
-  header, nav, #cursor-dot, #cursor-ring, #audio-toggle, #btn-open-oracle, .entry-gate-overlay {
+  header, nav, .entry-gate-overlay {
     display: none !important;
   }
-  #unweave-modal, #secret-vault-panel, #oracle-panel {
+  #unweave-modal {
     position: static !important;
     background: #fff !important;
     color: #000 !important;
@@ -119,10 +119,6 @@
   0%   { opacity: 0; letter-spacing: 0.5em; filter: blur(8px); }
   60%  { letter-spacing: 0.15em; filter: blur(1px); }
   100% { opacity: 1; letter-spacing: 0.08em; filter: blur(0); }
-}
-@keyframes glyph-pulse {
-  0%, 100% { opacity: 0.08; text-shadow: 0 0 10px rgba(201, 162, 39, 0); }
-  50%       { opacity: 0.25; text-shadow: 0 0 20px rgba(201, 162, 39, 0.4); }
 }
 @keyframes konark-draw {
   from { stroke-dashoffset: 240; opacity: 0; }
@@ -172,56 +168,6 @@ html, body {
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  cursor: none; /* Custom cursor active */
-}
-
-/* ─── Custom Silk Thread Cursor ────────────────────────── */
-#cursor-dot {
-  position: fixed;
-  top: 0; left: 0;
-  width: 8px; height: 8px;
-  background: var(--color-accent-bright);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 99999;
-  transform: translate(-50%, -50%);
-  transition: width 0.2s, height 0.2s, background 0.2s;
-  box-shadow: 0 0 10px rgba(247, 215, 109, 0.8), 0 0 30px rgba(247, 215, 109, 0.3);
-  mix-blend-mode: screen;
-}
-#cursor-ring {
-  position: fixed;
-  top: 0; left: 0;
-  width: 36px; height: 36px;
-  border: 1.5px solid rgba(201, 162, 39, 0.6);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 99998;
-  transform: translate(-50%, -50%);
-  transition: width 0.35s var(--ease-silk), height 0.35s var(--ease-silk),
-              opacity 0.3s, border-color 0.3s;
-}
-.cursor-trail-particle {
-  position: fixed;
-  pointer-events: none;
-  z-index: 99997;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(247,215,109,0.9), rgba(201,162,39,0.3));
-  transform: translate(-50%, -50%) scale(1);
-  animation: cursor-trail-fade 0.7s var(--ease-silk) forwards;
-}
-@keyframes cursor-trail-fade {
-  0%   { opacity: 0.9; transform: translate(-50%,-50%) scale(1); }
-  100% { opacity: 0;   transform: translate(-50%,-50%) scale(0.1); }
-}
-a, button, .btn, canvas, [role="button"], .saree-card, .avatar-thumb {
-  cursor: none;
-}
-body:has(a:hover) #cursor-ring,
-body:has(button:hover) #cursor-ring,
-body:has(.saree-card:hover) #cursor-ring {
-  width: 56px; height: 56px;
-  border-color: var(--color-accent-bright);
 }
 
 /* Custom Scrollbar */
@@ -416,59 +362,6 @@ body:has(.saree-card:hover) #cursor-ring {
   border-color: #fff;
 }
 
-/* Audio Indicator Floating Button */
-.audio-indicator {
-  position: fixed;
-  bottom: 2rem;
-  right: 2rem;
-  z-index: 1000;
-  background: rgba(10, 10, 10, 0.6);
-  border: 1px solid rgba(212, 175, 55, 0.2);
-  backdrop-filter: blur(10px);
-  padding: 0.75rem 1.25rem;
-  border-radius: 30px;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  color: var(--color-text);
-}
-.audio-indicator:hover {
-  border-color: var(--color-accent);
-  box-shadow: 0 0 15px rgba(212, 175, 55, 0.15);
-}
-.sound-bars {
-  display: flex;
-  align-items: flex-end;
-  gap: 3px;
-  height: 14px;
-}
-.sound-bars span {
-  display: block;
-  width: 2px;
-  background: var(--color-accent);
-  height: 4px;
-  animation: none;
-  transform-origin: bottom;
-}
-.audio-indicator.playing .sound-bars span {
-  animation: pulse-sound 1s infinite alternate;
-}
-.audio-indicator.playing .sound-bars span:nth-child(1) { animation-delay: 0.1s; }
-.audio-indicator.playing .sound-bars span:nth-child(2) { animation-delay: 0.4s; }
-.audio-indicator.playing .sound-bars span:nth-child(3) { animation-delay: 0.2s; }
-.audio-indicator.playing .sound-bars span:nth-child(4) { animation-delay: 0.5s; }
-@keyframes pulse-sound {
-  0% { transform: scaleY(1); }
-  100% { transform: scaleY(3.5); }
-}
-.audio-text {
-  font-size: 0.75rem;
-  letter-spacing: 0.15em;
-  font-weight: 600;
-}
-
 /* Sections Structure */
 .scroll-section {
   position: relative;
@@ -527,96 +420,6 @@ body:has(.saree-card:hover) #cursor-ring {
 }
 .warp-thread-line:nth-child(2) { animation-delay: 0.1s; opacity: 0.35; }
 .warp-thread-line:nth-child(3) { animation-delay: 0.2s; opacity: 0.2; }
-
-/* ─── Hidden Glyph Easter Egg ──────────────────────────── */
-.hidden-glyph {
-  font-family: var(--font-serif);
-  font-size: 1.8rem;
-  color: var(--color-accent);
-  opacity: 0.07;
-  cursor: pointer;
-  user-select: none;
-  transition: opacity 0.4s, text-shadow 0.4s, transform 0.4s;
-  animation: glyph-pulse 4s ease-in-out infinite;
-  position: absolute;
-  z-index: 5;
-  pointer-events: auto;
-}
-.hidden-glyph:hover {
-  opacity: 0.9;
-  text-shadow: 0 0 30px rgba(247, 215, 109, 0.8), 0 0 60px rgba(201, 162, 39, 0.4);
-  transform: scale(1.3);
-}
-.hidden-glyph.found {
-  opacity: 1;
-  color: var(--color-accent-bright);
-  animation: none;
-  text-shadow: 0 0 20px rgba(247, 215, 109, 0.9);
-}
-
-/* ─── Secret Vault Panel ───────────────────────────────── */
-#secret-vault-panel {
-  position: fixed;
-  inset: 0;
-  z-index: 19000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.95);
-  backdrop-filter: blur(30px);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.8s var(--ease-silk);
-}
-#secret-vault-panel.active {
-  opacity: 1;
-  pointer-events: auto;
-}
-.secret-vault-card {
-  max-width: 560px;
-  width: 90%;
-  border: 1px solid rgba(247, 215, 109, 0.35);
-  border-radius: 16px;
-  padding: 3.5rem;
-  text-align: center;
-  background: linear-gradient(135deg, rgba(8, 12, 26, 0.9), rgba(20, 12, 5, 0.9));
-  box-shadow: 0 0 80px rgba(201, 162, 39, 0.2), 0 40px 80px rgba(0,0,0,0.9);
-  animation: gold-pulse-glow 3s ease-in-out infinite;
-}
-.secret-vault-card h2 {
-  font-family: var(--font-serif);
-  font-size: 2.6rem;
-  font-weight: 300;
-  color: var(--color-accent-bright);
-  margin-bottom: 1rem;
-  background: linear-gradient(135deg, #c9a227, #f7d76d, #c9a227);
-  background-size: 200%;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: liquid-gold 3s ease-in-out infinite;
-}
-.secret-vault-card p {
-  color: var(--color-text-muted);
-  line-height: 1.7;
-  margin-bottom: 2rem;
-}
-.secret-vault-card .btn-close-secret {
-  background: transparent;
-  border: 1px solid rgba(201,162,39,0.4);
-  color: var(--color-accent);
-  padding: 0.7rem 2rem;
-  border-radius: 4px;
-  cursor: none;
-  font-size: 0.8rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  transition: all 0.3s;
-}
-.secret-vault-card .btn-close-secret:hover {
-  background: rgba(201,162,39,0.1);
-  border-color: var(--color-accent-bright);
-}
 
 .canvas-container {
   position: absolute;
@@ -937,23 +740,6 @@ body:has(.saree-card:hover) #cursor-ring {
   width: 100%;
   height: 100%;
   display: block;
-}
-.floating-code-overlay {
-  position: absolute;
-  top: 2rem;
-  left: 2rem;
-  font-family: monospace;
-  font-size: 0.8rem;
-  color: rgba(212, 175, 55, 0.75);
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
-  pointer-events: none;
-}
-.floating-code-overlay code {
-  background: rgba(0, 0, 0, 0.5);
-  padding: 0.3rem 0.6rem;
-  border-left: 2px solid var(--color-accent);
 }
 
 /* SECTION 3: METAMORPHOSIS */
@@ -1997,86 +1783,6 @@ body:has(.saree-card:hover) #cursor-ring {
   .bottom-bar-group { padding: 0 0.4rem; }
 }
 
-/* ── Custom Cursor Styles ────────────────────────────────────────────────── */
-.custom-cursor-dot,
-.custom-cursor-ring {
-  position: fixed;
-  top: 0;
-  left: 0;
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 10000;
-  transform: translate(-50%, -50%);
-  transition: transform 0.1s ease, width 0.25s ease, height 0.25s ease, border-color 0.25s ease, background-color 0.25s ease;
-}
-
-.custom-cursor-dot {
-  width: 6px;
-  height: 6px;
-  background-color: var(--color-accent);
-  box-shadow: 0 0 10px var(--color-accent);
-}
-
-.custom-cursor-ring {
-  width: 32px;
-  height: 32px;
-  border: 1px solid rgba(255, 183, 3, 0.4);
-}
-
-/* Hover States */
-body.cursor-hover .custom-cursor-dot {
-  width: 0;
-  height: 0;
-  background-color: transparent;
-}
-
-body.cursor-hover .custom-cursor-ring {
-  width: 50px;
-  height: 50px;
-  border-color: #fff;
-  background-color: rgba(255, 255, 255, 0.08);
-  border-width: 1.5px;
-  box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
-}
-
-/* Drag State for 3D Canvas */
-body.cursor-drag .custom-cursor-dot {
-  background-color: #fff;
-  width: 4px;
-  height: 4px;
-}
-
-body.cursor-drag .custom-cursor-ring {
-  width: 64px;
-  height: 64px;
-  border-color: var(--color-accent);
-  border-width: 2px;
-}
-body.cursor-drag .custom-cursor-ring::after {
-  content: 'DRAG';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-family: monospace;
-  font-size: 8px;
-  font-weight: 700;
-  color: var(--color-accent);
-  letter-spacing: 1px;
-}
-
-/* Hide default cursor on desktop */
-@media (min-width: 769px) {
-  body, a, button, select, input, .avatar-thumb, canvas {
-    cursor: none !important;
-  }
-}
-@media (max-width: 768px) {
-  .custom-cursor-dot, .custom-cursor-ring {
-    display: none !important;
-  }
-}
-
 /* ── Odisha visual language & wayfinding ────────────────────────────────── */
 .site-header {
   position: fixed;
@@ -2229,16 +1935,11 @@ body.cursor-drag .custom-cursor-ring::after {
   .brand-lockup strong { font-size: .9rem; }
   .brand-wheel { width: 29px; height: 29px; font-size: 1rem; }
   .header-journal { font-size: .58rem; }
-  .audio-indicator { bottom: 1rem; right: 1rem; }
-  .audio-text { display: none; }
-  .audio-indicator { padding: .7rem .8rem; }
   .content-overlay.center-content::after { bottom: 9vh; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
-  .custom-cursor-dot, .custom-cursor-ring { display: none !important; }
-  body, a, button, select, input, .avatar-thumb, canvas { cursor: auto !important; }
 }
 
 .saree-layer.layer-model {
@@ -2582,12 +2283,6 @@ body::before {
   mix-blend-mode: screen;
 }
 
-/* ── Curator Whisper Overlay ─────────────────────────────────── */
-#curator-whisper-overlay {
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
-}
-
 /* ── Mobile Touch Optimisations ─────────────────────────────── */
 @media (max-width: 768px) {
   .saree-card {
@@ -2611,253 +2306,6 @@ body::before {
 .model-option:nth-child(n+6) {
   background-size: cover !important;
   background-position: center !important;
-}
-
-/* ═══════════════════════════════════════════════════════════
-   TOP-OF-THE-WORLD SURPRISE FEATURES — v4.0 ULTIMATE
-═══════════════════════════════════════════════════════════ */
-
-/* ─── Silk Oracle Concierge ─────────────────────────── */
-#oracle-panel {
-  position: fixed;
-  bottom: 6rem; right: 2rem;
-  width: 380px;
-  max-height: 540px;
-  z-index: 15000;
-  border: 1px solid rgba(201, 162, 39, 0.3);
-  border-radius: 16px;
-  background: linear-gradient(160deg,
-    rgba(3, 5, 15, 0.97) 0%,
-    rgba(10, 8, 2, 0.97) 100%);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  box-shadow: 0 0 60px rgba(201, 162, 39, 0.12),
-              0 30px 80px rgba(0, 0, 0, 0.9),
-              inset 0 0 0 1px rgba(201, 162, 39, 0.06);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  opacity: 0;
-  transform: translateY(20px) scale(0.95);
-  pointer-events: none;
-  transition: opacity 0.5s var(--ease-silk),
-              transform 0.5s var(--ease-silk);
-}
-#oracle-panel.open {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-  pointer-events: auto;
-}
-.oracle-header {
-  display: flex;
-  align-items: center;
-  gap: 0.9rem;
-  padding: 1.2rem 1.4rem;
-  border-bottom: 1px solid rgba(201, 162, 39, 0.12);
-  position: relative;
-  overflow: hidden;
-}
-.oracle-header::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, rgba(201,162,39,0.08) 0%, transparent 70%);
-  pointer-events: none;
-}
-.oracle-avatar {
-  width: 38px; height: 38px;
-  border-radius: 50%;
-  border: 1.5px solid rgba(201, 162, 39, 0.5);
-  background: radial-gradient(circle at 35% 35%,
-    rgba(247,215,109,0.3),
-    rgba(201,162,39,0.1),
-    rgba(3,5,15,0.8));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.1rem;
-  animation: gold-pulse-glow 3s ease-in-out infinite;
-  flex-shrink: 0;
-}
-.oracle-name {
-  font-family: var(--font-serif);
-  font-size: 1rem;
-  font-weight: 400;
-  color: var(--color-text);
-}
-.oracle-status {
-  font-size: 0.65rem;
-  color: var(--color-accent);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  margin-top: 1px;
-}
-.oracle-close {
-  margin-left: auto;
-  background: none;
-  border: none;
-  color: var(--color-text-muted);
-  font-size: 1.2rem;
-  cursor: none;
-  transition: color 0.2s;
-}
-.oracle-close:hover { color: var(--color-text); }
-.oracle-chat-area {
-  flex: 1;
-  overflow-y: auto;
-  padding: 1rem 1.2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
-  min-height: 200px;
-  max-height: 300px;
-}
-.oracle-chat-area::-webkit-scrollbar { width: 3px; }
-.oracle-chat-area::-webkit-scrollbar-thumb { background: rgba(201,162,39,0.2); }
-.oracle-bubble {
-  max-width: 88%;
-  padding: 0.7rem 1rem;
-  border-radius: 12px;
-  font-size: 0.875rem;
-  line-height: 1.55;
-  animation: oracle-bubble-in 0.4s var(--ease-silk);
-}
-@keyframes oracle-bubble-in {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-.oracle-bubble.oracle {
-  background: rgba(201, 162, 39, 0.08);
-  border: 1px solid rgba(201, 162, 39, 0.15);
-  color: var(--color-text);
-  align-self: flex-start;
-  border-radius: 4px 12px 12px 12px;
-}
-.oracle-bubble.oracle em {
-  color: var(--color-accent-bright);
-  font-style: italic;
-}
-.oracle-bubble.user {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: rgba(240, 237, 230, 0.85);
-  align-self: flex-end;
-  border-radius: 12px 12px 4px 12px;
-}
-.oracle-typing {
-  display: flex;
-  gap: 4px;
-  align-items: center;
-  padding: 0.6rem 1rem;
-  align-self: flex-start;
-}
-.oracle-typing-dot {
-  width: 5px; height: 5px;
-  border-radius: 50%;
-  background: var(--color-accent);
-  animation: oracle-dot-bounce 1.2s ease-in-out infinite;
-}
-.oracle-typing-dot:nth-child(2) { animation-delay: 0.2s; }
-.oracle-typing-dot:nth-child(3) { animation-delay: 0.4s; }
-@keyframes oracle-dot-bounce {
-  0%, 100% { transform: translateY(0); opacity: 0.4; }
-  50% { transform: translateY(-5px); opacity: 1; }
-}
-.oracle-input-row {
-  display: flex;
-  gap: 0.6rem;
-  padding: 0.9rem 1.2rem;
-  border-top: 1px solid rgba(201, 162, 39, 0.1);
-  background: rgba(0, 0, 0, 0.3);
-}
-.oracle-input {
-  flex: 1;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(201, 162, 39, 0.18);
-  border-radius: 8px;
-  color: var(--color-text);
-  font-family: var(--font-sans);
-  font-size: 0.85rem;
-  padding: 0.55rem 0.9rem;
-  outline: none;
-  transition: border-color 0.3s;
-}
-.oracle-input::placeholder { color: rgba(138, 141, 160, 0.6); }
-.oracle-input:focus { border-color: rgba(201, 162, 39, 0.4); }
-.oracle-send {
-  background: linear-gradient(135deg, var(--color-accent-deep), var(--color-accent));
-  border: none;
-  border-radius: 8px;
-  color: #000;
-  width: 36px; height: 36px;
-  display: flex; align-items: center; justify-content: center;
-  cursor: none;
-  font-size: 1rem;
-  transition: all 0.3s var(--ease-silk);
-}
-.oracle-send:hover {
-  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-bright));
-  box-shadow: 0 0 15px rgba(201,162,39,0.4);
-}
-#btn-open-oracle {
-  position: fixed;
-  bottom: 2rem; right: 2rem;
-  z-index: 14999;
-  width: 56px; height: 56px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, rgba(122,92,10,0.9), rgba(201,162,39,0.9));
-  border: 1px solid rgba(247, 215, 109, 0.4);
-  display: flex; align-items: center; justify-content: center;
-  cursor: none;
-  box-shadow: 0 0 30px rgba(201,162,39,0.3), 0 10px 30px rgba(0,0,0,0.6);
-  animation: gold-pulse-glow 3s ease-in-out infinite;
-  transition: transform 0.3s var(--ease-silk), box-shadow 0.3s;
-  font-size: 1.4rem;
-}
-#btn-open-oracle:hover {
-  transform: scale(1.12);
-  box-shadow: 0 0 50px rgba(247,215,109,0.5), 0 10px 40px rgba(0,0,0,0.8);
-}
-#btn-open-oracle.oracle-open {
-  opacity: 0;
-  pointer-events: none;
-}
-
-/* ─── Glyph Hunt Counter Badge ──────────────────────────── */
-#glyph-counter {
-  position: fixed;
-  top: 90px; right: 2rem;
-  z-index: 5000;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: rgba(3, 5, 15, 0.8);
-  border: 1px solid rgba(201, 162, 39, 0.2);
-  border-radius: 20px;
-  padding: 0.35rem 0.9rem;
-  font-size: 0.72rem;
-  letter-spacing: 0.12em;
-  color: var(--color-accent);
-  text-transform: uppercase;
-  opacity: 0;
-  transition: opacity 0.5s;
-  pointer-events: none;
-  backdrop-filter: blur(10px);
-}
-#glyph-counter.visible { opacity: 1; }
-#glyph-counter-dots {
-  display: flex; gap: 4px;
-}
-.glyph-dot {
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: rgba(201,162,39,0.25);
-  border: 1px solid rgba(201,162,39,0.4);
-  transition: background 0.3s, box-shadow 0.3s;
-}
-.glyph-dot.found {
-  background: var(--color-accent-bright);
-  box-shadow: 0 0 8px rgba(247,215,109,0.8);
 }
 
 /* ─── Live Countdown Ribbon ────────────────────────────── */
@@ -2962,9 +2410,6 @@ body::before {
 
 /* ─── Mobile ───────────────────────────────────────────────── */
 @media (max-width: 768px) {
-  #oracle-panel { width: calc(100vw - 2rem); right: 1rem; }
-  #cursor-dot, #cursor-ring { display: none; }
-  body, a, button, .btn, canvas { cursor: auto; }
   #weaving-countdown-ribbon { display: none; }
   .embroidered-text { font-size: 3.8rem; }
 }
